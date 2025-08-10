@@ -1,46 +1,41 @@
-(function(){
-  const API_URL = "/api/chat";
-  const chat = document.getElementById('chat');
-  const msg = document.getElementById('msg');
-  const send = document.getElementById('send');
-  if(!chat || !msg || !send) return;
+// public/ai.js
+const chat = document.getElementById('chat');
+const msg  = document.getElementById('msg');
+const send = document.getElementById('send');
 
-  function append(text, who){
-    const div = document.createElement('div');
-    div.className = 'bubble ' + (who === 'me' ? 'me' : 'ai');
-    if (who === 'ai' && window.marked) div.innerHTML = window.marked.parse(text);
-    else div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-    return div;
+function bubble(role, text) {
+  const div = document.createElement('div');
+  div.className = 'bubble ' + (role === 'user' ? 'me' : 'ai');
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = (msg.value || '').trim();
+  if (!text) return;
+  bubble('user', text);
+  msg.value = '';
+  send.disabled = true;
+
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: text }],
+        userContext: { lang: 'fr', app: 'Mon Objectif Finance' }
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data?.detail || data?.error || r.statusText);
+    bubble('assistant', data.content || 'Désolé, pas de réponse.');
+  } catch (e) {
+    bubble('assistant', 'Erreur : ' + (e.message || e));
+  } finally {
+    send.disabled = false;
   }
+}
 
-  async function ask(question){
-    const thinking = append('…', 'ai');
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages:[{ role:"user", content: question }], userContext:{ locale:"fr-FR" } })
-      });
-      const data = await res.json();
-      thinking.remove();
-      append(data.content || "Réponse vide.", 'ai');
-    } catch(e){
-      thinking.remove();
-      append("Erreur de connexion à l'IA. Réessaie.", 'ai');
-      console.error(e);
-    }
-  }
-
-  send.addEventListener('click', ()=>{
-    const t = msg.value.trim();
-    if(!t) return;
-    append(t, 'me');
-    msg.value = '';
-    ask(t);
-  });
-  msg.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){ e.preventDefault(); send.click(); }
-  });
-})();
+send?.addEventListener('click', sendMessage);
+msg?.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
