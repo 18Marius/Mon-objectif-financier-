@@ -1,138 +1,130 @@
-// public/ai.js — mémoire locale par objectif (localStorage)
+// public/ai.js — compatible IDs + mémoire par objectif (localStorage)
 
-const chat = document.getElementById('chat');
-const msg  = document.getElementById('msg');
-const send = document.getElementById('send');
-const goalSelect = document.getElementById('goal');
-const newGoalBtn = document.getElementById('newGoal');
+document.addEventListener('DOMContentLoaded', () => {
+  // --- helpers
+  const pick = (...ids) => ids.map(id => document.getElementById(id)).find(Boolean);
+  const chat  = pick('chat');
+  const msg   = pick('msg');
+  const send  = pick('send');
+  const reset = pick('reset');
 
-const STORE_KEY = 'mof_memory_v1';
+  // deux variantes possibles pour les IDs d’objectifs
+  const goalSelect = pick('goal', 'objectiveSelect');
+  const newGoalBtn = pick('newGoal', 'addObjective');
+  const nameInput  = pick('newObjectiveName'); // si présent
 
-// ---------- Storage helpers ----------
-function loadState() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { current:null, goals:{} }; }
-  catch { return { current:null, goals:{} }; }
-}
-function saveState(st) { localStorage.setItem(STORE_KEY, JSON.stringify(st)); }
+  // rendre les boutons inoffensifs (pas de submit GET)
+  send?.setAttribute('type', 'button');
+  newGoalBtn?.setAttribute('type','button');
+  reset?.setAttribute('type','button');
 
-function ensureDefaultGoal(st) {
-  if (!st.current) {
-    const id = 'goal_' + Date.now();
-    st.current = id;
-    st.goals[id] = { name: 'Général', history: [] };
-    saveState(st);
-  }
-  return st;
-}
-function currentGoal(st) { return st.goals[st.current]; }
-
-// ---------- UI helpers ----------
-function bubble(role, text) {
-  const div = document.createElement('div');
-  div.className = 'bubble ' + (role === 'user' ? 'me' : 'ai');
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function renderGoals() {
-  let st = ensureDefaultGoal(loadState());
-  goalSelect.innerHTML = '';
-  Object.entries(st.goals).forEach(([id, g]) => {
-    const opt = document.createElement('option');
-    opt.value = id;
-    opt.textContent = g.name;
-    if (st.current === id) opt.selected = true;
-    goalSelect.appendChild(opt);
+  // --- stockage
+  const K_OBJS = 'mof_objectives_v1';
+  const K_HIST = (id) => `mof_history_${id}`;
+  const load = (k,f)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? f; }catch{ return f; } };
+  const save = (k,v)=>localStorage.setItem(k, JSON.stringify(v));
+  const uuid = ()=> 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+    const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16);
   });
-}
 
-function renderChat() {
-  let st = ensureDefaultGoal(loadState());
-  const g = currentGoal(st);
-  chat.innerHTML = '';
-  g.history.forEach(m => bubble(m.role, m.content));
-  renderGoals();
-}
+  // init objectifs
+  let objectives = load(K_OBJS, []);
+  if (!objectives.length) {
+    objectives = [{ id: uuid(), name: 'Général' }];
+    save(K_OBJS, objectives);
+  }
+  let currentId = objectives[0].id;
 
-// ---------- Goal actions ----------
-newGoalBtn.addEventListener('click', () => {
-  const name = prompt("Nom de l'objectif ? (ex : Épargner 3000 €)");
-  if (!name) return;
-  let st = loadState();
-  const id = 'goal_' + Date.now();
-  st.goals[id] = { name, history: [] };
-  st.current = id;
-  saveState(st);
-  renderChat();
-});
-
-goalSelect.addEventListener('change', (e) => {
-  let st = loadState();
-  st.current = e.target.value;
-  saveState(st);
-  renderChat();
-});
-
-// ---------- Chat ----------
-async function sendMessage() {
-  const text = (msg.value || '').trim();
-  if (!text) return;
-
-  // UI + save user message
-  bubble('user', text);
-  msg.value = '';
-  send.disabled = true;
-
-  let st = ensureDefaultGoal(loadState());
-  const g = currentGoal(st);
-  g.history.push({ role: 'user', content: text, ts: Date.now() });
-
-  // on cap l'historique envoyé (ex: 30 derniers échanges)
-  const MAX_TURNS = 30;
-  const recent = g.history.slice(-MAX_TURNS);
-
-  const payload = {
-    // On envoie l'historique complet (récent) pour que le modèle "se souvienne"
-    messages: recent.map(m => ({ role: m.role, content: m.content })),
-    // Un petit contexte côté système (utile pour guider le ton)
-    userContext: {
-      goalName: g.name,
-      allGoals: Object.values(st.goals).map(x => x.name),
-      locale: 'fr-FR'
+  function refreshSelect() {
+    if (!goalSelect) return;
+    goalSelect.innerHTML = '';
+    for (const o of objectives) {
+      const opt = document.createElement('option');
+      opt.value = o.id; opt.textContent = o.name;
+      if (o.id === currentId) opt.selected = true;
+      goalSelect.appendChild(opt);
     }
-  };
-
-  try {
-    const r = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await r.json();
-    const content = data?.content || "Désolé, je n'ai pas pu répondre.";
-    bubble('assistant', content);
-
-    // save assistant message
-    let st2 = loadState();
-    const g2 = currentGoal(st2);
-    g2.history.push({ role: 'assistant', content, ts: Date.now() });
-    saveState(st2);
-  } catch (e) {
-    bubble('assistant', "Erreur réseau : " + String(e));
-  } finally {
-    send.disabled = false;
   }
-}
 
-send.addEventListener('click', sendMessage);
-msg.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+  function renderHistory(id){
+    if (!chat) return;
+    chat.innerHTML = '';
+    const hist = load(K_HIST(id), []);
+    for (const m of hist) {
+      const div = document.createElement('div');
+      div.className = 'bubble ' + (m.role === 'assistant' ? 'ai' : 'me');
+      div.textContent = m.content;
+      chat.appendChild(div);
+    }
+    chat.scrollTop = chat.scrollHeight;
   }
+
+  refreshSelect();
+  renderHistory(currentId);
+
+  goalSelect?.addEventListener('change', () => {
+    currentId = goalSelect.value;
+    renderHistory(currentId);
+  });
+
+  newGoalBtn?.addEventListener('click', () => {
+    const name = (nameInput?.value?.trim()) || prompt("Nom de l'objectif ? (ex : Épargner 3000 €)");
+    if (!name) return;
+    const o = { id: uuid(), name };
+    objectives.push(o); save(K_OBJS, objectives);
+    if (nameInput) nameInput.value = '';
+    currentId = o.id;
+    refreshSelect(); renderHistory(currentId);
+  });
+
+  reset?.addEventListener('click', () => {
+    localStorage.removeItem(K_HIST(currentId));
+    renderHistory(currentId);
+  });
+
+  function bubble(role, text){
+    if (!chat) return;
+    const div = document.createElement('div');
+    div.className = 'bubble ' + (role === 'assistant' ? 'ai' : 'me');
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function sendMessage(){
+    const text = (msg?.value || '').trim();
+    if (!text) return;
+    bubble('user', text);
+    if (msg) msg.value = '';
+    if (send) send.disabled = true;
+
+    try{
+      const history = load(K_HIST(currentId), []);
+      const MAX_TURNS = 30; // limite soft envoyée au modèle
+      const messages = history.concat([{ role: 'user', content: text }]).slice(-MAX_TURNS);
+
+      const r = await fetch('/api/chat', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          messages,
+          userContext: { objectiveId: currentId }
+        })
+      });
+
+      const data = await r.json();
+      const content = data?.content || 'Réponse vide.';
+      bubble('assistant', content);
+
+      const after = history.concat([{ role:'user', content:text }, { role:'assistant', content }]);
+      save(K_HIST(currentId), after);
+    }catch(e){
+      bubble('assistant', 'Erreur : ' + (e.message || e));
+    }finally{
+      if (send) send.disabled = false;
+    }
+  }
+
+  send?.addEventListener('click', sendMessage);
+  msg?.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
 });
-
-// init
-renderChat();
