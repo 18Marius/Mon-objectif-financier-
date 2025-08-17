@@ -54,7 +54,16 @@
         Réponses longues, en Markdown : Résumé, Analyse, Plan, Exemples, Risques, Actions.
       </p>
     </div>
-  </main>
+<div class="card" style="margin-top:20px; padding:20px;">
+  <h2>Connexion</h2>
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
+  </form>
+  <p id="error-message" style="color:red;"></p>
+</div>
+    </main>
 
   <script src="/public/ai.js"></script>
 </body>
