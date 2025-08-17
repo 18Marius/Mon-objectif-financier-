@@ -66,5 +66,34 @@
     </main>
 
   <script src="/public/ai.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+<script>
+  // Mets tes vraies infos Supabase ici
+  const SUPABASE_URL = "https://axoxjkizgtdpgrangsts.supabase.co"
+  const SUPABASE_ANON_KEY = "TON_ANON_KEY_ICI"
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  async function signUp() {
+    const email = document.getElementById("email").value
+    const password = document.getElementById("password").value
+    const { data, error } = await supabaseClient.auth.signUp({ email, password })
+    console.log(data, error)
+    alert(error ? error.message : "✅ Inscription réussie, vérifie ton mail !")
+  }
+
+  async function signIn() {
+    const email = document.getElementById("email").value
+    const password = document.getElementById("password").value
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
+    console.log(data, error)
+    alert(error ? error.message : "✅ Connexion réussie !")
+  }
+
+  async function signOut() {
+    await supabaseClient.auth.signOut()
+    alert("🚪 Déconnecté")
+  }
+</script>
 </body>
 </html>
