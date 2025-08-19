@@ -127,25 +127,14 @@ async function addObjective() {
 }
 
 
-// Récupérer les objectifs
-async function getObjectives() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
-    alert("⚠️ Connecte-toi d'abord");
-    return;
-  }
+// Affiche la liste dans la page
+function renderObjectives(rows = []) { ... }
 
-  const { data, error } = await supabaseClient
-    .from("objectives")
-    .select("*")
-    .eq("user_id", user.id);
+// Petit helper pour éviter l'injection HTML
+function escapeHtml(s) { ... }
 
-  if (error) {
-    alert(error.message);
-  } else {
-    console.log("🎯 Objectifs récupérés:", data);
-    alert("📋 Objectifs récupérés (voir console)");
-  }
+// Récupérer les objectifs (et afficher dans la page)
+async function getObjectives() { ... }
 }
 </script>
 </body>
