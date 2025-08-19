@@ -104,29 +104,29 @@
   alert("📕 Déconnecté")
 }
 
-// Ajouter un objectif
 async function addObjective() {
   const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
-    alert("⚠️ Connecte-toi d'abord");
+  if (!user) { alert("⚠️ Connecte-toi d'abord"); return; }
+
+  const title = document.getElementById('goalTitle').value.trim();
+  const description = document.getElementById('goalDesc').value.trim();
+  if (!title) { alert("Donne au moins un titre"); return; }
+
+  const { error } = await supabaseClient
+    .from('objectives')
+    .insert([{ user_id: user.id, title, description }]);
+
+  if (error) {
+    alert(error.message);
     return;
   }
 
-  const title = document.getElementById("objective").value;
-  const description = document.getElementById("description").value;
-
-  const { error } = await supabaseClient.from("objectives").insert([
-    {
-      user_id: user.id,
-      title,
-      description
-    }
-  ]);
-
-  alert(error ? error.message : "🎯 Objectif enregistré");
+  // vide les champs et recharge
+  document.getElementById('goalTitle').value = '';
+  document.getElementById('goalDesc').value  = '';
+  alert("🎯 Objectif ajouté !");
+  await getObjectives();
 }
-
-
 // Affiche la liste dans la page
 function renderObjectives(rows = []) { ... }
 
