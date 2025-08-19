@@ -93,7 +93,54 @@
   async function signOut() {
     await supabaseClient.auth.signOut()
     alert("🚪 Déconnecté")
+  }async function signOut() {
+  await supabaseClient.auth.signOut()
+  alert("📕 Déconnecté")
+}
+
+// Ajouter un objectif
+async function addObjective() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    alert("⚠️ Connecte-toi d'abord");
+    return;
   }
+
+  const title = document.getElementById("objective").value;
+  const description = document.getElementById("description").value;
+
+  const { error } = await supabaseClient.from("objectives").insert([
+    {
+      user_id: user.id,
+      title,
+      description
+    }
+  ]);
+
+  alert(error ? error.message : "🎯 Objectif enregistré");
+}
+
+// Récupérer les objectifs
+async function getObjectives() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    alert("⚠️ Connecte-toi d'abord");
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("objectives")
+    .select("*")
+    .eq("user_id", user.id);
+
+  if (error) {
+    alert(error.message);
+  } else {
+    console.log("Objectifs:", data);
+    alert("📋 Objectifs récupérés (voir console)");
+  }
+}
+</script>
 </script>
 </body>
 </html>
