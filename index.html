@@ -140,8 +140,26 @@ async function getObjectives() {
     alert("📋 Objectifs récupérés (voir console)");
   }
 }
-</script>
-</script>
+// Récupérer les objectifs
+async function getObjectives() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    alert("⚠️ Connecte-toi d'abord");
+    return;
+  }
 
+  const { data, error } = await supabaseClient
+    .from("objectives")
+    .select("*")
+    .eq("user_id", user.id);
+
+  if (error) {
+    alert(error.message);
+  } else {
+    console.log("🎯 Objectifs récupérés:", data);
+    alert("📋 Objectifs récupérés (voir console)");
+  }
+}
+</script>
 </body>
 </html>
