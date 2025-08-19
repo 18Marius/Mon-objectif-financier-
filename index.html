@@ -125,13 +125,57 @@ async function addObjective() {
   await getObjectives();
 }
 // Affiche la liste dans la page
-function renderObjectives(rows = []) { ... }
+function renderObjectives(rows = []) {
+  const panel = document.getElementById('objectivesPanel');
+  const list  = document.getElementById('objectivesList');
+  if (!panel || !list) return;
 
-// Petit helper pour éviter l'injection HTML
-function escapeHtml(s) { ... }
+  if (!rows.length) {
+    list.innerHTML = '<li>Aucun objectif pour le moment.</li>';
+    panel.style.display = 'block';
+    return;
+  }
 
-// Récupérer les objectifs (et afficher dans la page)
-async function getObjectives() { ... }
+  list.innerHTML = rows.map(r => `
+    <li>
+      <strong>${escapeHtml(r.title || '')}</strong>
+      <div>${escapeHtml(r.description || '')}</div>
+      <small>Créé le ${new Date(r.created_at).toLocaleString()}</small>
+    </li>
+  `).join('');
+
+  panel.style.display = 'block';
+}
+
+// Petit helper pour éviter l'injection
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#39;')
+    .replaceAll('`','&#96;');
+}
+
+// Récupérer les objectifs (et afficher)
+async function getObjectives() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) { alert('⚠️ Connecte-toi d\'abord'); return; }
+
+  const { data, error } = await supabaseClient
+    .from('objectives')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return;
+  }
+  console.log('🎯 Objectifs récupérés:', data);
+  renderObjectives(data || []);
 }
 </script>
 </body>
