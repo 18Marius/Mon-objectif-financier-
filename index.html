@@ -120,26 +120,7 @@ async function addObjective() {
   alert(error ? error.message : "🎯 Objectif enregistré");
 }
 
-// Récupérer les objectifs
-async function getObjectives() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
-    alert("⚠️ Connecte-toi d'abord");
-    return;
-  }
 
-  const { data, error } = await supabaseClient
-    .from("objectives")
-    .select("*")
-    .eq("user_id", user.id);
-
-  if (error) {
-    alert(error.message);
-  } else {
-    console.log("Objectifs:", data);
-    alert("📋 Objectifs récupérés (voir console)");
-  }
-}
 // Récupérer les objectifs
 async function getObjectives() {
   const { data: { user } } = await supabaseClient.auth.getUser();
