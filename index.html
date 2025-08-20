@@ -160,13 +160,29 @@ function escapeHtml(s) {
 
 // Récupérer les objectifs (et afficher)
 async function getObjectives() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) { alert('⚠️ Connecte-toi d\'abord'); return; }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { 
+    alert('⚠️ Connecte-toi d\'abord'); 
+    return; 
+  }
 
-  const { data, error } = await supabaseClient
+  // Récupérer le profile.id correspondant à auth.users.id
+  const { data: profile, error: eProf } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (eProf || !profile) {
+    alert('Profil introuvable');
+    return;
+  }
+
+  // Maintenant on utilise profiles.id pour chercher les objectifs
+  const { data, error } = await supabase
     .from('objectives')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', profile.id) // 👈 ici profile.id
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -174,6 +190,7 @@ async function getObjectives() {
     alert(error.message);
     return;
   }
+
   console.log('🎯 Objectifs récupérés:', data);
   renderObjectives(data || []);
 }
