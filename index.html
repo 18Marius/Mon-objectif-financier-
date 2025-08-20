@@ -190,14 +190,6 @@ function escapeHtml(s) {
     .replaceAll('`','&#96;');
 }
 
-// Récupérer les objectifs (et afficher)
-async function getObjectives() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) { 
-    alert('⚠️ Connecte-toi d\'abord'); 
-    return; 
-  }
-
   // Récupérer le profile.id correspondant à auth.users.id
   const { data: profile, error: eProf } = await supabase
     .from('profiles')
