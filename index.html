@@ -102,23 +102,55 @@
 }
 
 async function addObjective() {
+  // 1) vérifier la session
   const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) { alert("⚠️ Connecte-toi d'abord"); return; }
-
-  const title = document.getElementById('goalTitle').value.trim();
-  const description = document.getElementById('goalDesc').value.trim();
-  if (!title) { alert("Donne au moins un titre"); return; }
-
-  const { error } = await supabaseClient
-    .from('objectives')
-    .insert([{ user_id: user.id, title, description }]);
-
-  if (error) {
-    alert(error.message);
+  if (!user) {
+    alert("⚠️ Connecte-toi d'abord");
     return;
   }
 
-  // vide les champs et recharge
+  // 2) récupérer le profiles.id lié à l'utilisateur
+  const { data: profile, error: eProf } = await supabaseClient
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (eProf || !profile) {
+    alert("Profil introuvable");
+    console.error(eProf);
+    return;
+  }
+
+  // 3) lire le titre (et valider)
+  const title = document.getElementById('goalTitle')?.value?.trim();
+  if (!title) {
+    alert("Donne au moins un titre");
+    return;
+  }
+
+  // 4) insérer l’objectif (⚠️ pas de description ici)
+  const { error } = await supabaseClient
+    .from('objectives')
+    .insert([{
+      user_id: profile.id,  // 👈 on met le profiles.id
+      title: title
+      // target_amount, current_amount, deadline : si tu as des inputs, ajoute-les ici
+    }]);
+
+  if (error) {
+    alert(error.message);
+    console.error(error);
+    return;
+  }
+
+  // 5) vider le champ + recharger la liste
+  document.getElementById('goalTitle').value = '';
+  alert("🎯 Objectif ajouté !");
+  await getObjectives();
+}
+
+// vide les champs et recharge
   document.getElementById('goalTitle').value = '';
   document.getElementById('goalDesc').value  = '';
   alert("🎯 Objectif ajouté !");
