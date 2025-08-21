@@ -71,191 +71,50 @@
 </div>
     </main>
 
+<!-- Charge la lib Supabase (ferme bien le script !) -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 
 <script>
+// === 1) CONFIG SUPABASE ===
+const SUPABASE_URL = "https://TON_PROJECT_ID.supabase.co";          // ← remplace
+const SUPABASE_ANON_KEY = "TON_PUBLIC_ANON_KEY";                     // ← remplace
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// === 2) AUTH ===
+async function signUp() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const { error } = await supabase.auth.signUp({ email, password });
+  alert(error ? "❌ Erreur inscription: " + error.message : "✅ Inscription OK (vérifie tes mails)");
+}
+
+async function signIn() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  alert(error ? "❌ Erreur connexion: " + error.message : "✅ Connecté !");
+}
+
+async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  alert(error ? "❌ Erreur déconnexion: " + error.message : "📕 Déconnecté !");
+}
+
+// === 3) OBJECTIFS ===
+// Ajout — adapte si tu as aussi goalDesc, etc.
 async function addObjective() {
-// vide les champs et recharge
-  document.getElementById('goalTitle').value = '';
-  document.getElementById('goalDesc').value  = '';
-  alert("🎯 Objectif ajouté !");
-  await getObjectives();
-}
-// Affiche la liste dans la page
-function renderObjectives(rows = []) {
-  const panel = document.getElementById('objectivesPanel');
-  const list  = document.getElementById('objectivesList');
-  if (!panel || !list) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { alert("⚠️ Connecte-toi d'abord"); return; }
 
-  if (!rows.length) {
-    list.innerHTML = '<li>Aucun objectif pour le moment.</li>';
-    panel.style.display = 'block';
-    return;
-  }
+  const title = document.getElementById('goalTitle')?.value?.trim() || "";
+  const description = document.getElementById('goalDesc')?.value?.trim() || "";
 
-  list.innerHTML = rows.map(r => `
-    <li>
-      <strong>${escapeHtml(r.title || '')}</strong>
-      <div>${escapeHtml(r.description || '')}</div>
-      <small>Créé le ${new Date(r.created_at).toLocaleString()}</small>
-    </li>
-  `).join('');
+  if (!title) { alert("Donne au moins un titre"); return; }
 
-  panel.style.display = 'block';
-}
-
-// Petit helper pour éviter l'injection
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
-    .replaceAll("'",'&#39;')
-    .replaceAll('`','&#96;');
-}
-
-  // Récupérer le profile.id correspondant à auth.users.id
-  const { data: profile, error: eProf } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
-
-  if (eProf || !profile) {
-    alert('Profil introuvable');
-    return;
-  }
-
-  // Maintenant on utilise profiles.id pour chercher les objectifs
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('objectives')
-    .select('*')
-    .eq('user_id', profile.id) // 👈 ici profile.id
-    .order('created_at', { ascending: false });
+    .insert([{ user_id: user.id, title, description }]);
 
   if (error) {
-    console.error(error);
-    alert(error.message);
-    return;
-  }
-
-  console.log('🎯 Objectifs récupérés:', data);
-  renderObjectives(data || []);
-}
-<script>
-  // Initialisation de Supabase
-  const supabaseUrl = "https://YOUR_PROJECT.supabase.co"; // ⬅️ mets ton URL Supabase ici
-  const supabaseKey = "YOUR_PUBLIC_ANON_KEY";             // ⬅️ mets ta clé publique ici
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-  // Fonction inscription
-  async function signUp() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      alert("Erreur inscription : " + error.message);
-    } else {
-      alert("✅ Inscription réussie, vérifie tes mails !");
-    }
-  }
-
-  // Fonction connexion
-  async function signIn() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      alert("❌ Erreur connexion : " + error.message);
-    } else {
-      alert("✅ Connecté !");
-    }
-  }
-
-  // Fonction déconnexion
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      alert("❌ Erreur déconnexion : " + error.message);
-    } else {
-      alert("🚪 Déconnecté !");
-    }
-  }
-
-  // Fonction ajout objectif
-  async function addObjective() {
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
-      alert("⚠️ Connecte-toi d'abord");
-      return;
-    }
-
-    const text = document.getElementById("msg").value;
-
-    const { error } = await supabase.from("objectives").insert({
-      user_id: user.id,
-      text: text,
-      created_at: new Date(),
-    });
-
-    if (error) {
-      alert("❌ Erreur ajout objectif : " + error.message);
-    } else {
-      alert("🎯 Objectif ajouté !");
-      getObjectives(); // recharge la liste
-    }
-  }
-
-  // Fonction récupération objectifs
-  async function getObjectives() {
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
-      alert("⚠️ Connecte-toi d'abord");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("objectives")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      alert("❌ Erreur récupération : " + error.message);
-      return;
-    }
-
-    renderObjectives(data || []);
-  }
-
-  // Fonction d'affichage des objectifs
-  function renderObjectives(objectives) {
-    const list = document.getElementById("objectivesList");
-    list.innerHTML = "";
-    objectives.forEach((obj) => {
-      const li = document.createElement("li");
-      li.textContent = obj.text;
-      list.appendChild(li);
-    });
-  }
-
-  // ✅ Rendre les fonctions accessibles aux boutons
-  window.signIn = signIn;
-  window.signUp = signUp;
-  window.signOut = signOut;
-  window.addObjective = addObjective;
-  window.getObjectives = getObjectives;
-</script>
 </body>
 </html>
