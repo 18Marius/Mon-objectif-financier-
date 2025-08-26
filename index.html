@@ -39,7 +39,8 @@
 <div class="row" style="margin:8px 12px;align-items:center">
   <label for="goal" class="muted" style="margin-right:8px">Objectif</label>
   <select id="goal" class="btn" style="padding:8px 12px"></select>
-  <button onclick="addObjective()" type="button" class="btn" style="margin-left:8px;">➕ Nouvel objectif</button>
+  <button id="newGoal" type="button" class="btn" style="margin-left:8px"
+        onclick="toggleNewGoal()">+ Nouvel objectif</button>
 </div>
 
 <!-- Zone de chat + envoi -->
