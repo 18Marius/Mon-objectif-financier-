@@ -34,19 +34,27 @@
   <main class="wrap" style="padding-bottom:96px">
     <div class="card" style="margin-bottom:12px">
       <h2 style="margin:0 0 8px">Mon Coach IA</h2>
-      <div class="bubble ai">Salut 👋 Donne-moi ton objectif financier et je te fais un plan détaillé.</div>
-<!-- Sélecteur d’objectif -->
-<div class="row" style="margin:8px 0 12px;align-items:center">
+
+<!-- Sélecteur d’objectif + ajout -->
+<div class="row" style="margin:8px 12px;align-items:center">
   <label for="goal" class="muted" style="margin-right:8px">Objectif</label>
   <select id="goal" class="btn" style="padding:8px 12px"></select>
-  
+  <button id="newGoal" type="button" class="btn" style="margin-left:8px">
+    + Nouvel objectif
+  </button>
+</div>
+
+<!-- Champs pour créer un objectif -->
 <div class="row" style="margin:8px 0; align-items:center">
   <input id="goalTitle" type="text" placeholder="Titre de l’objectif" class="input" style="margin-right:8px;">
   <input id="goalDesc"  type="text" placeholder="Description (optionnel)" class="input">
 </div>
-<button id="newGoal" type="button" class="btn" style="margin-left:8px;" onclick="addObjective()">+ Nouvel objectif</button>
 
-<button id="send" type="button" class="btn" onclick="addObjective()">Envoyer</button>
+<!-- Zone de chat + envoi -->
+<div id="chat"></div>
+<div class="row" style="margin:8px 0">
+  <input id="msg" type="text" placeholder="Ex : Épargner 1000 € en 3 mois" class="input" />
+  <button id="send" type="button" class="btn">Envoyer</button>
 </div>
       <div id="chat"></div>
 
