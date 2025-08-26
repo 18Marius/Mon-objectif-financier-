@@ -141,6 +141,7 @@
     `).join('');
     panel.style.display = 'block';
   }
+// 5) Zone de chat (envoi de message)  
 function sendMessage() {
   const msg = document.getElementById('msg').value;
   if (!msg) return alert("⚠️ Message vide !");
@@ -154,6 +155,7 @@ function sendMessage() {
   window.addObjective = addObjective;
   window.getObjectives = getObjectives;
   window.sendMessage = sendMessage;
+  
   console.log("✅ Script chargé");
 </script>
 </body>
