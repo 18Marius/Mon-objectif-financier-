@@ -230,13 +230,10 @@ async function sendMessage() {
     }
   }
 }
-window.sendMessage = sendMessage; // expose au HTML
   // 5) EXPOSER AU GLOBAL (OBLIGATOIRE POUR LES onclick DU HTML)
   window.signIn = signIn;
   window.signUp = signUp;
   window.signOut = signOut;
-  window.addObjective = addObjective;
-  window.getObjectives = getObjectives;
   window.sendMessage = sendMessage;
   
   console.log("✅ Script chargé");
