@@ -42,6 +42,16 @@
   <button id="newGoal" type="button" class="btn" style="margin-left:8px"
         onclick="toggleNewGoal()">+ Nouvel objectif</button>
 </div>
+      <div id="newGoalForm" class="row"
+     style="margin:8px 0; align-items:center; display:none;">
+  <input id="goalTitle" type="text" placeholder="Titre de l'objectif"
+         class="input" style="margin-right:8px;" />
+  <input id="goalDesc"  type="text" placeholder="Description (optionnel)"
+         class="input" style="margin-right:8px;" />
+  <button type="button" class="btn" onclick="confirmAddObjective()">Créer</button>
+  <button type="button" class="btn muted" style="margin-left:8px;"
+          onclick="toggleNewGoal(false)">Annuler</button>
+</div>
 
 <!-- Zone de chat + envoi -->
 <div id="chat"></div>
