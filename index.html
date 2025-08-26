@@ -141,14 +141,19 @@
     `).join('');
     panel.style.display = 'block';
   }
-
+function sendMessage() {
+  const msg = document.getElementById('msg').value;
+  if (!msg) return alert("⚠️ Message vide !");
+  alert("💬 Message envoyé : " + msg);
+  document.getElementById('msg').value = "";
+}
   // 5) EXPOSER AU GLOBAL (OBLIGATOIRE POUR LES onclick DU HTML)
   window.signIn = signIn;
   window.signUp = signUp;
   window.signOut = signOut;
   window.addObjective = addObjective;
   window.getObjectives = getObjectives;
-
+  window.sendMessage = sendMessage;
   console.log("✅ Script chargé");
 </script>
 </body>
