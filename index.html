@@ -197,6 +197,40 @@ async function confirmAddObjective() {
   await getObjectives();
   alert('🎯 Objectif ajouté !');
 }
+async function sendMessage() {
+  const input = document.getElementById('msg');
+  const message = input?.value.trim() || '';
+  if (!message) return alert('⚠️ Message vide !');
+
+  const chat = document.getElementById('chat');
+  if (chat) {
+    chat.innerHTML += `<div class="bubble me">${escapeHtml(message)}</div>`;
+  }
+  input.value = '';
+
+  // Essaie d’appeler ton endpoint Vercel s’il existe (ex: /api/coach)
+  try {
+    const goalId = document.getElementById('goal')?.value || null;
+    const res = await fetch('/api/coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, goalId })
+    });
+    if (!res.ok) throw new Error(res.statusText);
+    const json = await res.json();
+    if (chat) {
+      chat.innerHTML += `<div class="bubble bot">${escapeHtml(json.reply || 'Ok.')}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  } catch (e) {
+    // Fallback si ton backend n’est pas câblé
+    if (chat) {
+      chat.innerHTML += `<div class="bubble bot muted">⚠️ L’IA n’est pas encore branchée côté serveur.</div>`;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  }
+}
+window.sendMessage = sendMessage; // expose au HTML
   // 5) EXPOSER AU GLOBAL (OBLIGATOIRE POUR LES onclick DU HTML)
   window.signIn = signIn;
   window.signUp = signUp;
