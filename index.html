@@ -1,1103 +1,1770 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>QuestBoard — Mes Objectifs</title>
-  <style>
-    :root {
-      --bg:#08090e; --bg2:#0d0f1a; --panel:#12141f; --panel2:#181a27;
-      --border:#1e2235; --text:#e8eaf6; --muted:#7a88a8;
-      --cyan:#64ffda; --purple:#bd93f9; --pink:#ff79c6;
-      --yellow:#f1fa8c; --green:#50fa7b; --orange:#ffb86c; --red:#ff5555;
-      --xp:#ffd700;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{min-height:100%;background:var(--bg);color:var(--text);font:15px/1.5 'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
-    ::-webkit-scrollbar{width:5px}
-    ::-webkit-scrollbar-track{background:var(--bg)}
-    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EduXP — Mes Cours</title>
+<style>
+:root{
+  --bg:#07080f;--bg2:#0c0e1c;--sur:#111425;--sur2:#171a2e;--sur3:#1e2240;
+  --brd:#252a45;--txt:#e2e8f0;--txt2:#94a3b8;--mut:#475569;
+  --blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899;--green:#10b981;
+  --yellow:#f59e0b;--orange:#f97316;--red:#ef4444;--cyan:#06b6d4;
+  --xp:#fbbf24;--r8:8px;--r12:12px;--r16:16px;--r20:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
 
-    /* ── HEADER ── */
-    .header{position:sticky;top:0;z-index:100;background:rgba(8,9,14,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(14px)}
-    .header-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:62px}
-    .logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-    .player-bar{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
-    .streak{display:flex;align-items:center;gap:5px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:600}
-    .xp-wrap{display:flex;flex-direction:column;gap:2px;min-width:110px}
-    .xp-lbl{font-size:11px;color:var(--muted);text-align:right}
-    .xp-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
-    .xp-fill{height:100%;background:linear-gradient(90deg,var(--xp),var(--orange));border-radius:3px;transition:width .6s ease}
-    .lvl-badge{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#08090e;font-weight:800;font-size:12px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes cardIn{from{transform:translateY(20px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-800px 0}100%{background-position:800px 0}}
+@keyframes glow{0%,100%{box-shadow:0 0 12px rgba(139,92,246,.35)}50%{box-shadow:0 0 28px rgba(139,92,246,.7)}}
+@keyframes tIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-    /* ── NAV ── */
-    .nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:62px;z-index:99;overflow-x:auto}
-    .nav-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:2px;white-space:nowrap}
-    .nav-tab{padding:12px 16px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;border-bottom:2px solid transparent;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-    .nav-tab:hover{color:var(--text)}
-    .nav-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-    .badge-n{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:17px;text-align:center}
+.fa{animation:fadeIn .25s ease}
+.su{animation:slideUp .28s ease}
+.ci{animation:cardIn .3s ease both}
 
-    /* ── LAYOUT ── */
-    .main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
-    .tab{display:none}.tab.active{display:block}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    @media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+/* ── HEADER ── */
+.hdr{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(7,8,15,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--brd);z-index:100;display:flex;align-items:center;padding:0 20px;gap:14px}
+.logo{font-size:20px;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;white-space:nowrap;letter-spacing:-.5px;flex-shrink:0}
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--txt2);flex:1;overflow:hidden;min-width:0}
+.bc span{cursor:pointer;transition:color .2s;white-space:nowrap}
+.bc span:hover{color:var(--txt)}
+.bc .sep{color:var(--mut);flex-shrink:0}
+.bc .cur{color:var(--txt);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.hdr-r{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.streak{display:flex;align-items:center;gap:5px;background:var(--sur2);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:13px;font-weight:700}
+.xpw{display:flex;flex-direction:column;gap:2px;min-width:110px}
+.xpl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2)}
+.xpb{height:5px;background:var(--brd);border-radius:3px;overflow:hidden}
+.xpf{height:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4);border-radius:3px;transition:width .6s ease}
+.lvl{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;font-weight:800;font-size:11px;padding:3px 10px;border-radius:20px}
 
-    /* ── CARDS ── */
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}
-    .card-sm{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+/* ── LAYOUT ── */
+.page{padding:74px 20px 48px;max-width:1120px;margin:0 auto}
+.view{display:none}.view.active{display:block;animation:fadeIn .22s ease}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;gap:12px;flex-wrap:wrap}
+.pt{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.ps{font-size:13px;color:var(--txt2);margin-top:4px}
 
-    /* ── BUTTONS ── */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .18s;font-family:inherit}
-    .btn-p{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#08090e}
-    .btn-p:hover{filter:brightness(1.1);transform:translateY(-1px)}
-    .btn-g{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
-    .btn-g:hover{border-color:var(--cyan);color:var(--cyan)}
-    .btn-d{background:rgba(255,85,85,.12);color:var(--red);border:1px solid rgba(255,85,85,.25)}
-    .btn-d:hover{background:rgba(255,85,85,.22)}
-    .btn-sm{padding:5px 10px;font-size:12px;border-radius:7px}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border:none;border-radius:var(--r12);font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
+.bp{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;box-shadow:0 4px 15px rgba(139,92,246,.4)}
+.bp:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 6px 22px rgba(139,92,246,.55)}
+.bp:active{transform:translateY(0)}
+.bg{background:var(--sur2);color:var(--txt);border:1px solid var(--brd)}
+.bg:hover{border-color:var(--purple);color:#c4b5fd;background:rgba(139,92,246,.08)}
+.bd{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.bd:hover{background:rgba(239,68,68,.2)}
+.bsm{padding:5px 11px;font-size:12px;border-radius:var(--r8)}
+.blg{padding:12px 22px;font-size:15px;border-radius:var(--r16)}
+.bic{width:34px;height:34px;padding:0;justify-content:center;border-radius:var(--r8)}
 
-    /* ── INPUTS ── */
-    .inp,.ta,.sel{background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;width:100%;outline:none;transition:border-color .2s}
-    .inp:focus,.ta:focus,.sel:focus{border-color:var(--cyan)}
-    .ta{resize:vertical;min-height:80px}
-    .sel option{background:var(--panel)}
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:5px}
-    .fg{margin-bottom:14px}
+/* ── STATS ROW ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.sc{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r16);padding:18px;transition:border-color .2s}
+.sc:hover{border-color:var(--brd)}
+.sc-ico{font-size:22px;margin-bottom:8px}
+.sc-val{font-size:28px;font-weight:800;line-height:1}
+.sc-lbl{font-size:12px;color:var(--txt2);margin-top:4px}
 
-    /* ── SECTION HEADER ── */
-    .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
-    .st{font-size:20px;font-weight:700}
+/* ── SUBJECT GRID ── */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.scard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);overflow:hidden;cursor:pointer;transition:all .25s;position:relative}
+.scard:hover{transform:translateY(-4px);border-color:transparent;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.scard-h{height:76px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.scard-h::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.15)}
+.scard-ico{font-size:34px;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.scard-b{padding:16px}
+.scard-n{font-size:16px;font-weight:700;margin-bottom:7px}
+.scard-st{display:flex;gap:12px;font-size:12px;color:var(--txt2);margin-bottom:11px}
+.scard-st span{display:flex;align-items:center;gap:4px}
+.spbar{height:4px;background:var(--brd);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.spfill{height:100%;border-radius:2px;transition:width .5s ease}
+.scard-acts{display:flex;gap:5px;justify-content:flex-end;opacity:0;transition:opacity .2s}
+.scard:hover .scard-acts{opacity:1}
+.sact{width:28px;height:28px;border:none;border-radius:7px;background:var(--sur2);color:var(--txt2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.sact:hover{background:var(--brd);color:var(--txt)}
+.sact.del:hover{background:rgba(239,68,68,.2);color:var(--red)}
 
-    /* ── STAT CARDS ── */
-    .sc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
-    .sc-icon{font-size:24px;margin-bottom:6px}
-    .sc-val{font-size:28px;font-weight:800;line-height:1}
-    .sc-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.sadd{background:transparent;border:2px dashed var(--brd);border-radius:var(--r20);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .25s;padding:36px 20px;color:var(--mut);min-height:170px}
+.sadd:hover{border-color:var(--purple);color:var(--purple);background:rgba(139,92,246,.05);transform:translateY(-2px)}
+.sadd-ico{font-size:26px}
+.sadd-txt{font-size:14px;font-weight:600}
 
-    /* ── GOAL CARDS ── */
-    .gc{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-    .gc:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 28px rgba(100,255,218,.09)}
-    .gc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gc-color,linear-gradient(90deg,var(--cyan),var(--purple)))}
-    .gc-icon{font-size:28px;margin-bottom:10px}
-    .gc-title{font-size:16px;font-weight:700;margin-bottom:5px}
-    .gc-desc{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .ring-wrap{display:flex;align-items:center;gap:14px;margin-top:12px}
-    .ring{position:relative;flex-shrink:0}
-    .ring svg{transform:rotate(-90deg)}
-    .ring-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700;color:var(--cyan);text-align:center}
-    .gc-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-    .tag{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--muted)}
-    .del-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px;opacity:0;transition:all .2s;line-height:1}
-    .edit-btn-card{position:absolute;top:10px;right:36px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;opacity:0;transition:all .2s;line-height:1}
-    .gc:hover .del-btn,.gc:hover .edit-btn-card{opacity:1}
-    .del-btn:hover{color:var(--red);background:rgba(255,85,85,.12)}
-    .edit-btn-card:hover{color:var(--cyan);background:rgba(100,255,218,.1)}
+/* ── SUBJECT VIEW ── */
+.svh{border-radius:var(--r20);padding:26px 28px;margin-bottom:22px;position:relative;overflow:hidden}
+.svh::before{content:'';position:absolute;top:-40%;right:-8%;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06)}
+.svh::after{content:'';position:absolute;bottom:-60%;left:-5%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.svt{font-size:26px;font-weight:900;display:flex;align-items:center;gap:12px;margin-bottom:6px;position:relative;z-index:1}
+.svd{font-size:13px;opacity:.75;position:relative;z-index:1}
+.stabs{display:flex;gap:8px;margin-bottom:20px}
+.stab{padding:8px 18px;border-radius:var(--r12);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:var(--sur);color:var(--txt2);transition:all .2s}
+.stab.act{background:rgba(139,92,246,.15);border-color:var(--purple);color:#c4b5fd}
+.stab:hover:not(.act){background:var(--sur2);color:var(--txt)}
+.tab-content{display:none}.tab-content.act{display:block;animation:fadeIn .2s ease}
 
-    /* category top-bar colors */
-    .cat-finance{--gc-color:linear-gradient(90deg,#f1fa8c,#ffb86c)}
-    .cat-code{--gc-color:linear-gradient(90deg,#64ffda,#bd93f9)}
-    .cat-sante{--gc-color:linear-gradient(90deg,#50fa7b,#64ffda)}
-    .cat-perso{--gc-color:linear-gradient(90deg,#ff79c6,#bd93f9)}
-    .cat-sport{--gc-color:linear-gradient(90deg,#ff5555,#ffb86c)}
-    .cat-autre{--gc-color:linear-gradient(90deg,#8892b0,#64ffda)}
+/* ── ITEM CARDS ── */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.icard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r16);padding:18px;cursor:pointer;transition:all .2s;position:relative}
+.icard:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.icard-ico{font-size:24px;margin-bottom:10px}
+.icard-t{font-size:15px;font-weight:700;margin-bottom:5px}
+.icard-s{font-size:12px;color:var(--txt2)}
+.icard-acts{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
+.icard:hover .icard-acts{opacity:1}
+.iact{width:25px;height:25px;border:none;border-radius:6px;background:var(--sur2);color:var(--txt2);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.iact:hover{background:var(--brd);color:var(--txt)}
+.iact.del:hover{background:rgba(239,68,68,.2);color:var(--red)}
+.ibadge{display:inline-flex;align-items:center;gap:4px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin-top:9px}
+.ibadge.green{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:#6ee7b7}
+.ibadge.yellow{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:#fde68a}
+.ibadge.red{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.score-hist{display:flex;gap:4px;margin-top:8px;align-items:center}
+.sh-dot{width:9px;height:9px;border-radius:50%}
 
-    /* ── TASK ITEMS ── */
-    .ti{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:all .18s}
-    .ti:hover{background:var(--panel2)}
-    .ti.done{opacity:.5}
-    .ti.done .ti-title{text-decoration:line-through}
-    .ti-chk{width:22px;height:22px;border:2px solid var(--border);border-radius:7px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;margin-top:1px;font-size:13px}
-    .ti-chk:hover{border-color:var(--cyan)}
-    .ti-chk.ok{background:var(--cyan);border-color:var(--cyan);color:#08090e;font-weight:700}
-    .ti-body{flex:1;min-width:0}
-    .ti-title{font-size:14px;font-weight:600;margin-bottom:3px}
-    .ti-desc{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .ti-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* ── CHAPTER VIEW ── */
+.clayout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.ced{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);overflow:hidden}
+.ced-head{padding:14px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.ced-title{font-size:15px;font-weight:700}
+.course-ta{padding:20px;min-height:320px;background:transparent;border:none;color:var(--txt);font-family:inherit;font-size:14px;line-height:1.75;width:100%;resize:vertical;outline:none}
+.course-ta::placeholder{color:var(--mut)}
+.ced-foot{padding:11px 20px;border-top:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;background:var(--sur2)}
+.saved-lbl{font-size:12px;color:var(--txt2);display:flex;align-items:center;gap:6px}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);transition:background .3s}
+.sdot.dirty{background:var(--yellow);animation:pulse 1.2s infinite}
 
-    /* ── NOTES ── */
-    .nc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative}
-    .nc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .nc-content{font-size:14px;line-height:1.65;white-space:pre-wrap;color:var(--text)}
-    .xp-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.28);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--xp);margin-top:8px}
+/* ── AI PANEL ── */
+.aipanel{display:flex;flex-direction:column;gap:12px;position:sticky;top:76px}
+.aicard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);overflow:hidden}
+.aicard-head{padding:13px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(6,182,212,.1))}
+.aicard-title{font-size:14px;font-weight:700}
+.spark{animation:bounce 2.2s infinite;font-size:16px}
+.aitool{width:100%;padding:13px 16px;background:transparent;border:none;border-bottom:1px solid var(--brd);color:var(--txt);cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit;font-size:14px;transition:background .18s;text-align:left}
+.aitool:last-child{border-bottom:none}
+.aitool:hover:not(:disabled){background:var(--sur2)}
+.aitool:disabled{opacity:.45;cursor:not-allowed}
+.aitool-ico{width:36px;height:36px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.aitool-info{flex:1}
+.aitool-n{font-weight:600;font-size:13px}
+.aitool-d{font-size:11px;color:var(--txt2);margin-top:1px}
+.spinning{display:inline-block;animation:spin .7s linear infinite}
 
-    /* ── TIMELINE ── */
-    .timeline{position:relative;padding-left:50px}
-    .timeline::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:2px;background:var(--border);border-radius:1px}
-    .tl-item{position:relative;margin-bottom:18px}
-    .tl-dot{position:absolute;left:-50px;top:0;width:36px;height:36px;border-radius:50%;background:var(--panel);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;z-index:1}
+/* Chat widget */
+.aichat{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);overflow:hidden}
+.aichat-head{padding:12px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(6,182,212,.1))}
+.aichat-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:15px}
+.aichat-msgs{height:200px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.cbub{max-width:88%;padding:8px 12px;border-radius:10px;font-size:12px;line-height:1.5;animation:slideUp .2s ease}
+.cbub.ai{background:var(--sur2);border:1px solid var(--brd);align-self:flex-start;border-bottom-left-radius:3px}
+.cbub.me{background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(6,182,212,.2));border:1px solid rgba(139,92,246,.3);align-self:flex-end;border-bottom-right-radius:3px}
+.cbub.think{background:var(--sur2);border:1px solid var(--brd);align-self:flex-start}
+.tdots span{display:inline-block;width:5px;height:5px;background:var(--mut);border-radius:50%;margin:0 1px;animation:bounce .6s infinite}
+.tdots span:nth-child(2){animation-delay:.15s}
+.tdots span:nth-child(3){animation-delay:.3s}
+.aichat-inp-row{padding:8px;border-top:1px solid var(--brd);display:flex;gap:7px}
+.aichat-inp{flex:1;background:var(--sur2);border:1px solid var(--brd);border-radius:var(--r8);color:var(--txt);font-family:inherit;font-size:12px;padding:7px 10px;outline:none;transition:border-color .2s}
+.aichat-inp:focus{border-color:var(--purple)}
 
-    /* ── ACHIEVEMENT BADGES ── */
-    .ach{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;opacity:.35;transition:all .3s}
-    .ach.on{opacity:1;border-color:var(--xp);box-shadow:0 0 16px rgba(255,215,0,.12)}
-    .ach-icon{font-size:34px;margin-bottom:7px}
-    .ach-name{font-size:13px;font-weight:700}
-    .ach-desc{font-size:11px;color:var(--muted);margin-top:3px}
+/* Quiz score history in panel */
+.score-panel{padding:14px 16px}
+.score-panel-t{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.score-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:5px 0}
+.score-row+.score-row{border-top:1px solid var(--brd)}
+.score-v{font-weight:700}
+.sg{color:var(--green)}.sm{color:var(--yellow)}.sb{color:var(--red)}
 
-    /* ── MODAL ── */
-    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
-    .overlay.open{display:flex}
-    .modal{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:26px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;animation:slideUp .22s ease}
-    .modal.wide{max-width:680px}
-    @keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .modal-title{font-size:18px;font-weight:700;margin-bottom:20px}
-    .mf{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+/* ── QUIZ ── */
+.qwrap{max-width:680px;margin:0 auto}
+.qhead{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.qtxt{font-size:13px;color:var(--txt2);white-space:nowrap}
+.qpbar{flex:1;height:6px;background:var(--brd);border-radius:3px;overflow:hidden}
+.qpfill{height:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4);border-radius:3px;transition:width .4s ease}
+.qtimer{font-size:14px;font-weight:700;color:var(--txt2);min-width:24px;text-align:right}
+.qtimer.warn{color:var(--red);animation:pulse 1s infinite}
+.qcard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:28px;margin-bottom:18px;animation:slideUp .28s ease}
+.qnum{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.qq{font-size:18px;font-weight:700;line-height:1.45;margin-bottom:22px}
+.qopts{display:flex;flex-direction:column;gap:9px}
+.qopt{padding:13px 17px;border:2px solid var(--brd);border-radius:var(--r12);cursor:pointer;transition:all .2s;font-size:14px;font-weight:500;display:flex;align-items:center;gap:12px;background:var(--sur2)}
+.qopt:hover:not(.answered){border-color:var(--purple);background:rgba(139,92,246,.1)}
+.qopt.correct{border-color:var(--green);background:rgba(16,185,129,.1);color:#6ee7b7}
+.qopt.wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:#fca5a5}
+.qopt.reveal{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)}
+.qletter{width:27px;height:27px;border-radius:7px;background:var(--brd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.qexpl{margin-top:15px;padding:12px 14px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:var(--r12);font-size:13px;color:#67e8f9;line-height:1.55;animation:slideUp .25s ease}
+.qnav{display:flex;justify-content:center;gap:10px}
 
-    /* ── ICON PICKER ── */
-    .icon-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
-    .ig-item{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:var(--bg);border:2px solid var(--border);transition:all .18s}
-    .ig-item:hover{border-color:var(--muted)}
-    .ig-item.sel{border-color:var(--cyan);background:rgba(100,255,218,.1)}
+/* Quiz result */
+.qresult{text-align:center;padding:40px 20px;animation:slideUp .35s ease}
+.res-emoji{font-size:64px;margin-bottom:14px;animation:bounce 1s}
+.res-score{font-size:52px;font-weight:900}
+.res-lbl{font-size:17px;color:var(--txt2);margin-top:6px}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.res-s{background:var(--sur2);border-radius:var(--r12);padding:14px}
+.res-sv{font-size:22px;font-weight:800}
+.res-sl{font-size:11px;color:var(--txt2);margin-top:3px}
+.res-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
-    /* ── MOOD PICKER ── */
-    .mood-grid{display:flex;gap:8px;margin-top:5px}
-    .mood-item{flex:1;text-align:center;padding:9px 4px;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);font-size:22px;transition:all .18s}
-    .mood-item:hover{border-color:var(--muted)}
-    .mood-item.sel{border-color:var(--cyan);background:rgba(100,255,218,.08)}
-    .mood-item span{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+/* ── FLASHCARDS ── */
+.fcwrap{max-width:580px;margin:0 auto}
+.fchead{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.fcctr{font-size:14px;color:var(--txt2)}
+.fcscene{perspective:1000px;margin-bottom:18px;cursor:pointer;user-select:none}
+.fc{width:100%;height:250px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.fc.flipped{transform:rotateY(180deg)}
+.fcface{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r20);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center}
+.fcfront{background:var(--sur);border:1px solid var(--brd)}
+.fcback{background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(6,182,212,.12));border:1px solid rgba(139,92,246,.3);transform:rotateY(180deg)}
+.fclbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut);margin-bottom:11px}
+.fctxt{font-size:19px;font-weight:700;line-height:1.4}
+.fchint{font-size:12px;color:var(--mut);margin-top:14px}
+.fcnav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px}
+.fcdots{display:flex;gap:5px;justify-content:center;margin-bottom:14px}
+.fcd{width:7px;height:7px;border-radius:50%;background:var(--brd);transition:all .2s}
+.fcd.act{background:var(--purple);transform:scale(1.25)}
+.fcd.kn{background:var(--green)}
+.fcacts{display:flex;gap:10px;justify-content:center}
 
-    /* ── CHIPS ── */
-    .chip-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
-    .chip{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--muted);transition:all .18s}
-    .chip.sel{border-color:var(--cyan);color:var(--cyan);background:rgba(100,255,218,.08)}
+/* ── SUMMARY ── */
+.smry{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:26px;font-size:14px;line-height:1.8}
+.smry h1{font-size:18px;font-weight:800;color:#c4b5fd;margin:16px 0 8px}
+.smry h2{font-size:16px;font-weight:700;color:#67e8f9;margin:14px 0 7px}
+.smry h3{font-size:14px;font-weight:700;color:var(--yellow);margin:12px 0 6px}
+.smry strong{color:#e2e8f0}
+.smry ul,.smry ol{margin-left:20px;margin-bottom:10px}
+.smry li{margin-bottom:4px}
+.smry p{margin-bottom:10px}
+.smry code{background:var(--sur2);padding:1px 6px;border-radius:4px;color:var(--cyan);font-size:13px}
+.smry blockquote{border-left:3px solid var(--purple);padding-left:14px;color:var(--txt2);font-style:italic;margin:10px 0}
 
-    /* ── SUBTABS ── */
-    .stabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
-    .stab{padding:6px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--muted);transition:all .18s}
-    .stab.active{background:rgba(100,255,218,.1);border-color:var(--cyan);color:var(--cyan)}
+/* ── MODALS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px)}
+.overlay.open{display:flex}
+.modal{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .22s ease;position:relative}
+.modal.wide{max-width:640px}
+.mclose{position:absolute;top:14px;right:14px;width:28px;height:28px;border:none;background:var(--sur2);border-radius:7px;color:var(--txt2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.mclose:hover{background:var(--brd);color:var(--txt)}
+.mtitle{font-size:19px;font-weight:800;margin-bottom:22px;padding-right:30px}
+.mfoot{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
 
-    /* ── PROGRESS BAR ── */
-    .pbar{height:7px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:6px}
-    .pfill{height:100%;border-radius:4px;transition:width .5s ease}
+/* ── FORM ── */
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:13px;color:var(--txt2);font-weight:500;margin-bottom:6px}
+.inp,.ta,.sel{width:100%;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r12);color:var(--txt);font-family:inherit;font-size:14px;padding:9px 12px;outline:none;transition:border-color .2s}
+.inp:focus,.ta:focus,.sel:focus{border-color:var(--purple)}
+.ta{resize:vertical;min-height:88px}
+.sel option{background:var(--sur)}
 
-    /* ── DIVIDER ── */
-    .divider{height:1px;background:var(--border);margin:16px 0}
+.cpick{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.cpi{width:34px;height:34px;border-radius:var(--r8);cursor:pointer;border:3px solid transparent;transition:all .18s}
+.cpi.sel{border-color:#fff;transform:scale(1.15)}
+.cpi:hover:not(.sel){transform:scale(1.08)}
 
-    /* ── EMPTY STATE ── */
-    .empty{text-align:center;padding:44px 20px;color:var(--muted)}
-    .empty-icon{font-size:46px;margin-bottom:12px}
-    .empty-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:5px}
+.ipick{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.ipi{width:40px;height:40px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;background:var(--bg2);border:2px solid var(--brd);transition:all .18s}
+.ipi.sel{border-color:var(--purple);background:rgba(139,92,246,.15)}
+.ipi:hover:not(.sel){border-color:var(--mut);transform:scale(1.08)}
 
-    /* ── TOAST ── */
-    #toasts{position:fixed;bottom:22px;right:22px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-    .toast{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:11px 15px;font-size:14px;display:flex;align-items:center;gap:9px;animation:tIn .28s ease;max-width:300px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
-    @keyframes tIn{from{transform:translateX(50px);opacity:0}to{transform:translateX(0);opacity:1}}
-    .toast.xp{border-color:rgba(255,215,0,.35)}
-    .toast.ok{border-color:rgba(80,250,123,.35)}
-    .toast.lvl{border-color:var(--purple);background:rgba(189,147,249,.1)}
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--sur2);border:1px solid var(--brd);border-radius:var(--r12);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;animation:tIn .25s ease;max-width:300px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
+.toast.ok{border-color:rgba(16,185,129,.4)}
+.toast.xp{border-color:rgba(251,191,36,.4)}
+.toast.err{border-color:rgba(239,68,68,.4)}
+.toast.ai{border-color:rgba(139,92,246,.4)}
 
-    /* ── CONFETTI ── */
-    #confetti{position:fixed;inset:0;pointer-events:none;z-index:500}
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:56px 20px;color:var(--mut)}
+.empty-ico{font-size:48px;margin-bottom:12px}
+.empty-t{font-size:17px;font-weight:700;color:var(--txt2);margin-bottom:7px}
+.empty-d{font-size:13px;line-height:1.6;margin-bottom:18px}
 
-    /* ── ANIMATIONS ── */
-    .reveal{animation:reveal .28s ease}
-    @keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    .popAnim{animation:pop .45s ease}
-    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.28)}100%{transform:scale(1)}}
+/* ── LOADING ── */
+.loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:50px}
+.spin{width:34px;height:34px;border:3px solid var(--brd);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite}
+.loader-t{font-size:14px;color:var(--txt2)}
 
-    @media(max-width:500px){
-      .header-inner{gap:8px}
-      .xp-wrap{min-width:80px}
-      #toasts{bottom:16px;right:10px}
-    }
-  </style>
+/* ── CONFETTI ── */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:998}
+
+/* ── CCF/BAC specific ── */
+.grade-display{font-size:36px;font-weight:900}
+.grade-display.g-good{color:var(--green)}.grade-display.g-mid{color:var(--yellow)}.grade-display.g-bad{color:var(--red)}
+.detail-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:24px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.clayout{grid-template-columns:1fr}.aipanel{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.page{padding:68px 14px 40px}.sgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.pt{font-size:21px}.hdr{padding:0 14px}.xpw{min-width:80px}.bc{display:none}}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════
-     HEADER
-════════════════════════════════════════════════════════════ -->
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">🎯 QuestBoard</div>
-    <div class="player-bar">
-      <div class="streak">🔥 <span id="hStreak">0</span></div>
-      <div class="xp-wrap">
-        <div class="xp-lbl"><span id="hXP">0</span> / <span id="hNext">100</span> XP</div>
-        <div class="xp-bar"><div class="xp-fill" id="hFill" style="width:0%"></div></div>
-      </div>
-      <div class="lvl-badge" id="hLvl">Niv. 1</div>
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo" onclick="nav('home')">⚡ EduXP</div>
+  <div class="bc" id="bc"></div>
+  <div class="hdr-r">
+    <div class="streak">🔥 <span id="hStreak">0</span></div>
+    <div class="xpw">
+      <div class="xpl"><span id="hXP">0</span> / <span id="hNext">100</span> XP</div>
+      <div class="xpb"><div class="xpf" id="hFill" style="width:0%"></div></div>
     </div>
+    <div class="lvl" id="hLvl">Niv. 1</div>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════════
-     NAV
-════════════════════════════════════════════════════════════ -->
-<nav class="nav">
-  <div class="nav-inner">
-    <div class="nav-tab active" data-tab="dash"   onclick="go('dash')">📊 Tableau de bord</div>
-    <div class="nav-tab"        data-tab="goals"  onclick="go('goals')">🎯 Objectifs</div>
-    <div class="nav-tab"        data-tab="tasks"  onclick="go('tasks')">✅ Tâches <span class="badge-n" id="pendBadge" style="display:none"></span></div>
-    <div class="nav-tab"        data-tab="journal"onclick="go('journal')">📝 Journal</div>
-    <div class="nav-tab"        data-tab="achiev" onclick="go('achiev')">🏆 Succès</div>
-  </div>
-</nav>
+<main class="page">
 
-<!-- ═══════════════════════════════════════════════════════════
-     MAIN
-════════════════════════════════════════════════════════════ -->
-<main class="main">
-
-  <!-- ── DASHBOARD ── -->
-  <div class="tab active" id="tab-dash">
-    <div class="sh">
-      <h1 class="st">Tableau de bord</h1>
-      <span style="color:var(--muted);font-size:13px" id="greeting"></span>
+  <!-- HOME VIEW -->
+  <div class="view active" id="v-home">
+    <div class="ph">
+      <div><div class="pt">📚 Mes Matières</div><div class="ps" id="home-sub">Choisis une matière pour commencer</div></div>
+      <button class="btn bp" onclick="openModal('m-subject')">+ Nouvelle matière</button>
     </div>
-    <div class="g4" style="margin-bottom:20px">
-      <div class="sc"><div class="sc-icon">🎯</div><div class="sc-val" id="sGoals">0</div><div class="sc-lbl">Objectifs actifs</div></div>
-      <div class="sc"><div class="sc-icon">✅</div><div class="sc-val" id="sDone">0</div><div class="sc-lbl">Tâches terminées</div></div>
-      <div class="sc"><div class="sc-icon">📝</div><div class="sc-val" id="sNotes">0</div><div class="sc-lbl">Notes de progrès</div></div>
-      <div class="sc"><div class="sc-icon">⚡</div><div class="sc-val" id="sXP">0</div><div class="sc-lbl">XP total gagné</div></div>
-    </div>
-    <div class="g2">
-      <div class="card">
-        <div class="sh" style="margin-bottom:12px">
-          <h2 style="font-size:15px;font-weight:700">Mes objectifs</h2>
-          <button class="btn btn-g btn-sm" onclick="go('goals')">Voir tout →</button>
-        </div>
-        <div id="dGoals"></div>
-      </div>
-      <div class="card">
-        <div class="sh" style="margin-bottom:12px">
-          <h2 style="font-size:15px;font-weight:700">À faire</h2>
-          <button class="btn btn-g btn-sm" onclick="go('tasks')">Voir tout →</button>
-        </div>
-        <div id="dTasks"></div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <div class="sh" style="margin-bottom:12px">
-        <h2 style="font-size:15px;font-weight:700">Journal récent</h2>
-        <button class="btn btn-g btn-sm" onclick="go('journal')">Voir tout →</button>
-      </div>
-      <div id="dJournal"></div>
-    </div>
+    <div class="stats" id="home-stats"></div>
+    <div class="sgrid" id="home-grid"></div>
   </div>
 
-  <!-- ── OBJECTIFS ── -->
-  <div class="tab" id="tab-goals">
-    <div class="sh">
-      <h1 class="st">Mes objectifs</h1>
-      <button class="btn btn-p" onclick="openGoalModal()">+ Nouvel objectif</button>
+  <!-- SUBJECT VIEW -->
+  <div class="view" id="v-subject">
+    <div class="svh" id="sv-header"></div>
+    <div class="stabs" id="sv-tabs">
+      <div class="stab act" data-t="chapitres" onclick="svTab('chapitres')">📖 Chapitres</div>
+      <div class="stab" data-t="ccf" onclick="svTab('ccf')">📋 CCF</div>
+      <div class="stab" data-t="bac" onclick="svTab('bac')">🎓 BAC</div>
     </div>
-    <div class="stabs" id="gFilterTabs">
-      <div class="stab active" data-f="all"     onclick="filterGoals('all')">Tous</div>
-      <div class="stab"        data-f="finance"  onclick="filterGoals('finance')">💰 Finance</div>
-      <div class="stab"        data-f="code"     onclick="filterGoals('code')">💻 Code</div>
-      <div class="stab"        data-f="sante"    onclick="filterGoals('sante')">🏃 Santé</div>
-      <div class="stab"        data-f="perso"    onclick="filterGoals('perso')">🌱 Perso</div>
-      <div class="stab"        data-f="sport"    onclick="filterGoals('sport')">💪 Sport</div>
-    </div>
-    <div class="g2" id="goalsGrid"></div>
+    <div class="tab-content act" id="tc-chapitres"></div>
+    <div class="tab-content" id="tc-ccf"></div>
+    <div class="tab-content" id="tc-bac"></div>
   </div>
 
-  <!-- ── TÂCHES ── -->
-  <div class="tab" id="tab-tasks">
-    <div class="sh">
-      <h1 class="st">Mes tâches</h1>
-      <button class="btn btn-p" onclick="openTaskModal()">+ Nouvelle tâche</button>
-    </div>
-    <div class="stabs" id="tFilterTabs">
-      <div class="stab active" data-f="pending" onclick="filterTasks('pending')">À faire</div>
-      <div class="stab"        data-f="done"    onclick="filterTasks('done')">Terminées</div>
-      <div class="stab"        data-f="all"     onclick="filterTasks('all')">Toutes</div>
-    </div>
-    <div class="chip-list" id="tGoalFilter" style="margin-bottom:16px"></div>
-    <div id="tasksList"></div>
+  <!-- CHAPTER VIEW -->
+  <div class="view" id="v-chapter">
+    <div class="clayout" id="chapter-layout"></div>
   </div>
 
-  <!-- ── JOURNAL ── -->
-  <div class="tab" id="tab-journal">
-    <div class="sh">
-      <h1 class="st">Journal de progression</h1>
-      <button class="btn btn-p" onclick="openNoteModal()">+ Nouvelle note</button>
-    </div>
-    <div class="chip-list" id="jGoalFilter" style="margin-bottom:16px"></div>
-    <div class="timeline" id="journalList"></div>
+  <!-- QUIZ VIEW -->
+  <div class="view" id="v-quiz">
+    <div class="qwrap" id="quiz-wrap"></div>
   </div>
 
-  <!-- ── SUCCÈS ── -->
-  <div class="tab" id="tab-achiev">
-    <div class="sh">
-      <h1 class="st">Succès & Badges</h1>
-      <span style="color:var(--muted);font-size:13px"><span id="achOn">0</span> / <span id="achTotal">0</span> débloqués</span>
+  <!-- FLASHCARDS VIEW -->
+  <div class="view" id="v-flashcards">
+    <div class="fcwrap" id="fc-wrap"></div>
+  </div>
+
+  <!-- SUMMARY VIEW -->
+  <div class="view" id="v-summary">
+    <div class="ph">
+      <div><div class="pt" id="sum-title">Fiche de révision</div></div>
+      <button class="btn bg" onclick="navBack()">← Retour</button>
     </div>
-    <div class="g4" id="achievGrid"></div>
+    <div id="sum-content"></div>
+  </div>
+
+  <!-- CCF DETAIL VIEW -->
+  <div class="view" id="v-ccf-detail">
+    <div class="ph">
+      <div><div class="pt" id="ccf-detail-title"></div></div>
+      <button class="btn bg" onclick="navBack()">← Retour</button>
+    </div>
+    <div id="ccf-detail-content"></div>
+  </div>
+
+  <!-- BAC DETAIL VIEW -->
+  <div class="view" id="v-bac-detail">
+    <div class="ph">
+      <div><div class="pt" id="bac-detail-title"></div></div>
+      <button class="btn bg" onclick="navBack()">← Retour</button>
+    </div>
+    <div id="bac-detail-content"></div>
   </div>
 
 </main>
 
-<!-- ═══════════════════════════════════════════════════════════
-     MODALS
-════════════════════════════════════════════════════════════ -->
-
-<!-- GOAL MODAL -->
-<div class="overlay" id="mGoal">
+<!-- MODAL: CREATE/EDIT SUBJECT -->
+<div class="overlay" id="m-subject">
   <div class="modal">
-    <h2 class="modal-title" id="mGoalTitle">Nouvel objectif</h2>
-    <input type="hidden" id="gEditId" />
-    <div class="fg"><label>Titre *</label><input class="inp" id="gTitle" placeholder="Ex: Épargner 5 000 €" /></div>
-    <div class="fg"><label>Description</label><textarea class="ta" id="gDesc" placeholder="Décris ton objectif..."></textarea></div>
-    <div class="fg">
-      <label>Catégorie</label>
-      <select class="sel" id="gCat">
-        <option value="finance">💰 Finance</option>
-        <option value="code">💻 Code / Projet</option>
-        <option value="sante">🏃 Santé</option>
-        <option value="perso">🌱 Personnel</option>
-        <option value="sport">💪 Sport</option>
-        <option value="autre">⭐ Autre</option>
-      </select>
-    </div>
-    <div class="fg"><label>Icône</label><div class="icon-grid" id="iconGrid"></div></div>
-    <div class="fg">
-      <label>Progression actuelle : <strong id="progVal">0</strong>%</label>
-      <input type="range" id="gProg" min="0" max="100" value="0" style="width:100%;accent-color:var(--cyan);margin-top:4px"
-             oninput="document.getElementById('progVal').textContent=this.value" />
-    </div>
-    <div class="fg"><label>Date limite (optionnel)</label><input type="date" class="inp" id="gDeadline" /></div>
-    <div class="mf">
-      <button class="btn btn-g" onclick="closeM('mGoal')">Annuler</button>
-      <button class="btn btn-p" onclick="saveGoal()">Enregistrer</button>
+    <button class="mclose" onclick="closeModal('m-subject')">✕</button>
+    <div class="mtitle" id="m-subject-title">Nouvelle matière</div>
+    <input type="hidden" id="s-edit-id">
+    <div class="fg"><label>Nom de la matière *</label><input class="inp" id="s-name" placeholder="Ex: Mathématiques"></div>
+    <div class="fg"><label>Icône</label><div class="ipick" id="s-ipick"></div></div>
+    <div class="fg"><label>Couleur</label><div class="cpick" id="s-cpick"></div></div>
+    <div class="fg"><label>Description (optionnel)</label><textarea class="ta" id="s-desc" placeholder="Quelques mots sur cette matière..."></textarea></div>
+    <div class="mfoot">
+      <button class="btn bg" onclick="closeModal('m-subject')">Annuler</button>
+      <button class="btn bp" onclick="saveSubject()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<!-- TASK MODAL -->
-<div class="overlay" id="mTask">
+<!-- MODAL: CREATE CHAPTER -->
+<div class="overlay" id="m-chapter">
   <div class="modal">
-    <h2 class="modal-title">Nouvelle tâche</h2>
-    <div class="fg"><label>Titre *</label><input class="inp" id="tTitle" placeholder="Ex: Ouvrir un livret A" /></div>
-    <div class="fg"><label>Description</label><textarea class="ta" id="tDesc" placeholder="Détails..."></textarea></div>
-    <div class="fg"><label>Objectif lié</label><div class="chip-list" id="tGoalChips"></div></div>
-    <div class="fg">
-      <label>Priorité</label>
-      <div style="display:flex;gap:12px;margin-top:5px">
-        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
-          <input type="radio" name="tPrio" value="low" style="accent-color:var(--green)" checked> 🟢 Basse
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
-          <input type="radio" name="tPrio" value="medium" style="accent-color:var(--yellow)"> 🟡 Moyenne
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
-          <input type="radio" name="tPrio" value="high" style="accent-color:var(--red)"> 🔴 Haute
-        </label>
+    <button class="mclose" onclick="closeModal('m-chapter')">✕</button>
+    <div class="mtitle">Nouveau chapitre</div>
+    <div class="fg"><label>Titre du chapitre *</label><input class="inp" id="ch-name" placeholder="Ex: Chapitre 1 — Les fonctions"></div>
+    <div class="mfoot">
+      <button class="btn bg" onclick="closeModal('m-chapter')">Annuler</button>
+      <button class="btn bp" onclick="saveChapter()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CREATE CCF -->
+<div class="overlay" id="m-ccf">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('m-ccf')">✕</button>
+    <div class="mtitle">Nouveau CCF</div>
+    <div class="fg"><label>Titre *</label><input class="inp" id="ccf-name" placeholder="Ex: CCF N°1 — Oral"></div>
+    <div class="fg"><label>Date</label><input type="date" class="inp" id="ccf-date"></div>
+    <div class="fg"><label>Note obtenue</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="number" class="inp" id="ccf-grade" placeholder="Ex: 14" min="0" max="20" style="max-width:100px">
+        <span style="color:var(--txt2);font-size:14px">/ 20</span>
       </div>
     </div>
-    <div class="fg"><label>Date d'échéance (optionnel)</label><input type="date" class="inp" id="tDue" /></div>
-    <div class="mf">
-      <button class="btn btn-g" onclick="closeM('mTask')">Annuler</button>
-      <button class="btn btn-p" onclick="saveTask()">Ajouter (+5 XP)</button>
+    <div class="fg"><label>Notes / Observations</label><textarea class="ta" id="ccf-notes" placeholder="Ce qui s'est bien passé, ce qu'il faut améliorer..."></textarea></div>
+    <div class="mfoot">
+      <button class="btn bg" onclick="closeModal('m-ccf')">Annuler</button>
+      <button class="btn bp" onclick="saveCCF()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<!-- NOTE MODAL -->
-<div class="overlay" id="mNote">
+<!-- MODAL: CREATE BAC -->
+<div class="overlay" id="m-bac">
   <div class="modal">
-    <h2 class="modal-title">Nouvelle note de progression</h2>
-    <div class="fg">
-      <label>Comment tu te sens ?</label>
-      <div class="mood-grid">
-        <div class="mood-item sel" data-m="excited" onclick="selMood('excited')">🤩<span>En feu !</span></div>
-        <div class="mood-item"     data-m="good"    onclick="selMood('good')">😊<span>Bien</span></div>
-        <div class="mood-item"     data-m="neutral" onclick="selMood('neutral')">😐<span>Neutre</span></div>
-        <div class="mood-item"     data-m="tough"   onclick="selMood('tough')">😓<span>Difficile</span></div>
-      </div>
-    </div>
-    <div class="fg"><label>Objectif concerné</label><div class="chip-list" id="nGoalChips"></div></div>
-    <div class="fg">
-      <label>Ta note *</label>
-      <textarea class="ta" id="nContent" style="min-height:110px"
-        placeholder="Qu'est-ce que tu as accompli ? Qu'est-ce que tu as appris ? Quels sont tes prochains pas ?"></textarea>
-    </div>
-    <div class="mf">
-      <button class="btn btn-g" onclick="closeM('mNote')">Annuler</button>
-      <button class="btn btn-p" onclick="saveNote()">Publier (+10 XP)</button>
+    <button class="mclose" onclick="closeModal('m-bac')">✕</button>
+    <div class="mtitle">Nouvelle annale BAC</div>
+    <div class="fg"><label>Titre *</label><input class="inp" id="bac-name" placeholder="Ex: Annale 2023 — Sujet A"></div>
+    <div class="fg"><label>Année</label><input type="number" class="inp" id="bac-year" placeholder="2023" min="2000" max="2030"></div>
+    <div class="fg"><label>Contenu / Sujet</label><textarea class="ta" id="bac-content" placeholder="Colle ici le sujet ou tes notes de révision..."></textarea></div>
+    <div class="mfoot">
+      <button class="btn bg" onclick="closeModal('m-bac')">Annuler</button>
+      <button class="btn bp" onclick="saveBAC()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<!-- GOAL DETAIL MODAL -->
-<div class="overlay" id="mDetail">
-  <div class="modal wide">
-    <button class="btn btn-g btn-sm" style="margin-bottom:16px" onclick="closeM('mDetail')">← Retour</button>
-    <div id="detailContent"></div>
-  </div>
-</div>
-
-<!-- TOASTS & CONFETTI -->
+<!-- TOAST CONTAINER -->
 <div id="toasts"></div>
 <canvas id="confetti"></canvas>
 
-<!-- ═══════════════════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════════════════════ -->
 <script>
-// ── DATA ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════
+const COLORS = [
+  {id:'blue',   f:'#1d4ed8',t:'#60a5fa', tx:'#bfdbfe'},
+  {id:'purple', f:'#6d28d9',t:'#a78bfa', tx:'#ddd6fe'},
+  {id:'green',  f:'#065f46',t:'#34d399', tx:'#a7f3d0'},
+  {id:'pink',   f:'#9d174d',t:'#f472b6', tx:'#fbcfe8'},
+  {id:'orange', f:'#92400e',t:'#fb923c', tx:'#fed7aa'},
+  {id:'red',    f:'#991b1b',t:'#f87171', tx:'#fecaca'},
+  {id:'cyan',   f:'#155e75',t:'#22d3ee', tx:'#cffafe'},
+  {id:'yellow', f:'#78350f',t:'#fbbf24', tx:'#fef08a'},
+  {id:'teal',   f:'#134e4a',t:'#2dd4bf', tx:'#99f6e4'},
+  {id:'indigo', f:'#312e81',t:'#818cf8', tx:'#e0e7ff'},
+];
+
+const ICONS = [
+  '📐','📏','🔢','🧮','📚','✏️','📖','🖊️','🌍','⚔️','🏛️','🗺️',
+  '🔬','⚗️','🧪','🧬','🇬🇧','🇩🇪','🌐','💬','💻','🖥️','⌨️','🤖',
+  '🎨','🎭','🎵','🎸','⚽','🏃','💪','🏊','💰','📊','📈','🏦',
+  '⚖️','📜','🎓','🏫','🌱','🌿','🌊','🔭','🎯','🚀','🌟','⚡',
+];
+
+const AI_MSGS = [
+  "L'IA réfléchit...",
+  "Génération en cours ✨",
+  "Le cerveau IA tourne à plein régime 🧠",
+  "Préparation de tes questions...",
+  "Magie en cours 🪄",
+];
+
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
 const DB = {
-  load:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
-  save:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-  id:()=>crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)+Date.now().toString(36),
+  load: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  save: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+  id: () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36),
 };
 
 let S = {
-  goals:  DB.load('qb_goals',  []),
-  tasks:  DB.load('qb_tasks',  []),
-  notes:  DB.load('qb_notes',  []),
-  player: DB.load('qb_player', {xp:0,level:1,streak:0,lastActive:null,totalXP:0,badges:[],tasksDone:0,totalNotes:0}),
+  subjects: DB.load('eduxp_subjects', []),
+  player: DB.load('eduxp_player', {xp:0,level:1,streak:0,lastActive:null,totalXP:0,quizDone:0,flashDone:0,perfectQuiz:0}),
 };
 
 const save = () => {
-  DB.save('qb_goals',  S.goals);
-  DB.save('qb_tasks',  S.tasks);
-  DB.save('qb_notes',  S.notes);
-  DB.save('qb_player', S.player);
+  DB.save('eduxp_subjects', S.subjects);
+  DB.save('eduxp_player', S.player);
 };
 
-// ── XP / LEVEL ───────────────────────────────────────────────
-const xpNeeded = lvl => 100 + (lvl-1)*60;
+// ═══════════════════════════════════════════════════
+//  ROUTING
+// ═══════════════════════════════════════════════════
+let R = { view: 'home', subjectId: null, chapterId: null, itemId: null, itemType: null };
+let navStack = [];
 
-function addXP(n, why='') {
+function nav(view, params = {}) {
+  navStack.push({ ...R });
+  R = { view, subjectId: params.subjectId || null, chapterId: params.chapterId || null, itemId: params.itemId || null, itemType: params.itemType || null };
+  renderView();
+  updateBC();
+  window.scrollTo(0, 0);
+}
+
+function navBack() {
+  if (navStack.length) {
+    R = navStack.pop();
+    renderView();
+    updateBC();
+    window.scrollTo(0, 0);
+  } else {
+    nav('home');
+  }
+}
+
+function renderView() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('v-' + R.view)?.classList.add('active');
+  switch (R.view) {
+    case 'home':       renderHome(); break;
+    case 'subject':    renderSubject(); break;
+    case 'chapter':    renderChapter(); break;
+    case 'quiz':       renderQuiz(); break;
+    case 'flashcards': renderFlashcards(); break;
+    case 'summary':    renderSummary(); break;
+    case 'ccf-detail': renderCCFDetail(); break;
+    case 'bac-detail': renderBACDetail(); break;
+  }
+}
+
+function updateBC() {
+  const bc = document.getElementById('bc');
+  const parts = [];
+  const sub = R.subjectId ? S.subjects.find(s => s.id === R.subjectId) : null;
+  const ch = R.chapterId && sub ? sub.chapters?.find(c => c.id === R.chapterId) : null;
+
+  parts.push(`<span onclick="nav('home')">🏠 Accueil</span>`);
+  if (sub) {
+    parts.push(`<span class="sep">›</span><span onclick="nav('subject',{subjectId:'${sub.id}'})">${sub.icon} ${esc(sub.name)}</span>`);
+  }
+  if (ch) {
+    parts.push(`<span class="sep">›</span><span class="cur">${esc(ch.title)}</span>`);
+  } else if (['quiz','flashcards','summary'].includes(R.view)) {
+    parts.push(`<span class="sep">›</span><span class="cur">${R.view === 'quiz' ? '📝 Quiz' : R.view === 'flashcards' ? '🃏 Flashcards' : '📋 Fiche'}</span>`);
+  }
+  bc.innerHTML = parts.join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  XP / LEVEL
+// ═══════════════════════════════════════════════════
+const xpFor = lvl => 100 + (lvl - 1) * 65;
+
+function addXP(n, why = '') {
   const p = S.player;
   p.xp += n; p.totalXP += n;
   let leveled = false;
-  while (p.xp >= xpNeeded(p.level)) { p.xp -= xpNeeded(p.level); p.level++; leveled=true; }
-  save(); renderHUD();
-  if (leveled) {
-    toast('lvl', `🎉 Niveau ${p.level} atteint !`, 4000);
-    confetti();
-    const b = document.getElementById('hLvl');
-    b?.classList.add('popAnim');
-    setTimeout(()=>b?.classList.remove('popAnim'),500);
-  }
-  if (why) toast('xp', `+${n} XP — ${why}`);
+  while (p.xp >= xpFor(p.level)) { p.xp -= xpFor(p.level); p.level++; leveled = true; }
+  save();
+  renderHUD();
+  if (leveled) { toast('ai', `🎉 Niveau ${p.level} atteint !`, 4000); confetti(); }
+  if (why) toast('xp', `⚡ +${n} XP — ${why}`);
 }
 
 function renderHUD() {
   const p = S.player;
-  const pct = Math.min(p.xp/xpNeeded(p.level)*100,100).toFixed(1);
+  const pct = Math.min(p.xp / xpFor(p.level) * 100, 100).toFixed(1);
   document.getElementById('hXP').textContent = p.xp;
-  document.getElementById('hNext').textContent = xpNeeded(p.level);
-  document.getElementById('hFill').style.width = pct+'%';
+  document.getElementById('hNext').textContent = xpFor(p.level);
+  document.getElementById('hFill').style.width = pct + '%';
   document.getElementById('hLvl').textContent = `Niv. ${p.level}`;
   document.getElementById('hStreak').textContent = p.streak;
 }
 
 function checkStreak() {
-  const p = S.player;
-  const today = new Date().toDateString();
+  const p = S.player, today = new Date().toDateString();
   if (p.lastActive === today) return;
-  const yest = new Date(Date.now()-86400000).toDateString();
-  p.streak = p.lastActive === yest ? p.streak+1 : 1;
+  const yest = new Date(Date.now() - 86400000).toDateString();
+  p.streak = p.lastActive === yest ? p.streak + 1 : 1;
   p.lastActive = today;
-  if (p.streak > 1 && p.streak % 7 === 0) toast('lvl', `🔥 ${p.streak} jours de suite !`, 4000);
   save();
 }
 
-// ── ACHIEVEMENTS ─────────────────────────────────────────────
-const ACHES = [
-  {id:'g1',  icon:'🎯', name:'Premier objectif', desc:'Crée ton premier objectif',  chk:s=>s.goals.length>=1},
-  {id:'g5',  icon:'🏹', name:'Archer',           desc:'5 objectifs créés',           chk:s=>s.goals.length>=5},
-  {id:'t1',  icon:'✅', name:'Action !',          desc:'Complète ta première tâche', chk:s=>s.player.tasksDone>=1},
-  {id:'t10', icon:'⚡', name:'Productif',         desc:'10 tâches terminées',         chk:s=>s.player.tasksDone>=10},
-  {id:'t25', icon:'🚀', name:'Machine',           desc:'25 tâches terminées',         chk:s=>s.player.tasksDone>=25},
-  {id:'n1',  icon:'📝', name:'Journaliste',       desc:'Écris ta première note',      chk:s=>s.notes.length>=1},
-  {id:'n10', icon:'📖', name:'Chroniqueur',       desc:'10 notes de progrès',         chk:s=>s.notes.length>=10},
-  {id:'l5',  icon:'🌟', name:'Étoile montante',   desc:'Atteins le niveau 5',         chk:s=>s.player.level>=5},
-  {id:'l10', icon:'💫', name:'Légende',           desc:'Atteins le niveau 10',        chk:s=>s.player.level>=10},
-  {id:'s7',  icon:'🔥', name:'En feu !',          desc:'7 jours d\'affilée',          chk:s=>s.player.streak>=7},
-  {id:'s30', icon:'🌋', name:'Inarrêtable',       desc:'30 jours d\'affilée',         chk:s=>s.player.streak>=30},
-  {id:'p100',icon:'🏆', name:'Accompli !',        desc:'1 objectif à 100%',           chk:s=>s.goals.some(g=>g.progress>=100)},
-  {id:'xp1k',icon:'💎', name:'Millionnaire XP',   desc:'Cumule 1 000 XP',             chk:s=>s.player.totalXP>=1000},
-];
+// ═══════════════════════════════════════════════════
+//  HOME VIEW
+// ═══════════════════════════════════════════════════
+function renderHome() {
+  const totalChapters = S.subjects.reduce((a, s) => a + (s.chapters?.length || 0), 0);
+  const totalCCF = S.subjects.reduce((a, s) => a + (s.ccf?.length || 0), 0);
+  const avgScore = (() => {
+    const scores = [];
+    S.subjects.forEach(s => s.chapters?.forEach(c => c.quizScores?.forEach(sc => scores.push(sc.pct))));
+    return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  })();
 
-function checkAch() {
-  let nb=0;
-  for (const a of ACHES) {
-    if (!S.player.badges.includes(a.id) && a.chk(S)) {
-      S.player.badges.push(a.id); nb++;
-      toast('ok', `🏅 Succès : ${a.name} !`, 4000);
+  document.getElementById('home-stats').innerHTML = `
+    <div class="sc"><div class="sc-ico">📚</div><div class="sc-val">${S.subjects.length}</div><div class="sc-lbl">Matières</div></div>
+    <div class="sc"><div class="sc-ico">📖</div><div class="sc-val">${totalChapters}</div><div class="sc-lbl">Chapitres</div></div>
+    <div class="sc"><div class="sc-ico">📋</div><div class="sc-val">${totalCCF}</div><div class="sc-lbl">CCF enregistrés</div></div>
+    <div class="sc"><div class="sc-ico">🎯</div><div class="sc-val">${avgScore}%</div><div class="sc-lbl">Score moyen quiz</div></div>
+  `;
+
+  const sub = document.getElementById('home-sub');
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
+  sub.textContent = `${greet} ! ${S.subjects.length ? 'Quelle matière aujourd\'hui ?' : 'Crée ta première matière pour commencer.'}`;
+
+  const grid = document.getElementById('home-grid');
+  let html = '';
+
+  S.subjects.forEach((s, i) => {
+    const col = COLORS.find(c => c.id === s.colorId) || COLORS[0];
+    const chapters = s.chapters?.length || 0;
+    const ccf = s.ccf?.length || 0;
+    const bac = s.bac?.length || 0;
+    const scores = [];
+    s.chapters?.forEach(c => c.quizScores?.forEach(sc => scores.push(sc.pct)));
+    const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+    const style = `animation-delay:${i * 0.06}s`;
+
+    html += `<div class="scard ci" style="${style}" onclick="nav('subject',{subjectId:'${s.id}'})">
+      <div class="scard-h" style="background:linear-gradient(135deg,${col.f},${col.t})">
+        <div class="scard-ico">${s.icon}</div>
+      </div>
+      <div class="scard-b">
+        <div class="scard-n">${esc(s.name)}</div>
+        <div class="scard-st">
+          <span>📖 ${chapters} chapitre${chapters !== 1 ? 's' : ''}</span>
+          ${ccf ? `<span>📋 ${ccf} CCF</span>` : ''}
+          ${avg !== null ? `<span>🎯 ${avg}%</span>` : ''}
+        </div>
+        ${avg !== null ? `<div class="spbar"><div class="spfill" style="width:${avg}%;background:linear-gradient(90deg,${col.f},${col.t})"></div></div>` : ''}
+        <div class="scard-acts">
+          <button class="sact" title="Modifier" onclick="event.stopPropagation();editSubject('${s.id}')">✏️</button>
+          <button class="sact del" title="Supprimer" onclick="event.stopPropagation();delSubject('${s.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `<div class="sadd" onclick="openModal('m-subject')"><div class="sadd-ico">➕</div><div class="sadd-txt">Nouvelle matière</div></div>`;
+  grid.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  SUBJECT VIEW
+// ═══════════════════════════════════════════════════
+let curSvTab = 'chapitres';
+
+function renderSubject() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  if (!sub) { nav('home'); return; }
+  const col = COLORS.find(c => c.id === sub.colorId) || COLORS[0];
+
+  document.getElementById('sv-header').style.background = `linear-gradient(135deg,${col.f},${col.t})`;
+  document.getElementById('sv-header').innerHTML = `
+    <button class="btn bg bsm" onclick="nav('home')" style="margin-bottom:14px;background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.2);color:#fff">← Retour</button>
+    <div class="svt" style="color:#fff">${sub.icon} ${esc(sub.name)}</div>
+    ${sub.desc ? `<div class="svd" style="color:rgba(255,255,255,.8)">${esc(sub.desc)}</div>` : ''}
+  `;
+
+  svTab(curSvTab);
+}
+
+function svTab(t) {
+  curSvTab = t;
+  document.querySelectorAll('.stab').forEach(el => el.classList.toggle('act', el.dataset.t === t));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('act'));
+  document.getElementById('tc-' + t)?.classList.add('act');
+
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  if (!sub) return;
+
+  if (t === 'chapitres') renderTabChapters(sub);
+  else if (t === 'ccf') renderTabCCF(sub);
+  else if (t === 'bac') renderTabBAC(sub);
+}
+
+function renderTabChapters(sub) {
+  const tc = document.getElementById('tc-chapitres');
+  const ch = sub.chapters || [];
+
+  let html = `<div class="ph" style="margin-bottom:16px">
+    <div style="font-size:16px;font-weight:700">📖 Chapitres (${ch.length})</div>
+    <button class="btn bp bsm" onclick="openModal('m-chapter')">+ Chapitre</button>
+  </div>`;
+
+  if (!ch.length) {
+    html += `<div class="empty"><div class="empty-ico">📖</div><div class="empty-t">Aucun chapitre</div><div class="empty-d">Crée ton premier chapitre pour commencer à organiser tes cours.</div><button class="btn bp" onclick="openModal('m-chapter')">+ Créer un chapitre</button></div>`;
+  } else {
+    html += '<div class="igrid">';
+    ch.forEach((c, i) => {
+      const scores = c.quizScores || [];
+      const lastScore = scores[scores.length - 1];
+      const hasContent = c.content && c.content.trim().length > 30;
+      const hasQuiz = c.quiz?.length > 0;
+      const hasFC = c.flashcards?.length > 0;
+      const style = `animation-delay:${i * 0.05}s`;
+
+      const scoreColor = lastScore ? (lastScore.pct >= 80 ? 'sg' : lastScore.pct >= 50 ? 'sm' : 'sb') : '';
+
+      html += `<div class="icard ci" style="${style}" onclick="nav('chapter',{subjectId:'${sub.id}',chapterId:'${c.id}'})">
+        <div class="icard-acts">
+          <button class="iact del" onclick="event.stopPropagation();delChapter('${sub.id}','${c.id}')" title="Supprimer">✕</button>
+        </div>
+        <div class="icard-ico">📖</div>
+        <div class="icard-t">${esc(c.title)}</div>
+        <div class="icard-s">${hasContent ? Math.round(c.content.length / 5) + ' mots environ' : 'Aucun contenu'}</div>
+        ${hasQuiz ? `<div class="ibadge green">✅ Quiz dispo</div>` : ''}
+        ${hasFC ? `<div class="ibadge">🃏 Flashcards</div>` : ''}
+        ${lastScore ? `<div class="ibadge ${scoreColor === 'sg' ? 'green' : scoreColor === 'sm' ? 'yellow' : 'red'}">🎯 ${lastScore.pct}%</div>` : ''}
+        ${scores.length > 1 ? `<div class="score-hist">${scores.slice(-5).map(sc => `<div class="sh-dot" style="background:${sc.pct>=80?'var(--green)':sc.pct>=50?'var(--yellow)':'var(--red)'}"></div>`).join('')}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  }
+  tc.innerHTML = html;
+}
+
+function renderTabCCF(sub) {
+  const tc = document.getElementById('tc-ccf');
+  const items = sub.ccf || [];
+
+  let html = `<div class="ph" style="margin-bottom:16px">
+    <div>
+      <div style="font-size:16px;font-weight:700">📋 CCF (${items.length})</div>
+      <div style="font-size:13px;color:var(--txt2);margin-top:3px">Contrôles en Cours de Formation</div>
+    </div>
+    <button class="btn bp bsm" onclick="openModal('m-ccf')">+ CCF</button>
+  </div>`;
+
+  if (!items.length) {
+    html += `<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">Aucun CCF enregistré</div><div class="empty-d">Ajoute tes CCF pour suivre tes notes et progresser.</div><button class="btn bp" onclick="openModal('m-ccf')">+ Ajouter un CCF</button></div>`;
+  } else {
+    html += '<div class="igrid">';
+    items.forEach((item, i) => {
+      const grade = item.grade != null ? item.grade : null;
+      const pct = grade != null ? Math.round(grade / 20 * 100) : null;
+      const gc = grade != null ? (grade >= 14 ? 'green' : grade >= 10 ? 'yellow' : 'red') : '';
+      const style = `animation-delay:${i * 0.05}s`;
+      html += `<div class="icard ci" style="${style}" onclick="nav('ccf-detail',{subjectId:'${sub.id}',itemId:'${item.id}'})">
+        <div class="icard-acts">
+          <button class="iact del" onclick="event.stopPropagation();delCCF('${sub.id}','${item.id}')" title="Supprimer">✕</button>
+        </div>
+        <div class="icard-ico">📋</div>
+        <div class="icard-t">${esc(item.title)}</div>
+        ${item.date ? `<div class="icard-s">📅 ${new Date(item.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div>` : '<div class="icard-s">Pas de date</div>'}
+        ${grade != null ? `<div class="ibadge ${gc}">Note : ${grade}/20</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+
+    // CCF average
+    const graded = items.filter(i => i.grade != null);
+    if (graded.length) {
+      const avg = (graded.reduce((a, b) => a + b.grade, 0) / graded.length).toFixed(1);
+      const avgColor = avg >= 14 ? 'var(--green)' : avg >= 10 ? 'var(--yellow)' : 'var(--red)';
+      html += `<div style="margin-top:16px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--r16);padding:18px;display:flex;align-items:center;gap:16px">
+        <div style="font-size:32px;font-weight:900;color:${avgColor}">${avg}</div>
+        <div><div style="font-weight:700">Moyenne CCF</div><div style="font-size:13px;color:var(--txt2)">${graded.length} note${graded.length>1?'s':''} sur 20</div></div>
+      </div>`;
     }
   }
-  if (nb) save();
+  tc.innerHTML = html;
 }
 
-// ── HELPERS ──────────────────────────────────────────────────
-const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmtDate = d => d ? new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '';
-const fmtRel  = d => {
-  if (!d) return '';
-  const diff = Date.now()-new Date(d);
-  if (diff<60000)    return 'à l\'instant';
-  if (diff<3600000)  return `il y a ${Math.floor(diff/60000)} min`;
-  if (diff<86400000) return `il y a ${Math.floor(diff/3600000)} h`;
-  if (diff<604800000)return `il y a ${Math.floor(diff/86400000)} j`;
-  return fmtDate(d);
-};
+function renderTabBAC(sub) {
+  const tc = document.getElementById('tc-bac');
+  const items = sub.bac || [];
 
-const MOODS = {excited:'🤩',good:'😊',neutral:'😐',tough:'😓'};
-const CATS  = {finance:'💰 Finance',code:'💻 Code',sante:'🏃 Santé',perso:'🌱 Perso',sport:'💪 Sport',autre:'⭐ Autre'};
-const ICONS = ['🎯','💰','💻','🚀','📚','🏃','💪','🌱','🎨','🎵','✈️','🏠','💼','🔧','📊','🎓','🌍','🎮','🏋️','🧠'];
-const PRIO_COLOR = {low:'var(--green)',medium:'var(--yellow)',high:'var(--red)'};
+  let html = `<div class="ph" style="margin-bottom:16px">
+    <div>
+      <div style="font-size:16px;font-weight:700">🎓 BAC (${items.length})</div>
+      <div style="font-size:13px;color:var(--txt2);margin-top:3px">Annales & révisions baccalauréat</div>
+    </div>
+    <button class="btn bp bsm" onclick="openModal('m-bac')">+ Annale</button>
+  </div>`;
 
-// ── NAVIGATION ───────────────────────────────────────────────
-let curTab='dash', gFilter='all', tFilter='pending', tGFilter='all', jGFilter='all';
-
-function go(tab) {
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById('tab-'+tab)?.classList.add('active');
-  document.querySelector(`.nav-tab[data-tab="${tab}"]`)?.classList.add('active');
-  curTab = tab;
-  renderAll();
+  if (!items.length) {
+    html += `<div class="empty"><div class="empty-ico">🎓</div><div class="empty-t">Aucune annale</div><div class="empty-d">Ajoute des annales pour t'entraîner sur de vrais sujets de BAC.</div><button class="btn bp" onclick="openModal('m-bac')">+ Ajouter une annale</button></div>`;
+  } else {
+    html += '<div class="igrid">';
+    items.forEach((item, i) => {
+      const style = `animation-delay:${i * 0.05}s`;
+      html += `<div class="icard ci" style="${style}" onclick="nav('bac-detail',{subjectId:'${sub.id}',itemId:'${item.id}'})">
+        <div class="icard-acts">
+          <button class="iact del" onclick="event.stopPropagation();delBAC('${sub.id}','${item.id}')" title="Supprimer">✕</button>
+        </div>
+        <div class="icard-ico">🎓</div>
+        <div class="icard-t">${esc(item.title)}</div>
+        ${item.year ? `<div class="icard-s">📅 ${item.year}</div>` : ''}
+        ${item.content ? `<div class="ibadge">📝 Contenu ajouté</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  }
+  tc.innerHTML = html;
 }
 
-// ── MODAL ────────────────────────────────────────────────────
-const openM  = id => document.getElementById(id)?.classList.add('open');
-const closeM = id => document.getElementById(id)?.classList.remove('open');
+// ═══════════════════════════════════════════════════
+//  CHAPTER VIEW
+// ═══════════════════════════════════════════════════
+let saveTimer = null;
 
+function renderChapter() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!sub || !ch) { navBack(); return; }
+
+  const col = COLORS.find(c => c.id === sub.colorId) || COLORS[0];
+  const hasContent = ch.content && ch.content.trim().length > 30;
+
+  const scores = ch.quizScores || [];
+  const lastScore = scores[scores.length - 1];
+
+  let scoresHTML = '';
+  if (scores.length) {
+    scoresHTML = `<div class="score-panel">
+      <div class="score-panel-t">Historique quiz</div>
+      ${scores.slice(-5).reverse().map(sc => `
+        <div class="score-row">
+          <span>${new Date(sc.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</span>
+          <span class="score-v ${sc.pct>=80?'sg':sc.pct>=50?'sm':'sb'}">${sc.correct}/${sc.total} — ${sc.pct}%</span>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  document.getElementById('chapter-layout').innerHTML = `
+    <div class="ced">
+      <div class="ced-head">
+        <div class="ced-title">📖 ${esc(ch.title)}</div>
+        <button class="btn bg bsm" onclick="navBack()">← Retour</button>
+      </div>
+      <textarea class="course-ta" id="course-ta" placeholder="Colle ou écris ton cours ici...
+&#10;• Définitions, formules, dates...
+&#10;• Plus ton cours est complet, meilleurs seront le quiz et les flashcards générés par l'IA ✨">${esc(ch.content || '')}</textarea>
+      <div class="ced-foot">
+        <div class="saved-lbl"><div class="sdot" id="sdot"></div><span id="saved-txt">Sauvegardé</span></div>
+        <div style="font-size:12px;color:var(--txt2)" id="char-count">${(ch.content||'').length} caractères</div>
+      </div>
+    </div>
+
+    <div class="aipanel">
+      <div class="aicard">
+        <div class="aicard-head">
+          <span class="spark">✨</span>
+          <div class="aicard-title">Outils IA</div>
+        </div>
+        <button class="aitool" id="btn-quiz" onclick="startAIQuiz()" ${!hasContent?'disabled':''}>
+          <div class="aitool-ico" style="background:rgba(139,92,246,.2)">📝</div>
+          <div class="aitool-info"><div class="aitool-n">Générer un Quiz</div><div class="aitool-d">5 QCM sur ton cours</div></div>
+          ${ch.quiz?.length ? '<span style="font-size:10px;color:var(--green)">✓ Dispo</span>' : ''}
+        </button>
+        <button class="aitool" id="btn-fc" onclick="startAIFlashcards()" ${!hasContent?'disabled':''}>
+          <div class="aitool-ico" style="background:rgba(6,182,212,.2)">🃏</div>
+          <div class="aitool-info"><div class="aitool-n">Créer des Flashcards</div><div class="aitool-d">8 cartes mémo</div></div>
+          ${ch.flashcards?.length ? '<span style="font-size:10px;color:var(--green)">✓ Dispo</span>' : ''}
+        </button>
+        <button class="aitool" id="btn-sum" onclick="startAISummary()" ${!hasContent?'disabled':''}>
+          <div class="aitool-ico" style="background:rgba(251,191,36,.2)">📋</div>
+          <div class="aitool-info"><div class="aitool-n">Fiche de révision</div><div class="aitool-d">Résumé structuré IA</div></div>
+          ${ch.summary ? '<span style="font-size:10px;color:var(--green)">✓ Dispo</span>' : ''}
+        </button>
+        ${!hasContent ? `<div style="padding:12px 16px;font-size:12px;color:var(--mut);text-align:center;line-height:1.5">Écris ou colle ton cours<br>pour débloquer les outils IA</div>` : ''}
+      </div>
+
+      ${scores.length ? `<div class="aicard">${scoresHTML}</div>` : ''}
+
+      <div class="aichat" id="ai-chat-widget">
+        <div class="aichat-head">
+          <div class="aichat-av">🤖</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Assistant IA</div>
+            <div style="font-size:11px;color:var(--txt2)">Pose tes questions sur ce cours</div>
+          </div>
+        </div>
+        <div class="aichat-msgs" id="chat-msgs">
+          <div class="cbub ai">Bonjour ! Je suis ton assistant pour ce chapitre. Pose-moi toutes tes questions 😊</div>
+        </div>
+        <div class="aichat-inp-row">
+          <input class="aichat-inp" id="chat-inp" placeholder="Ex: Explique-moi..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}">
+          <button class="btn bp bsm" onclick="sendChat()" id="chat-send">↑</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Auto-save course content
+  const ta = document.getElementById('course-ta');
+  if (ta) {
+    ta.addEventListener('input', () => {
+      document.getElementById('sdot').classList.add('dirty');
+      document.getElementById('saved-txt').textContent = 'Non sauvegardé';
+      document.getElementById('char-count').textContent = ta.value.length + ' caractères';
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        const s = S.subjects.find(s => s.id === R.subjectId);
+        const c = s?.chapters?.find(c => c.id === R.chapterId);
+        if (c) {
+          c.content = ta.value;
+          c.updatedAt = new Date().toISOString();
+          save();
+          document.getElementById('sdot').classList.remove('dirty');
+          document.getElementById('saved-txt').textContent = 'Sauvegardé';
+          // refresh AI buttons
+          const hasC = ta.value.trim().length > 30;
+          ['btn-quiz','btn-fc','btn-sum'].forEach(id => {
+            const b = document.getElementById(id);
+            if (b) b.disabled = !hasC;
+          });
+        }
+      }, 800);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  AI HELPERS
+// ═══════════════════════════════════════════════════
+async function callAI(systemOverride, userMsg, mode = 'chat') {
+  const r = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: userMsg }], systemOverride, mode })
+  });
+  const data = await r.json();
+  if (data.error) throw new Error(data.detail || data.error);
+  return data.content;
+}
+
+function parseAIJSON(text) {
+  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (m) { try { return JSON.parse(m[1].trim()); } catch {} }
+  try { return JSON.parse(text); } catch {}
+  const m2 = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+  if (m2) { try { return JSON.parse(m2[0]); } catch {} }
+  return null;
+}
+
+function setAIBtnLoading(id, loading) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  if (loading) {
+    btn.disabled = true;
+    const ico = btn.querySelector('.aitool-ico');
+    if (ico) ico.innerHTML = '<span class="spinning">⚙️</span>';
+  } else {
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  AI: QUIZ GENERATION
+// ═══════════════════════════════════════════════════
+async function startAIQuiz() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch) return;
+
+  if (ch.quiz?.length) {
+    nav('quiz', { subjectId: R.subjectId, chapterId: R.chapterId });
+    return;
+  }
+  await generateAndStartQuiz(sub, ch);
+}
+
+async function generateAndStartQuiz(sub, ch) {
+  setAIBtnLoading('btn-quiz', true);
+  toast('ai', AI_MSGS[Math.floor(Math.random() * AI_MSGS.length)], 5000);
+
+  try {
+    const system = `Tu es un professeur expert en ${sub.name}. Génère exactement 5 questions QCM sur le cours fourni.
+Réponds UNIQUEMENT avec du JSON valide, sans aucun texte autour.
+Format EXACT: {"quiz":[{"q":"question","opts":["option A","option B","option C","option D"],"correct":0,"exp":"explication courte"}]}
+"correct" = index (0-3) de la bonne réponse. Sois précis et basé uniquement sur le contenu.`;
+
+    const userMsg = `Matière: ${sub.name}\nChapitre: ${ch.title}\n\nCours:\n${(ch.content || '').substring(0, 3500)}\n\nGénère 5 QCM JSON.`;
+    const raw = await callAI(system, userMsg, 'quiz');
+    const parsed = parseAIJSON(raw);
+
+    if (!parsed?.quiz?.length) throw new Error('Format JSON invalide');
+
+    ch.quiz = parsed.quiz;
+    save();
+    toast('ok', '✅ Quiz généré !');
+    nav('quiz', { subjectId: sub.id, chapterId: ch.id });
+  } catch (e) {
+    toast('err', '❌ Erreur IA : ' + (e.message || 'Réessaie'));
+    setAIBtnLoading('btn-quiz', false);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  QUIZ VIEW
+// ═══════════════════════════════════════════════════
+let quizState = { questions: [], idx: 0, answers: [], answered: false, timer: null, timeLeft: 0 };
+
+function renderQuiz() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch?.quiz?.length) { navBack(); return; }
+
+  quizState = { questions: [...ch.quiz], idx: 0, answers: [], answered: false, timer: null, timeLeft: 30 };
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = quizState.questions[quizState.idx];
+  const wrap = document.getElementById('quiz-wrap');
+  if (!q) { renderQuizResult(); return; }
+
+  const pct = Math.round((quizState.idx / quizState.questions.length) * 100);
+
+  wrap.innerHTML = `
+    <div class="ph" style="margin-bottom:16px">
+      <div style="font-size:16px;font-weight:700">📝 Quiz</div>
+      <button class="btn bg bsm" onclick="if(confirm('Quitter le quiz ?')){navBack()}">✕ Quitter</button>
+    </div>
+    <div class="qhead">
+      <div class="qtxt">${quizState.idx + 1}/${quizState.questions.length}</div>
+      <div class="qpbar"><div class="qpfill" id="qpf" style="width:${pct}%"></div></div>
+      <div class="qtimer" id="qtimer">⏱ ${quizState.timeLeft}s</div>
+    </div>
+    <div class="qcard" id="qcard">
+      <div class="qnum">Question ${quizState.idx + 1}</div>
+      <div class="qq">${esc(q.q)}</div>
+      <div class="qopts" id="qopts">
+        ${q.opts.map((o, i) => `
+          <div class="qopt" id="qopt-${i}" onclick="answerQuiz(${i})">
+            <div class="qletter">${'ABCD'[i]}</div>
+            <span>${esc(o)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="qnav" id="qnav"></div>
+  `;
+
+  quizState.answered = false;
+  startQuizTimer();
+}
+
+function startQuizTimer() {
+  clearInterval(quizState.timer);
+  quizState.timeLeft = 30;
+  quizState.timer = setInterval(() => {
+    quizState.timeLeft--;
+    const el = document.getElementById('qtimer');
+    if (el) {
+      el.textContent = `⏱ ${quizState.timeLeft}s`;
+      if (quizState.timeLeft <= 10) el.classList.add('warn');
+    }
+    if (quizState.timeLeft <= 0) {
+      clearInterval(quizState.timer);
+      if (!quizState.answered) answerQuiz(-1);
+    }
+  }, 1000);
+}
+
+function answerQuiz(chosen) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  clearInterval(quizState.timer);
+
+  const q = quizState.questions[quizState.idx];
+  const correct = q.correct;
+  const isCorrect = chosen === correct;
+
+  quizState.answers.push({ chosen, correct, isCorrect });
+
+  document.querySelectorAll('.qopt').forEach((el, i) => {
+    el.classList.add('answered');
+    if (i === correct) el.classList.add('correct');
+    else if (i === chosen) el.classList.add('wrong');
+    else el.classList.add('reveal');
+  });
+
+  if (isCorrect) {
+    const card = document.getElementById('qcard');
+    if (card) { card.style.borderColor = 'var(--green)'; }
+  }
+
+  const qcard = document.getElementById('qcard');
+  if (qcard && q.exp) {
+    qcard.insertAdjacentHTML('beforeend', `<div class="qexpl">💡 ${esc(q.exp)}</div>`);
+  }
+
+  const nav = document.getElementById('qnav');
+  if (nav) {
+    const isLast = quizState.idx === quizState.questions.length - 1;
+    nav.innerHTML = `<button class="btn bp blg" onclick="${isLast ? 'renderQuizResult()' : 'nextQuizQ()'}">
+      ${isLast ? '🏁 Voir mes résultats' : 'Question suivante →'}
+    </button>`;
+  }
+}
+
+function nextQuizQ() {
+  quizState.idx++;
+  renderQuizQuestion();
+}
+
+function renderQuizResult() {
+  clearInterval(quizState.timer);
+  const correct = quizState.answers.filter(a => a.isCorrect).length;
+  const total = quizState.questions.length;
+  const pct = Math.round(correct / total * 100);
+
+  // Save score
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (ch) {
+    if (!ch.quizScores) ch.quizScores = [];
+    ch.quizScores.push({ correct, total, pct, date: new Date().toISOString() });
+    save();
+  }
+
+  S.player.quizDone++;
+  if (pct === 100) S.player.perfectQuiz++;
+  save();
+
+  const xpGained = Math.round(10 + pct * 0.4);
+  addXP(xpGained, `Quiz terminé (${pct}%)`);
+
+  const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '😊' : '💪';
+  const msg = pct >= 90 ? 'Excellent !' : pct >= 70 ? 'Très bien !' : pct >= 50 ? 'Pas mal !' : 'Continue à réviser !';
+
+  if (pct >= 80) confetti();
+
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="qresult">
+      <div class="res-emoji">${emoji}</div>
+      <div class="res-score" style="color:${pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}">${pct}%</div>
+      <div class="res-lbl">${msg} — ${correct}/${total} bonnes réponses</div>
+      <div class="res-grid">
+        <div class="res-s"><div class="res-sv" style="color:var(--green)">${correct}</div><div class="res-sl">Correctes</div></div>
+        <div class="res-s"><div class="res-sv" style="color:var(--red)">${total - correct}</div><div class="res-sl">Erreurs</div></div>
+        <div class="res-s"><div class="res-sv" style="color:var(--xp)">+${xpGained}</div><div class="res-sl">XP gagnés</div></div>
+      </div>
+      <div class="res-btns">
+        <button class="btn bp blg" onclick="regenAndQuiz()">🔄 Nouveau quiz</button>
+        <button class="btn bg blg" onclick="navBack()">← Retour au cours</button>
+      </div>
+    </div>
+  `;
+}
+
+async function regenAndQuiz() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!sub || !ch) return;
+  ch.quiz = null;
+  save();
+  document.getElementById('quiz-wrap').innerHTML = `<div class="loader-wrap"><div class="spin"></div><div class="loader-t">Génération d'un nouveau quiz...</div></div>`;
+  await generateAndStartQuiz(sub, ch);
+}
+
+// ═══════════════════════════════════════════════════
+//  AI: FLASHCARDS GENERATION
+// ═══════════════════════════════════════════════════
+async function startAIFlashcards() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch) return;
+
+  if (ch.flashcards?.length) {
+    nav('flashcards', { subjectId: R.subjectId, chapterId: R.chapterId });
+    return;
+  }
+  await generateAndStartFlashcards(sub, ch);
+}
+
+async function generateAndStartFlashcards(sub, ch) {
+  setAIBtnLoading('btn-fc', true);
+  toast('ai', '🃏 Création des flashcards...', 5000);
+
+  try {
+    const system = `Tu es un professeur expert en ${sub.name}. Génère 8 flashcards de révision.
+Réponds UNIQUEMENT avec du JSON valide, sans texte autour.
+Format EXACT: {"flashcards":[{"front":"terme ou question","back":"définition ou réponse complète"}]}
+Les cartes doivent couvrir les notions clés du cours.`;
+
+    const userMsg = `Matière: ${sub.name}\nChapitre: ${ch.title}\n\nCours:\n${(ch.content || '').substring(0, 3500)}\n\nGénère 8 flashcards JSON.`;
+    const raw = await callAI(system, userMsg, 'flashcards');
+    const parsed = parseAIJSON(raw);
+
+    if (!parsed?.flashcards?.length) throw new Error('Format invalide');
+
+    ch.flashcards = parsed.flashcards;
+    save();
+    toast('ok', '✅ Flashcards générées !');
+    nav('flashcards', { subjectId: sub.id, chapterId: ch.id });
+  } catch (e) {
+    toast('err', '❌ Erreur IA : ' + (e.message || 'Réessaie'));
+    setAIBtnLoading('btn-fc', false);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  FLASHCARDS VIEW
+// ═══════════════════════════════════════════════════
+let fcState = { cards: [], idx: 0, known: new Set(), flipped: false };
+
+function renderFlashcards() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch?.flashcards?.length) { navBack(); return; }
+
+  fcState = { cards: [...ch.flashcards], idx: 0, known: new Set(), flipped: false };
+  renderFC();
+}
+
+function renderFC() {
+  const wrap = document.getElementById('fc-wrap');
+  const card = fcState.cards[fcState.idx];
+  if (!card) return;
+  const total = fcState.cards.length;
+  const known = fcState.known.size;
+
+  wrap.innerHTML = `
+    <div class="ph" style="margin-bottom:16px">
+      <div>
+        <div style="font-size:16px;font-weight:700">🃏 Flashcards</div>
+        <div style="font-size:13px;color:var(--txt2);margin-top:2px">${known}/${total} connues</div>
+      </div>
+      <button class="btn bg bsm" onclick="navBack()">← Retour</button>
+    </div>
+    <div class="fchead">
+      <div class="fcctr">Carte ${fcState.idx + 1} / ${total}</div>
+      <button class="btn bg bsm" onclick="shuffleFC()">🔀 Mélanger</button>
+    </div>
+    <div class="fcscene" onclick="flipFC()">
+      <div class="fc" id="fc-card" ${fcState.flipped ? 'class="fc flipped"' : ''}>
+        <div class="fcface fcfront">
+          <div class="fclbl">Question</div>
+          <div class="fctxt">${esc(card.front)}</div>
+          <div class="fchint">Clique pour retourner la carte</div>
+        </div>
+        <div class="fcface fcback">
+          <div class="fclbl">Réponse</div>
+          <div class="fctxt">${esc(card.back)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fcdots">${fcState.cards.map((_, i) => `<div class="fcd ${i === fcState.idx ? 'act' : ''} ${fcState.known.has(i) ? 'kn' : ''}"></div>`).join('')}</div>
+    <div class="fcnav">
+      <button class="btn bg" onclick="prevFC()" ${fcState.idx === 0 ? 'disabled' : ''}>← Préc.</button>
+      <button class="btn bg" onclick="nextFC()" ${fcState.idx === total - 1 ? 'disabled' : ''}>Suiv. →</button>
+    </div>
+    <div class="fcacts">
+      <button class="btn ${fcState.known.has(fcState.idx) ? 'bg' : ''}" style="background:${fcState.known.has(fcState.idx)?'rgba(16,185,129,.15)':'var(--sur2)'};border:1px solid ${fcState.known.has(fcState.idx)?'rgba(16,185,129,.4)':'var(--brd)'};color:${fcState.known.has(fcState.idx)?'var(--green)':'var(--txt2)'}" onclick="markKnown()">
+        ${fcState.known.has(fcState.idx) ? '✓ Je sais !' : '✓ Je sais'}
+      </button>
+      <button class="btn" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)" onclick="markUnknown()">✗ À revoir</button>
+    </div>
+    ${fcState.idx === total - 1 && fcState.known.size > 0 ? `
+      <div style="margin-top:20px;text-align:center;padding:20px;background:var(--sur);border-radius:var(--r16);border:1px solid var(--brd)">
+        <div style="font-size:24px;margin-bottom:8px">${known === total ? '🏆' : '📊'}</div>
+        <div style="font-weight:700;font-size:16px">${known}/${total} cartes connues</div>
+        <div style="font-size:13px;color:var(--txt2);margin-top:4px">${known === total ? 'Parfait ! Tu maîtrises tout !' : 'Continue à réviser les cartes restantes !'}</div>
+        <button class="btn bp" style="margin-top:14px" onclick="regenAndFlashcards()">🔄 Régénérer</button>
+      </div>
+    ` : ''}
+  `;
+
+  if (fcState.flipped) {
+    setTimeout(() => {
+      const fc = document.getElementById('fc-card');
+      if (fc) fc.classList.add('flipped');
+    }, 10);
+  }
+}
+
+function flipFC() {
+  fcState.flipped = !fcState.flipped;
+  const fc = document.getElementById('fc-card');
+  if (fc) fc.classList.toggle('flipped');
+}
+
+function nextFC() { if (fcState.idx < fcState.cards.length - 1) { fcState.idx++; fcState.flipped = false; renderFC(); } }
+function prevFC() { if (fcState.idx > 0) { fcState.idx--; fcState.flipped = false; renderFC(); } }
+
+function markKnown() {
+  fcState.known.add(fcState.idx);
+  if (fcState.idx < fcState.cards.length - 1) { fcState.idx++; fcState.flipped = false; }
+  renderFC();
+  if (fcState.known.size === fcState.cards.length) {
+    addXP(20, 'Toutes les flashcards maîtrisées !');
+    confetti();
+  }
+}
+
+function markUnknown() {
+  fcState.known.delete(fcState.idx);
+  if (fcState.idx < fcState.cards.length - 1) { fcState.idx++; fcState.flipped = false; }
+  renderFC();
+}
+
+function shuffleFC() {
+  for (let i = fcState.cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [fcState.cards[i], fcState.cards[j]] = [fcState.cards[j], fcState.cards[i]];
+  }
+  fcState.idx = 0; fcState.flipped = false; fcState.known = new Set();
+  renderFC();
+  toast('ok', '🔀 Cartes mélangées !');
+}
+
+async function regenAndFlashcards() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!sub || !ch) return;
+  ch.flashcards = null;
+  save();
+  document.getElementById('fc-wrap').innerHTML = `<div class="loader-wrap"><div class="spin"></div><div class="loader-t">Génération de nouvelles flashcards...</div></div>`;
+  await generateAndStartFlashcards(sub, ch);
+}
+
+// ═══════════════════════════════════════════════════
+//  AI: SUMMARY
+// ═══════════════════════════════════════════════════
+async function startAISummary() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch) return;
+
+  if (ch.summary) {
+    nav('summary', { subjectId: R.subjectId, chapterId: R.chapterId });
+    return;
+  }
+  await generateSummary(sub, ch);
+}
+
+async function generateSummary(sub, ch) {
+  setAIBtnLoading('btn-sum', true);
+  toast('ai', '📋 Création de la fiche...', 6000);
+
+  try {
+    const system = `Tu es un professeur expert en ${sub.name}. Crée une fiche de révision structurée en Markdown.
+Structure: # Titre du chapitre, ## sections thématiques, ### sous-sections, **points clés**, listes à puces.
+Inclus: définitions importantes, formules/règles, points essentiels à retenir, conseils d'examen.
+Style: clair, synthétique, mémorisable. Maximum 500 mots.`;
+
+    const userMsg = `Matière: ${sub.name}\nChapitre: ${ch.title}\n\nCours:\n${(ch.content || '').substring(0, 3500)}\n\nCrée une fiche de révision complète.`;
+    const raw = await callAI(system, userMsg, 'summary');
+
+    ch.summary = raw;
+    save();
+    toast('ok', '✅ Fiche créée !');
+    addXP(10, 'Fiche de révision générée');
+    nav('summary', { subjectId: sub.id, chapterId: ch.id });
+  } catch (e) {
+    toast('err', '❌ Erreur IA : ' + (e.message || 'Réessaie'));
+    setAIBtnLoading('btn-sum', false);
+  }
+}
+
+function renderSummary() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch?.summary) { navBack(); return; }
+
+  document.getElementById('sum-title').textContent = `📋 Fiche — ${ch.title}`;
+  document.getElementById('sum-content').innerHTML = `
+    <div class="ph" style="margin-bottom:16px">
+      <div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bg bsm" onclick="regenSummary()">🔄 Régénérer</button>
+        <button class="btn bg bsm" onclick="navBack()">← Retour</button>
+      </div>
+    </div>
+    <div class="smry">${parseMarkdown(ch.summary)}</div>
+  `;
+}
+
+async function regenSummary() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!sub || !ch) return;
+  ch.summary = null;
+  save();
+  document.getElementById('sum-content').innerHTML = `<div class="loader-wrap"><div class="spin"></div><div class="loader-t">Régénération de la fiche...</div></div>`;
+  await generateSummary(sub, ch);
+}
+
+function parseMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*?<\/li>(\n|$))+/gs, m => '<ul>' + m + '</ul>')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/^(?!<[hul1-9b]|<\/)(.*\S.*)$/gm, '<p>$1</p>')
+    .replace(/<p><\/p>/g, '');
+}
+
+// ═══════════════════════════════════════════════════
+//  AI CHAT
+// ═══════════════════════════════════════════════════
+let chatHistory = [];
+
+async function sendChat() {
+  const inp = document.getElementById('chat-inp');
+  const msgs = document.getElementById('chat-msgs');
+  const btn = document.getElementById('chat-send');
+  if (!inp || !msgs) return;
+
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  btn.disabled = true;
+
+  appendBubble(msgs, 'me', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const thinkId = 'think-' + Date.now();
+  msgs.insertAdjacentHTML('beforeend', `<div class="cbub think" id="${thinkId}"><div class="tdots"><span></span><span></span><span></span></div></div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const sub = S.subjects.find(s => s.id === R.subjectId);
+    const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+    const context = ch?.content ? ch.content.substring(0, 1500) : '';
+
+    const system = `Tu es un tuteur IA bienveillant et pédagogique pour le cours de ${sub?.name || 'cette matière'}.
+Chapitre actuel: "${ch?.title || 'Général'}".
+${context ? `Contenu du cours (résumé): ${context}` : ''}
+Réponds en français, de façon concise, claire et encourageante. Utilise des exemples concrets.`;
+
+    const msgs_to_send = chatHistory.slice(-10);
+    const raw = await callAI(system, null, 'chat');
+
+    document.getElementById(thinkId)?.remove();
+
+    // We need to send full history
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: msgs_to_send, systemOverride: system, mode: 'chat' })
+    });
+    const data = await r.json();
+    const reply = data.content || 'Désolé, je n\'ai pas pu répondre.';
+
+    document.getElementById(thinkId)?.remove();
+    appendBubble(msgs, 'ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch (e) {
+    document.getElementById(thinkId)?.remove();
+    appendBubble(msgs, 'ai', '❌ Erreur : ' + (e.message || 'Réessaie'));
+  } finally {
+    btn.disabled = false;
+    inp.focus();
+  }
+}
+
+function appendBubble(container, role, text) {
+  const div = document.createElement('div');
+  div.className = 'cbub ' + (role === 'ai' ? 'ai' : 'me');
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════
+//  CCF / BAC DETAILS
+// ═══════════════════════════════════════════════════
+function renderCCFDetail() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const item = sub?.ccf?.find(c => c.id === R.itemId);
+  if (!sub || !item) { navBack(); return; }
+
+  document.getElementById('ccf-detail-title').textContent = `📋 ${item.title}`;
+  const grade = item.grade != null ? item.grade : null;
+  const gc = grade != null ? (grade >= 14 ? 'g-good' : grade >= 10 ? 'g-mid' : 'g-bad') : '';
+
+  document.getElementById('ccf-detail-content').innerHTML = `
+    <div class="detail-card">
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        ${grade != null ? `<div style="text-align:center"><div class="grade-display ${gc}">${grade}<small style="font-size:18px">/20</small></div><div style="font-size:12px;color:var(--txt2);margin-top:4px">${grade >= 14 ? '😊 Très bien' : grade >= 10 ? '😐 Passable' : '😟 À améliorer'}</div></div>` : ''}
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:17px;font-weight:700;margin-bottom:8px">${esc(item.title)}</div>
+          ${item.date ? `<div style="font-size:14px;color:var(--txt2);margin-bottom:6px">📅 ${new Date(item.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>` : ''}
+          ${item.notes ? `<div style="margin-top:14px"><div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:6px">📝 Notes</div><div style="font-size:14px;line-height:1.65;white-space:pre-wrap">${esc(item.notes)}</div></div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderBACDetail() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const item = sub?.bac?.find(b => b.id === R.itemId);
+  if (!sub || !item) { navBack(); return; }
+
+  document.getElementById('bac-detail-title').textContent = `🎓 ${item.title}`;
+  document.getElementById('bac-detail-content').innerHTML = `
+    <div class="detail-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:18px;font-weight:700">${esc(item.title)}</div>
+          ${item.year ? `<div style="font-size:13px;color:var(--txt2);margin-top:3px">📅 Session ${item.year}</div>` : ''}
+        </div>
+      </div>
+      ${item.content ? `<div style="background:var(--sur2);border-radius:var(--r12);padding:18px;font-size:14px;line-height:1.7;white-space:pre-wrap">${esc(item.content)}</div>` : '<div style="color:var(--mut);font-size:14px">Aucun contenu ajouté.</div>'}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  CRUD OPERATIONS
+// ═══════════════════════════════════════════════════
+let selColor = COLORS[0].id;
+let selIcon = '📚';
+
+function openModal(id) {
+  document.getElementById(id)?.classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id)?.classList.remove('open');
+}
 document.querySelectorAll('.overlay').forEach(el =>
-  el.addEventListener('click', e => { if (e.target===el) el.classList.remove('open'); })
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); })
 );
 
-// ── TOAST ────────────────────────────────────────────────────
-function toast(type, msg, ms=2400) {
+// Subject modal
+function openSubjectModal(editId = null) {
+  selColor = editId ? (S.subjects.find(s => s.id === editId)?.colorId || COLORS[0].id) : COLORS[0].id;
+  selIcon = editId ? (S.subjects.find(s => s.id === editId)?.icon || '📚') : '📚';
+
+  document.getElementById('s-edit-id').value = editId || '';
+  document.getElementById('m-subject-title').textContent = editId ? 'Modifier la matière' : 'Nouvelle matière';
+
+  const sub = editId ? S.subjects.find(s => s.id === editId) : null;
+  document.getElementById('s-name').value = sub?.name || '';
+  document.getElementById('s-desc').value = sub?.desc || '';
+
+  // Color picker
+  document.getElementById('s-cpick').innerHTML = COLORS.map(c =>
+    `<div class="cpi ${c.id === selColor ? 'sel' : ''}" data-cid="${c.id}"
+      style="background:linear-gradient(135deg,${c.f},${c.t})"
+      onclick="pickColor('${c.id}')"></div>`
+  ).join('');
+
+  // Icon picker
+  document.getElementById('s-ipick').innerHTML = ICONS.map(ic =>
+    `<div class="ipi ${ic === selIcon ? 'sel' : ''}" data-ic="${ic}" onclick="pickIcon('${ic}')">${ic}</div>`
+  ).join('');
+
+  openModal('m-subject');
+}
+
+function pickColor(id) {
+  selColor = id;
+  document.querySelectorAll('.cpi').forEach(el => el.classList.toggle('sel', el.dataset.cid === id));
+}
+function pickIcon(ic) {
+  selIcon = ic;
+  document.querySelectorAll('.ipi').forEach(el => el.classList.toggle('sel', el.dataset.ic === ic));
+}
+
+function saveSubject() {
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) { toast('err', '⚠️ Donne un nom à la matière'); return; }
+
+  const editId = document.getElementById('s-edit-id').value;
+  if (editId) {
+    const s = S.subjects.find(s => s.id === editId);
+    if (s) { s.name = name; s.icon = selIcon; s.colorId = selColor; s.desc = document.getElementById('s-desc').value.trim(); }
+  } else {
+    S.subjects.push({
+      id: DB.id(), name, icon: selIcon, colorId: selColor,
+      desc: document.getElementById('s-desc').value.trim(),
+      chapters: [], ccf: [], bac: [],
+      createdAt: new Date().toISOString()
+    });
+    addXP(15, 'Nouvelle matière créée 📚');
+  }
+  save(); closeModal('m-subject'); renderView();
+  toast('ok', editId ? '✏️ Matière modifiée' : '🎉 Matière créée !');
+}
+
+function editSubject(id) {
+  openSubjectModal(id);
+}
+
+function delSubject(id) {
+  if (!confirm('Supprimer cette matière et tout son contenu ?')) return;
+  S.subjects = S.subjects.filter(s => s.id !== id);
+  save(); renderView();
+  toast('ok', '🗑️ Matière supprimée');
+}
+
+// Chapter
+function saveChapter() {
+  const name = document.getElementById('ch-name').value.trim();
+  if (!name) { toast('err', '⚠️ Donne un titre au chapitre'); return; }
+
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  if (!sub) return;
+  if (!sub.chapters) sub.chapters = [];
+  sub.chapters.push({
+    id: DB.id(), title: name, content: '', summary: null,
+    quiz: null, flashcards: null, quizScores: [],
+    createdAt: new Date().toISOString()
+  });
+  save(); closeModal('m-chapter');
+  addXP(5, 'Nouveau chapitre ajouté');
+  svTab('chapitres');
+  toast('ok', '📖 Chapitre créé !');
+}
+
+function delChapter(subId, chId) {
+  if (!confirm('Supprimer ce chapitre ?')) return;
+  const sub = S.subjects.find(s => s.id === subId);
+  if (sub) sub.chapters = sub.chapters.filter(c => c.id !== chId);
+  save(); svTab('chapitres');
+  toast('ok', '🗑️ Chapitre supprimé');
+}
+
+// CCF
+function saveCCF() {
+  const name = document.getElementById('ccf-name').value.trim();
+  if (!name) { toast('err', '⚠️ Donne un titre au CCF'); return; }
+
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  if (!sub) return;
+  if (!sub.ccf) sub.ccf = [];
+
+  const grade = document.getElementById('ccf-grade').value;
+  sub.ccf.push({
+    id: DB.id(), title: name,
+    date: document.getElementById('ccf-date').value || null,
+    grade: grade !== '' ? parseFloat(grade) : null,
+    notes: document.getElementById('ccf-notes').value.trim(),
+    createdAt: new Date().toISOString()
+  });
+  save(); closeModal('m-ccf');
+  svTab('ccf');
+  toast('ok', '📋 CCF enregistré !');
+  addXP(10, 'CCF ajouté');
+}
+
+function delCCF(subId, itemId) {
+  if (!confirm('Supprimer ce CCF ?')) return;
+  const sub = S.subjects.find(s => s.id === subId);
+  if (sub) sub.ccf = sub.ccf.filter(c => c.id !== itemId);
+  save(); svTab('ccf');
+  toast('ok', '🗑️ CCF supprimé');
+}
+
+// BAC
+function saveBAC() {
+  const name = document.getElementById('bac-name').value.trim();
+  if (!name) { toast('err', '⚠️ Donne un titre'); return; }
+
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  if (!sub) return;
+  if (!sub.bac) sub.bac = [];
+  sub.bac.push({
+    id: DB.id(), title: name,
+    year: document.getElementById('bac-year').value || null,
+    content: document.getElementById('bac-content').value.trim(),
+    createdAt: new Date().toISOString()
+  });
+  save(); closeModal('m-bac');
+  svTab('bac');
+  toast('ok', '🎓 Annale ajoutée !');
+  addXP(10, 'Annale BAC ajoutée');
+}
+
+function delBAC(subId, itemId) {
+  if (!confirm('Supprimer cette annale ?')) return;
+  const sub = S.subjects.find(s => s.id === subId);
+  if (sub) sub.bac = sub.bac.filter(b => b.id !== itemId);
+  save(); svTab('bac');
+  toast('ok', '🗑️ Annale supprimée');
+}
+
+// ═══════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function toast(type, msg, ms = 2600) {
   const c = document.getElementById('toasts');
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
   c.appendChild(el);
-  setTimeout(()=>el.remove(), ms);
+  setTimeout(() => el.remove(), ms);
 }
 
-// ── CONFETTI ─────────────────────────────────────────────────
 function confetti() {
   const cv = document.getElementById('confetti');
   const ctx = cv.getContext('2d');
-  cv.width  = window.innerWidth;
-  cv.height = window.innerHeight;
-  const cols = ['#64ffda','#bd93f9','#ff79c6','#f1fa8c','#50fa7b','#ffb86c'];
-  const pts  = Array.from({length:110}, ()=>({
-    x:Math.random()*cv.width, y:-8, r:Math.random()*5+3,
-    c:cols[Math.floor(Math.random()*cols.length)],
-    vx:(Math.random()-.5)*3, vy:Math.random()*3.5+2,
-    ang:Math.random()*360, spin:(Math.random()-.5)*7,
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#8b5cf6','#06b6d4','#10b981','#f59e0b','#ec4899','#f97316','#3b82f6'];
+  const pts = Array.from({ length: 120 }, () => ({
+    x: Math.random() * cv.width, y: -10,
+    r: Math.random() * 5 + 3,
+    c: cols[Math.floor(Math.random() * cols.length)],
+    vx: (Math.random() - .5) * 3.5, vy: Math.random() * 4 + 2,
+    ang: Math.random() * 360, spin: (Math.random() - .5) * 8,
   }));
-  let fr, tick=0;
-  const draw=()=>{
-    ctx.clearRect(0,0,cv.width,cv.height);
-    pts.forEach(p=>{
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.ang*Math.PI/180);
-      ctx.fillStyle=p.c; ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r); ctx.restore();
-      p.x+=p.vx; p.y+=p.vy; p.ang+=p.spin; p.vy+=.09;
+  let fr, tick = 0;
+  const draw = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    pts.forEach(p => {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang * Math.PI / 180);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); ctx.restore();
+      p.x += p.vx; p.y += p.vy; p.ang += p.spin; p.vy += .1;
     });
-    if(++tick<130) fr=requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,cv.width,cv.height);
+    if (++tick < 140) fr = requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
   };
   cancelAnimationFrame(fr); draw();
 }
 
-// ── GOALS ────────────────────────────────────────────────────
-let selIcon='🎯';
+// Override openModal for subject to init pickers
+const _openModal = openModal;
+window.openModal = (id) => {
+  if (id === 'm-subject') openSubjectModal();
+  else _openModal(id);
+};
 
-function openGoalModal(editId=null) {
-  selIcon = '🎯';
-  document.getElementById('gTitle').value    = '';
-  document.getElementById('gDesc').value     = '';
-  document.getElementById('gCat').value      = 'finance';
-  document.getElementById('gProg').value     = 0;
-  document.getElementById('progVal').textContent = '0';
-  document.getElementById('gDeadline').value = '';
-  document.getElementById('gEditId').value   = editId||'';
-  document.getElementById('mGoalTitle').textContent = editId ? 'Modifier l\'objectif' : 'Nouvel objectif';
-
-  // icon picker
-  document.getElementById('iconGrid').innerHTML = ICONS.map(ic=>
-    `<div class="ig-item ${ic===selIcon?'sel':''}" data-ic="${ic}" onclick="pickIcon('${ic}')">${ic}</div>`
-  ).join('');
-
-  if (editId) {
-    const g = S.goals.find(g=>g.id===editId);
-    if (g) {
-      document.getElementById('gTitle').value        = g.title;
-      document.getElementById('gDesc').value         = g.description||'';
-      document.getElementById('gCat').value          = g.category||'autre';
-      document.getElementById('gProg').value         = g.progress;
-      document.getElementById('progVal').textContent = g.progress;
-      document.getElementById('gDeadline').value     = g.deadline||'';
-      selIcon = g.icon||'🎯';
-      document.querySelectorAll('#iconGrid .ig-item').forEach(el=>el.classList.toggle('sel',el.dataset.ic===selIcon));
-    }
-  }
-  openM('mGoal');
-}
-
-function pickIcon(ic) {
-  selIcon = ic;
-  document.querySelectorAll('#iconGrid .ig-item').forEach(el=>el.classList.toggle('sel',el.dataset.ic===ic));
-}
-
-function saveGoal() {
-  const title = document.getElementById('gTitle').value.trim();
-  if (!title) { toast('','⚠️ Donne un titre à ton objectif'); return; }
-  const editId   = document.getElementById('gEditId').value;
-  const progress = parseInt(document.getElementById('gProg').value)||0;
-
-  if (editId) {
-    const g = S.goals.find(g=>g.id===editId);
-    if (g) {
-      const prev = g.progress;
-      g.title       = title;
-      g.description = document.getElementById('gDesc').value.trim();
-      g.category    = document.getElementById('gCat').value;
-      g.icon        = selIcon;
-      g.progress    = progress;
-      g.deadline    = document.getElementById('gDeadline').value||null;
-      if (progress > prev) addXP(Math.round((progress-prev)*.5), 'Progression mise à jour 📈');
-    }
-  } else {
-    S.goals.push({
-      id:DB.id(), title,
-      description:document.getElementById('gDesc').value.trim(),
-      category:document.getElementById('gCat').value,
-      icon:selIcon, progress,
-      deadline:document.getElementById('gDeadline').value||null,
-      created_at:new Date().toISOString(),
-    });
-    addXP(20, 'Nouvel objectif créé 🎯');
-  }
-
-  save(); closeM('mGoal'); checkAch(); renderAll();
-}
-
-function delGoal(id) {
-  if (!confirm('Supprimer cet objectif ? Les tâches et notes liées seront aussi supprimées.')) return;
-  S.goals = S.goals.filter(g=>g.id!==id);
-  S.tasks = S.tasks.filter(t=>t.goalId!==id);
-  S.notes = S.notes.filter(n=>n.goalId!==id);
-  save(); renderAll(); toast('','🗑️ Objectif supprimé');
-}
-
-function filterGoals(f) {
-  gFilter = f;
-  document.querySelectorAll('#gFilterTabs .stab').forEach(el=>el.classList.toggle('active',el.dataset.f===f));
-  renderGoals();
-}
-
-function renderGoals() {
-  const grid = document.getElementById('goalsGrid');
-  const list = gFilter==='all' ? S.goals : S.goals.filter(g=>g.category===gFilter);
-
-  if (!list.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
-      <div class="empty-icon">🎯</div>
-      <div class="empty-title">Aucun objectif</div>
-      <div style="color:var(--muted);font-size:14px;margin-top:4px">Crée ton premier objectif pour commencer !</div>
-      <button class="btn btn-p" style="margin-top:14px" onclick="openGoalModal()">+ Créer un objectif</button>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = list.map(g => {
-    const tTotal = S.tasks.filter(t=>t.goalId===g.id).length;
-    const tDone  = S.tasks.filter(t=>t.goalId===g.id&&t.completed).length;
-    const nCount = S.notes.filter(n=>n.goalId===g.id).length;
-    const R=30, C=2*Math.PI*R, off=C-(g.progress/100)*C;
-    return `<div class="gc cat-${g.category||'autre'} reveal" onclick="openGoalDetail('${g.id}')">
-      <button class="del-btn"       onclick="event.stopPropagation();delGoal('${g.id}')">✕</button>
-      <button class="edit-btn-card" onclick="event.stopPropagation();openGoalModal('${g.id}')">✏️</button>
-      <div class="gc-icon">${esc(g.icon)}</div>
-      <div class="gc-title">${esc(g.title)}</div>
-      ${g.description?`<div class="gc-desc">${esc(g.description)}</div>`:''}
-      <div class="ring-wrap">
-        <div class="ring">
-          <svg width="76" height="76" viewBox="0 0 76 76">
-            <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--border)" stroke-width="7"/>
-            <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--cyan)" stroke-width="7"
-              stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"
-              stroke-linecap="round" style="transition:stroke-dashoffset .6s ease"/>
-          </svg>
-          <div class="ring-txt">${g.progress}%</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--muted)">Progression</div>
-          <div style="font-size:20px;font-weight:800;color:var(--cyan)">${g.progress}%</div>
-          ${g.deadline?`<div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${fmtDate(g.deadline)}</div>`:''}
-        </div>
-      </div>
-      <div class="gc-meta">
-        <span class="tag">${CATS[g.category]||g.category}</span>
-        ${tTotal?`<span class="tag">✅ ${tDone}/${tTotal}</span>`:''}
-        ${nCount?`<span class="tag">📝 ${nCount}</span>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── GOAL DETAIL ──────────────────────────────────────────────
-function openGoalDetail(id) {
-  const g = S.goals.find(g=>g.id===id);
-  if (!g) return;
-  const tasks = S.tasks.filter(t=>t.goalId===id);
-  const notes = [...S.notes.filter(n=>n.goalId===id)].reverse();
-
-  document.getElementById('detailContent').innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-      <span style="font-size:36px">${esc(g.icon)}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:20px;font-weight:800;word-break:break-word">${esc(g.title)}</div>
-        ${g.description?`<div style="color:var(--muted);font-size:13px;margin-top:4px">${esc(g.description)}</div>`:''}
-      </div>
-      <button class="btn btn-g btn-sm" onclick="closeM('mDetail');openGoalModal('${id}')">✏️</button>
-    </div>
-    <div style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-        <span style="font-size:13px;color:var(--muted)">Progression globale</span>
-        <span style="font-size:18px;font-weight:700;color:var(--cyan)">${g.progress}%</span>
-      </div>
-      <div class="pbar"><div class="pfill" style="width:${g.progress}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div></div>
-    </div>
-    <div class="divider"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="font-size:15px;font-weight:700">Tâches (${tasks.length})</h3>
-      <button class="btn btn-p btn-sm" onclick="closeM('mDetail');openTaskModal('${id}')">+ Tâche</button>
-    </div>
-    ${tasks.length ? tasks.map(t=>renderTaskItem(t,true)).join('') : '<p style="color:var(--muted);font-size:13px">Aucune tâche. Ajoute-en une !</p>'}
-    <div class="divider"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="font-size:15px;font-weight:700">Notes (${notes.length})</h3>
-      <button class="btn btn-p btn-sm" onclick="closeM('mDetail');openNoteModal('${id}')">+ Note</button>
-    </div>
-    ${notes.length ? notes.map(n=>`
-      <div class="nc" style="margin-bottom:10px">
-        <div class="nc-head">
-          <span style="font-size:20px">${MOODS[n.mood]||'📝'}</span>
-          <div>
-            <div style="font-weight:600;font-size:13px">${fmtRel(n.created_at)}</div>
-            <div style="font-size:11px;color:var(--muted)">${new Date(n.created_at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</div>
-          </div>
-        </div>
-        <div class="nc-content">${esc(n.content)}</div>
-        <div class="xp-chip">⚡ +${n.xp||10} XP</div>
-      </div>
-    `).join('') : '<p style="color:var(--muted);font-size:13px">Aucune note. Documente tes avancées !</p>'}
-  `;
-  openM('mDetail');
-}
-
-// ── TASKS ─────────────────────────────────────────────────────
-let selTGoal=null;
-
-function openTaskModal(preGoal=null) {
-  document.getElementById('tTitle').value = '';
-  document.getElementById('tDesc').value  = '';
-  document.getElementById('tDue').value   = '';
-  document.querySelector('input[name="tPrio"][value="medium"]').checked = true;
-  selTGoal = preGoal || S.goals[0]?.id || null;
-
-  document.getElementById('tGoalChips').innerHTML = S.goals.map(g=>
-    `<div class="chip ${g.id===selTGoal?'sel':''}" data-g="${g.id}" onclick="pickTGoal('${g.id}')">${esc(g.icon)} ${esc(g.title)}</div>`
-  ).join('') || '<span style="color:var(--muted);font-size:13px">Crée d\'abord un objectif</span>';
-  openM('mTask');
-}
-
-function pickTGoal(id) {
-  selTGoal=id;
-  document.querySelectorAll('#tGoalChips .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
-}
-
-function saveTask() {
-  const title = document.getElementById('tTitle').value.trim();
-  if (!title) { toast('','⚠️ Donne un titre à la tâche'); return; }
-  S.tasks.push({
-    id:DB.id(), title,
-    description:document.getElementById('tDesc').value.trim(),
-    goalId:selTGoal,
-    priority:document.querySelector('input[name="tPrio"]:checked')?.value||'medium',
-    dueDate:document.getElementById('tDue').value||null,
-    completed:false, completedAt:null,
-    created_at:new Date().toISOString(),
-  });
-  save(); closeM('mTask'); addXP(5,'Tâche ajoutée'); renderAll();
-}
-
-function toggleTask(id) {
-  const t = S.tasks.find(t=>t.id===id);
-  if (!t) return;
-  t.completed = !t.completed;
-  t.completedAt = t.completed ? new Date().toISOString() : null;
-  if (t.completed) {
-    S.player.tasksDone++;
-    const xpMap={high:30,medium:20,low:10};
-    addXP(xpMap[t.priority]||20,'Tâche complétée ! 🎉');
-    checkAch();
-    if (S.player.tasksDone % 5===0) confetti();
-  }
-  save(); renderAll();
-}
-
-function delTask(id) {
-  S.tasks = S.tasks.filter(t=>t.id!==id);
-  save(); renderAll();
-}
-
-function filterTasks(f) {
-  tFilter=f;
-  document.querySelectorAll('#tFilterTabs .stab').forEach(el=>el.classList.toggle('active',el.dataset.f===f));
-  renderTasks();
-}
-
-function filterTByGoal(id) {
-  tGFilter=id;
-  renderTasks();
-}
-
-function renderTaskItem(t, compact=false) {
-  const g = S.goals.find(g=>g.id===t.goalId);
-  const overdue = t.dueDate && new Date(t.dueDate)<new Date() && !t.completed;
-  return `<div class="ti ${t.completed?'done':''}">
-    <div class="ti-chk ${t.completed?'ok':''}" onclick="toggleTask('${t.id}')">${t.completed?'✓':''}</div>
-    <div class="ti-body">
-      <div class="ti-title">${esc(t.title)}</div>
-      ${t.description?`<div class="ti-desc">${esc(t.description)}</div>`:''}
-      <div class="ti-meta">
-        <div class="pdot" style="background:${PRIO_COLOR[t.priority]||'var(--muted)'}"></div>
-        ${g&&!compact?`<span class="tag">${esc(g.icon)} ${esc(g.title)}</span>`:''}
-        ${t.dueDate?`<span class="tag" style="color:${overdue?'var(--red)':'var(--muted)'}">📅 ${fmtDate(t.dueDate)}</span>`:''}
-        ${t.completed&&t.completedAt?`<span class="tag" style="color:var(--green)">✓ ${fmtRel(t.completedAt)}</span>`:''}
-      </div>
-    </div>
-    ${!compact?`<button class="btn btn-d btn-sm" onclick="delTask('${t.id}')">✕</button>`:''}
-  </div>`;
-}
-
-function renderTasks() {
-  const list = document.getElementById('tasksList');
-  let tasks = [...S.tasks];
-  if (tFilter==='pending') tasks=tasks.filter(t=>!t.completed);
-  else if (tFilter==='done') tasks=tasks.filter(t=>t.completed);
-  if (tGFilter!=='all') tasks=tasks.filter(t=>t.goalId===tGFilter);
-  const po={high:0,medium:1,low:2};
-  tasks.sort((a,b)=>a.completed!==b.completed?(a.completed?1:-1):(po[a.priority]??1)-(po[b.priority]??1));
-
-  // goal filter chips
-  const fc=document.getElementById('tGoalFilter');
-  const mk=(id,lbl)=>`<div class="chip ${tGFilter===id?'sel':''}" onclick="filterTByGoal('${id}')">${lbl}</div>`;
-  fc.innerHTML=mk('all','Tous les objectifs')+S.goals.map(g=>mk(g.id,`${esc(g.icon)} ${esc(g.title)}`)).join('');
-
-  if (!tasks.length) {
-    list.innerHTML=`<div class="empty">
-      <div class="empty-icon">${tFilter==='done'?'🎉':'✅'}</div>
-      <div class="empty-title">${tFilter==='done'?'Aucune tâche terminée':'Tout est à jour !'}</div>
-    </div>`;
-    return;
-  }
-  list.innerHTML=tasks.map(t=>renderTaskItem(t)).join('');
-
-  // pending badge
-  const pending=S.tasks.filter(t=>!t.completed).length;
-  const b=document.getElementById('pendBadge');
-  b.textContent=pending; b.style.display=pending?'inline':'none';
-}
-
-// ── NOTES / JOURNAL ──────────────────────────────────────────
-let selMoodV='excited', selNGoal=null;
-
-function openNoteModal(preGoal=null) {
-  document.getElementById('nContent').value='';
-  selMoodV='excited'; selNGoal=preGoal||S.goals[0]?.id||null;
-  document.querySelectorAll('.mood-item').forEach(el=>el.classList.toggle('sel',el.dataset.m==='excited'));
-  document.getElementById('nGoalChips').innerHTML=S.goals.map(g=>
-    `<div class="chip ${g.id===selNGoal?'sel':''}" data-g="${g.id}" onclick="pickNGoal('${g.id}')">${esc(g.icon)} ${esc(g.title)}</div>`
-  ).join('')||'<span style="color:var(--muted);font-size:13px">Crée d\'abord un objectif</span>';
-  openM('mNote');
-}
-
-function selMood(m) {
-  selMoodV=m;
-  document.querySelectorAll('.mood-item').forEach(el=>el.classList.toggle('sel',el.dataset.m===m));
-}
-
-function pickNGoal(id) {
-  selNGoal=id;
-  document.querySelectorAll('#nGoalChips .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
-}
-
-function saveNote() {
-  const content=document.getElementById('nContent').value.trim();
-  if (!content) { toast('','⚠️ Écris quelque chose dans ta note'); return; }
-  const xp={excited:15,good:10,neutral:10,tough:12}[selMoodV]||10;
-  S.notes.push({id:DB.id(),content,mood:selMoodV,goalId:selNGoal,xp,created_at:new Date().toISOString()});
-  S.player.totalNotes++;
-  save(); closeM('mNote'); addXP(xp,'Note de progression ajoutée 📝'); checkAch(); renderAll();
-}
-
-function delNote(id) {
-  S.notes=S.notes.filter(n=>n.id!==id); save(); renderAll();
-}
-
-function filterJByGoal(id) {
-  jGFilter=id;
-  document.querySelectorAll('#jGoalFilter .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
-  renderJournal();
-}
-
-function renderJournal() {
-  const fc=document.getElementById('jGoalFilter');
-  const mk=(id,lbl)=>`<div class="chip ${jGFilter===id?'sel':''}" data-g="${id}" onclick="filterJByGoal('${id}')">${lbl}</div>`;
-  fc.innerHTML=mk('all','Tous')+S.goals.map(g=>mk(g.id,`${esc(g.icon)} ${esc(g.title)}`)).join('');
-
-  let notes=[...S.notes].reverse();
-  if (jGFilter!=='all') notes=notes.filter(n=>n.goalId===jGFilter);
-
-  const list=document.getElementById('journalList');
-  if (!notes.length) {
-    list.innerHTML=`<div class="empty">
-      <div class="empty-icon">📝</div>
-      <div class="empty-title">Journal vide</div>
-      <div style="color:var(--muted);font-size:14px;margin-top:4px">Documente tes avancées pour garder la motivation !</div>
-      <button class="btn btn-p" style="margin-top:14px" onclick="openNoteModal()">+ Première note</button>
-    </div>`;
-    return;
-  }
-
-  list.innerHTML=notes.map(n=>{
-    const g=S.goals.find(g=>g.id===n.goalId);
-    return `<div class="tl-item reveal">
-      <div class="tl-dot">${MOODS[n.mood]||'📝'}</div>
-      <div class="nc" style="position:relative">
-        <button class="del-btn" style="opacity:0;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0" onclick="delNote('${n.id}')">✕</button>
-        <div class="nc-head">
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:13px">${fmtRel(n.created_at)}</div>
-            <div style="font-size:11px;color:var(--muted)">${new Date(n.created_at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
-          </div>
-          ${g?`<span style="font-size:11px;color:var(--cyan)">${esc(g.icon)} ${esc(g.title)}</span>`:''}
-        </div>
-        <div class="nc-content">${esc(n.content)}</div>
-        <div class="xp-chip">⚡ +${n.xp||10} XP</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  // hover fix for delete buttons inside timeline (can't use CSS :hover on parent)
-  list.querySelectorAll('.nc').forEach(nc=>{
-    const b=nc.querySelector('.del-btn');
-    if(!b) return;
-    nc.addEventListener('mouseenter',()=>b.style.opacity='1');
-    nc.addEventListener('mouseleave',()=>b.style.opacity='0');
-  });
-}
-
-// ── ACHIEVEMENTS ─────────────────────────────────────────────
-function renderAchievements() {
-  const grid=document.getElementById('achievGrid');
-  const unlocked=S.player.badges.length;
-  document.getElementById('achOn').textContent=unlocked;
-  document.getElementById('achTotal').textContent=ACHES.length;
-  grid.innerHTML=ACHES.map(a=>{
-    const on=S.player.badges.includes(a.id);
-    return `<div class="ach ${on?'on reveal':''}">
-      <div class="ach-icon">${a.icon}</div>
-      <div class="ach-name">${esc(a.name)}</div>
-      <div class="ach-desc">${esc(a.desc)}</div>
-      ${on?'<div style="font-size:11px;color:var(--xp);margin-top:6px">✓ Débloqué</div>':''}
-    </div>`;
-  }).join('');
-}
-
-// ── DASHBOARD ────────────────────────────────────────────────
-function renderDashboard() {
-  document.getElementById('sGoals').textContent = S.goals.length;
-  document.getElementById('sDone').textContent  = S.player.tasksDone;
-  document.getElementById('sNotes').textContent = S.notes.length;
-  document.getElementById('sXP').textContent    = S.player.totalXP;
-
-  const h=new Date().getHours();
-  document.getElementById('greeting').textContent =
-    (h<12?'Bonjour':'h<18'?'Bon après-midi':'Bonsoir')+' 👋';
-
-  // goals preview
-  const dg=document.getElementById('dGoals');
-  if (!S.goals.length) {
-    dg.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
-      Aucun objectif.
-      <button class="btn btn-p btn-sm" style="margin-left:8px;margin-top:4px" onclick="go('goals');openGoalModal()">+ Créer</button>
-    </div>`;
-  } else {
-    dg.innerHTML=S.goals.slice(0,5).map(g=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer;transition:background .2s"
-           onmouseover="this.style.background='var(--panel2)'" onmouseout="this.style.background=''"
-           onclick="openGoalDetail('${g.id}')">
-        <span style="font-size:20px">${esc(g.icon)}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(g.title)}</div>
-          <div class="pbar" style="margin-top:4px;height:5px">
-            <div class="pfill" style="width:${g.progress}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div>
-          </div>
-        </div>
-        <span style="font-size:13px;font-weight:700;color:var(--cyan)">${g.progress}%</span>
-      </div>
-    `).join('');
-  }
-
-  // tasks preview
-  const dt=document.getElementById('dTasks');
-  const pending=S.tasks.filter(t=>!t.completed).slice(0,5);
-  if (!pending.length) {
-    dt.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
-      🎉 Toutes tes tâches sont faites !
-      <br><button class="btn btn-p btn-sm" style="margin-top:8px" onclick="openTaskModal()">+ Nouvelle tâche</button>
-    </div>`;
-  } else {
-    dt.innerHTML=pending.map(t=>renderTaskItem(t)).join('');
-  }
-
-  // journal preview
-  const dj=document.getElementById('dJournal');
-  const recent=[...S.notes].reverse().slice(0,3);
-  if (!recent.length) {
-    dj.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
-      Aucune note pour l'instant.
-      <br><button class="btn btn-p btn-sm" style="margin-top:8px" onclick="openNoteModal()">+ Ajouter une note</button>
-    </div>`;
-  } else {
-    dj.innerHTML=recent.map(n=>{
-      const g=S.goals.find(g=>g.id===n.goalId);
-      return `<div style="display:flex;gap:10px;padding:10px;border-radius:10px;background:var(--panel2);margin-bottom:8px">
-        <span style="font-size:20px">${MOODS[n.mood]||'📝'}</span>
-        <div style="flex:1;min-width:0">
-          ${g?`<div style="font-size:11px;color:var(--cyan);margin-bottom:3px">${esc(g.icon)} ${esc(g.title)}</div>`:''}
-          <div style="font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(n.content)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">${fmtRel(n.created_at)}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-}
-
-// ── RENDER ALL ───────────────────────────────────────────────
-function renderAll() {
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  checkStreak();
   renderHUD();
-  renderDashboard();
-  renderGoals();
-  renderTasks();
-  renderJournal();
-  renderAchievements();
-  const p=S.tasks.filter(t=>!t.completed).length;
-  const b=document.getElementById('pendBadge');
-  b.textContent=p; b.style.display=p?'inline':'none';
-}
-
-// ── INIT ─────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', ()=>{ checkStreak(); renderAll(); });
+  renderView();
+  updateBC();
+});
 </script>
 </body>
 </html>
