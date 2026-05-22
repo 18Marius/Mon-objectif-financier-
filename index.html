@@ -3,244 +3,1101 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mon Objectif Finance</title>
+  <title>QuestBoard — Mes Objectifs</title>
   <style>
-    :root { --bg:#0a0a0f; --panel:#161823; --text:#e7e9ee; --muted:#9aa3b2; --btn:#6ee7f3; --btn2:#a78bfa; }
-    *{box-sizing:border-box} html,body{margin:0;padding:0;background:radial-gradient(1200px 800px at 10% -10%,#1f2030 0,#0a0a0f 55%),#0a0a0f;color:var(--text);font:16px system-ui,-apple-system,Segoe UI,Roboto}
-    .wrap{max-width:980px;margin:0 auto;padding:20px}
-    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(10,10,15,.95),rgba(10,10,15,.75));backdrop-filter:blur(8px);padding:12px 8px;margin-bottom:8px}
-    .brand{display:flex;gap:10px;align-items:center}
-    .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#6ee7f3,#a78bfa)}
-    .muted{color:var(--muted)}
-    .card{background:var(--panel);border:1px solid #1f2333;border-radius:14px;padding:16px}
-    .btn{display:inline-block;border:0;background:linear-gradient(90deg,var(--btn),var(--btn2));color:#0b0d14;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
-    #chat{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-height:55vh;overflow:auto}
-    .bubble{max-width:84%;padding:10px 12px;border-radius:14px;line-height:1.45}
-    .me{align-self:flex-end;background:rgba(43,208,216,.15);border:1px solid rgba(43,208,216,.35)}
-    .ai{align-self:flex-start;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35)}
-    .row{display:flex;gap:8px;margin-top:10px}
-    input[type="text"]{flex:1;background:#0e1018;border:1px solid #23283c;color:var(--text);padding:10px 12px;border-radius:10px}
-    @media(min-width:900px){.wrap{padding:28px}}
+    :root {
+      --bg:#08090e; --bg2:#0d0f1a; --panel:#12141f; --panel2:#181a27;
+      --border:#1e2235; --text:#e8eaf6; --muted:#7a88a8;
+      --cyan:#64ffda; --purple:#bd93f9; --pink:#ff79c6;
+      --yellow:#f1fa8c; --green:#50fa7b; --orange:#ffb86c; --red:#ff5555;
+      --xp:#ffd700;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);font:15px/1.5 'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    /* ── HEADER ── */
+    .header{position:sticky;top:0;z-index:100;background:rgba(8,9,14,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(14px)}
+    .header-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:62px}
+    .logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+    .player-bar{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+    .streak{display:flex;align-items:center;gap:5px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:600}
+    .xp-wrap{display:flex;flex-direction:column;gap:2px;min-width:110px}
+    .xp-lbl{font-size:11px;color:var(--muted);text-align:right}
+    .xp-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .xp-fill{height:100%;background:linear-gradient(90deg,var(--xp),var(--orange));border-radius:3px;transition:width .6s ease}
+    .lvl-badge{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#08090e;font-weight:800;font-size:12px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+
+    /* ── NAV ── */
+    .nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:62px;z-index:99;overflow-x:auto}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:2px;white-space:nowrap}
+    .nav-tab{padding:12px 16px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;border-bottom:2px solid transparent;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+    .nav-tab:hover{color:var(--text)}
+    .nav-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+    .badge-n{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:17px;text-align:center}
+
+    /* ── LAYOUT ── */
+    .main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+    .tab{display:none}.tab.active{display:block}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+    /* ── CARDS ── */
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}
+    .card-sm{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .18s;font-family:inherit}
+    .btn-p{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#08090e}
+    .btn-p:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-g{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+    .btn-g:hover{border-color:var(--cyan);color:var(--cyan)}
+    .btn-d{background:rgba(255,85,85,.12);color:var(--red);border:1px solid rgba(255,85,85,.25)}
+    .btn-d:hover{background:rgba(255,85,85,.22)}
+    .btn-sm{padding:5px 10px;font-size:12px;border-radius:7px}
+
+    /* ── INPUTS ── */
+    .inp,.ta,.sel{background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;width:100%;outline:none;transition:border-color .2s}
+    .inp:focus,.ta:focus,.sel:focus{border-color:var(--cyan)}
+    .ta{resize:vertical;min-height:80px}
+    .sel option{background:var(--panel)}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:5px}
+    .fg{margin-bottom:14px}
+
+    /* ── SECTION HEADER ── */
+    .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
+    .st{font-size:20px;font-weight:700}
+
+    /* ── STAT CARDS ── */
+    .sc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .sc-icon{font-size:24px;margin-bottom:6px}
+    .sc-val{font-size:28px;font-weight:800;line-height:1}
+    .sc-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+
+    /* ── GOAL CARDS ── */
+    .gc{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .gc:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 28px rgba(100,255,218,.09)}
+    .gc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gc-color,linear-gradient(90deg,var(--cyan),var(--purple)))}
+    .gc-icon{font-size:28px;margin-bottom:10px}
+    .gc-title{font-size:16px;font-weight:700;margin-bottom:5px}
+    .gc-desc{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .ring-wrap{display:flex;align-items:center;gap:14px;margin-top:12px}
+    .ring{position:relative;flex-shrink:0}
+    .ring svg{transform:rotate(-90deg)}
+    .ring-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700;color:var(--cyan);text-align:center}
+    .gc-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .tag{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--muted)}
+    .del-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px;opacity:0;transition:all .2s;line-height:1}
+    .edit-btn-card{position:absolute;top:10px;right:36px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;opacity:0;transition:all .2s;line-height:1}
+    .gc:hover .del-btn,.gc:hover .edit-btn-card{opacity:1}
+    .del-btn:hover{color:var(--red);background:rgba(255,85,85,.12)}
+    .edit-btn-card:hover{color:var(--cyan);background:rgba(100,255,218,.1)}
+
+    /* category top-bar colors */
+    .cat-finance{--gc-color:linear-gradient(90deg,#f1fa8c,#ffb86c)}
+    .cat-code{--gc-color:linear-gradient(90deg,#64ffda,#bd93f9)}
+    .cat-sante{--gc-color:linear-gradient(90deg,#50fa7b,#64ffda)}
+    .cat-perso{--gc-color:linear-gradient(90deg,#ff79c6,#bd93f9)}
+    .cat-sport{--gc-color:linear-gradient(90deg,#ff5555,#ffb86c)}
+    .cat-autre{--gc-color:linear-gradient(90deg,#8892b0,#64ffda)}
+
+    /* ── TASK ITEMS ── */
+    .ti{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:all .18s}
+    .ti:hover{background:var(--panel2)}
+    .ti.done{opacity:.5}
+    .ti.done .ti-title{text-decoration:line-through}
+    .ti-chk{width:22px;height:22px;border:2px solid var(--border);border-radius:7px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;margin-top:1px;font-size:13px}
+    .ti-chk:hover{border-color:var(--cyan)}
+    .ti-chk.ok{background:var(--cyan);border-color:var(--cyan);color:#08090e;font-weight:700}
+    .ti-body{flex:1;min-width:0}
+    .ti-title{font-size:14px;font-weight:600;margin-bottom:3px}
+    .ti-desc{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .ti-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+    /* ── NOTES ── */
+    .nc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative}
+    .nc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .nc-content{font-size:14px;line-height:1.65;white-space:pre-wrap;color:var(--text)}
+    .xp-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.28);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--xp);margin-top:8px}
+
+    /* ── TIMELINE ── */
+    .timeline{position:relative;padding-left:50px}
+    .timeline::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:2px;background:var(--border);border-radius:1px}
+    .tl-item{position:relative;margin-bottom:18px}
+    .tl-dot{position:absolute;left:-50px;top:0;width:36px;height:36px;border-radius:50%;background:var(--panel);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;z-index:1}
+
+    /* ── ACHIEVEMENT BADGES ── */
+    .ach{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;opacity:.35;transition:all .3s}
+    .ach.on{opacity:1;border-color:var(--xp);box-shadow:0 0 16px rgba(255,215,0,.12)}
+    .ach-icon{font-size:34px;margin-bottom:7px}
+    .ach-name{font-size:13px;font-weight:700}
+    .ach-desc{font-size:11px;color:var(--muted);margin-top:3px}
+
+    /* ── MODAL ── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
+    .overlay.open{display:flex}
+    .modal{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:26px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;animation:slideUp .22s ease}
+    .modal.wide{max-width:680px}
+    @keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:20px}
+    .mf{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+    /* ── ICON PICKER ── */
+    .icon-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+    .ig-item{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:var(--bg);border:2px solid var(--border);transition:all .18s}
+    .ig-item:hover{border-color:var(--muted)}
+    .ig-item.sel{border-color:var(--cyan);background:rgba(100,255,218,.1)}
+
+    /* ── MOOD PICKER ── */
+    .mood-grid{display:flex;gap:8px;margin-top:5px}
+    .mood-item{flex:1;text-align:center;padding:9px 4px;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);font-size:22px;transition:all .18s}
+    .mood-item:hover{border-color:var(--muted)}
+    .mood-item.sel{border-color:var(--cyan);background:rgba(100,255,218,.08)}
+    .mood-item span{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+
+    /* ── CHIPS ── */
+    .chip-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+    .chip{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--muted);transition:all .18s}
+    .chip.sel{border-color:var(--cyan);color:var(--cyan);background:rgba(100,255,218,.08)}
+
+    /* ── SUBTABS ── */
+    .stabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+    .stab{padding:6px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--muted);transition:all .18s}
+    .stab.active{background:rgba(100,255,218,.1);border-color:var(--cyan);color:var(--cyan)}
+
+    /* ── PROGRESS BAR ── */
+    .pbar{height:7px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:6px}
+    .pfill{height:100%;border-radius:4px;transition:width .5s ease}
+
+    /* ── DIVIDER ── */
+    .divider{height:1px;background:var(--border);margin:16px 0}
+
+    /* ── EMPTY STATE ── */
+    .empty{text-align:center;padding:44px 20px;color:var(--muted)}
+    .empty-icon{font-size:46px;margin-bottom:12px}
+    .empty-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:5px}
+
+    /* ── TOAST ── */
+    #toasts{position:fixed;bottom:22px;right:22px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:11px 15px;font-size:14px;display:flex;align-items:center;gap:9px;animation:tIn .28s ease;max-width:300px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
+    @keyframes tIn{from{transform:translateX(50px);opacity:0}to{transform:translateX(0);opacity:1}}
+    .toast.xp{border-color:rgba(255,215,0,.35)}
+    .toast.ok{border-color:rgba(80,250,123,.35)}
+    .toast.lvl{border-color:var(--purple);background:rgba(189,147,249,.1)}
+
+    /* ── CONFETTI ── */
+    #confetti{position:fixed;inset:0;pointer-events:none;z-index:500}
+
+    /* ── ANIMATIONS ── */
+    .reveal{animation:reveal .28s ease}
+    @keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .popAnim{animation:pop .45s ease}
+    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.28)}100%{transform:scale(1)}}
+
+    @media(max-width:500px){
+      .header-inner{gap:8px}
+      .xp-wrap{min-width:80px}
+      #toasts{bottom:16px;right:10px}
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap brand">
-      <div class="logo"></div>
-      <strong>Mon Objectif Finance</strong>
-          </div>
-  </header>
 
-  <main class="wrap" style="padding-bottom:96px">
-    <div class="card" style="margin-bottom:12px">
-      <h2 style="margin:0 0 8px">Mon Coach IA</h2>
-
-<!-- Sélecteur d’objectif + ajout -->
-<div class="row" style="margin:8px 12px;align-items:center">
-  <label for="goal" class="muted" style="margin-right:8px">Objectif</label>
-  <select id="goal" class="btn" style="padding:8px 12px"></select>
-  <button id="newGoal" type="button" class="btn" style="margin-left:8px"
-        onclick="toggleNewGoal()">+ Nouvel objectif</button>
-</div>
-      <div id="newGoalForm" class="row"
-     style="margin:8px 0; align-items:center; display:none;">
-  <input id="goalTitle" type="text" placeholder="Titre de l'objectif"
-         class="input" style="margin-right:8px;" />
-  <input id="goalDesc"  type="text" placeholder="Description (optionnel)"
-         class="input" style="margin-right:8px;" />
-  <button type="button" class="btn" onclick="confirmAddObjective()">Créer</button>
-  <button type="button" class="btn muted" style="margin-left:8px;"
-          onclick="toggleNewGoal(false)">Annuler</button>
-</div>
-
-<!-- Zone de chat + envoi -->
-<div id="chat"></div>
-<div class="row" style="margin:8px 0">
-  <input id="msg" type="text" placeholder="Ex : Épargner 1000 € en 3 mois" class="input" />
- <button id="send" type="button" class="btn" onclick="sendMessage()">Envoyer</button>
-</div>
-
-      <p class="muted" style="margin-top:10px">
-        Réponses longues, en Markdown : Résumé, Analyse, Plan, Exemples, Risques, Actions.
-      </p>
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">🎯 QuestBoard</div>
+    <div class="player-bar">
+      <div class="streak">🔥 <span id="hStreak">0</span></div>
+      <div class="xp-wrap">
+        <div class="xp-lbl"><span id="hXP">0</span> / <span id="hNext">100</span> XP</div>
+        <div class="xp-bar"><div class="xp-fill" id="hFill" style="width:0%"></div></div>
+      </div>
+      <div class="lvl-badge" id="hLvl">Niv. 1</div>
     </div>
+  </div>
+</header>
 
-<div>
-  <h2>Connexion / Inscription</h2>
-  <input type="email" id="email" placeholder="Email" />
-  <input type="password" id="password" placeholder="Mot de passe" />
-  <button onclick="signUp()">S'inscrire</button>
-  <button onclick="signIn()">Se connecter</button>
-  <button onclick="signOut()">Se déconnecter</button>
-<!-- Liste des objectifs -->
-<div id="objectivesPanel" class="card" style="margin-top:16px; display:none;">
-  <h2 style="margin:0 0 8px;">Mes objectifs</h2>
-  <ul id="objectivesList" style="list-style:disc; padding-left:18px; margin:0;"></ul>
-</div>
-</div>
-    </main>
+<!-- ═══════════════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-tab active" data-tab="dash"   onclick="go('dash')">📊 Tableau de bord</div>
+    <div class="nav-tab"        data-tab="goals"  onclick="go('goals')">🎯 Objectifs</div>
+    <div class="nav-tab"        data-tab="tasks"  onclick="go('tasks')">✅ Tâches <span class="badge-n" id="pendBadge" style="display:none"></span></div>
+    <div class="nav-tab"        data-tab="journal"onclick="go('journal')">📝 Journal</div>
+    <div class="nav-tab"        data-tab="achiev" onclick="go('achiev')">🏆 Succès</div>
+  </div>
+</nav>
 
-<!-- Charge la lib Supabase (ferme bien le script !) -->
-<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── DASHBOARD ── -->
+  <div class="tab active" id="tab-dash">
+    <div class="sh">
+      <h1 class="st">Tableau de bord</h1>
+      <span style="color:var(--muted);font-size:13px" id="greeting"></span>
+    </div>
+    <div class="g4" style="margin-bottom:20px">
+      <div class="sc"><div class="sc-icon">🎯</div><div class="sc-val" id="sGoals">0</div><div class="sc-lbl">Objectifs actifs</div></div>
+      <div class="sc"><div class="sc-icon">✅</div><div class="sc-val" id="sDone">0</div><div class="sc-lbl">Tâches terminées</div></div>
+      <div class="sc"><div class="sc-icon">📝</div><div class="sc-val" id="sNotes">0</div><div class="sc-lbl">Notes de progrès</div></div>
+      <div class="sc"><div class="sc-icon">⚡</div><div class="sc-val" id="sXP">0</div><div class="sc-lbl">XP total gagné</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="sh" style="margin-bottom:12px">
+          <h2 style="font-size:15px;font-weight:700">Mes objectifs</h2>
+          <button class="btn btn-g btn-sm" onclick="go('goals')">Voir tout →</button>
+        </div>
+        <div id="dGoals"></div>
+      </div>
+      <div class="card">
+        <div class="sh" style="margin-bottom:12px">
+          <h2 style="font-size:15px;font-weight:700">À faire</h2>
+          <button class="btn btn-g btn-sm" onclick="go('tasks')">Voir tout →</button>
+        </div>
+        <div id="dTasks"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="sh" style="margin-bottom:12px">
+        <h2 style="font-size:15px;font-weight:700">Journal récent</h2>
+        <button class="btn btn-g btn-sm" onclick="go('journal')">Voir tout →</button>
+      </div>
+      <div id="dJournal"></div>
+    </div>
+  </div>
+
+  <!-- ── OBJECTIFS ── -->
+  <div class="tab" id="tab-goals">
+    <div class="sh">
+      <h1 class="st">Mes objectifs</h1>
+      <button class="btn btn-p" onclick="openGoalModal()">+ Nouvel objectif</button>
+    </div>
+    <div class="stabs" id="gFilterTabs">
+      <div class="stab active" data-f="all"     onclick="filterGoals('all')">Tous</div>
+      <div class="stab"        data-f="finance"  onclick="filterGoals('finance')">💰 Finance</div>
+      <div class="stab"        data-f="code"     onclick="filterGoals('code')">💻 Code</div>
+      <div class="stab"        data-f="sante"    onclick="filterGoals('sante')">🏃 Santé</div>
+      <div class="stab"        data-f="perso"    onclick="filterGoals('perso')">🌱 Perso</div>
+      <div class="stab"        data-f="sport"    onclick="filterGoals('sport')">💪 Sport</div>
+    </div>
+    <div class="g2" id="goalsGrid"></div>
+  </div>
+
+  <!-- ── TÂCHES ── -->
+  <div class="tab" id="tab-tasks">
+    <div class="sh">
+      <h1 class="st">Mes tâches</h1>
+      <button class="btn btn-p" onclick="openTaskModal()">+ Nouvelle tâche</button>
+    </div>
+    <div class="stabs" id="tFilterTabs">
+      <div class="stab active" data-f="pending" onclick="filterTasks('pending')">À faire</div>
+      <div class="stab"        data-f="done"    onclick="filterTasks('done')">Terminées</div>
+      <div class="stab"        data-f="all"     onclick="filterTasks('all')">Toutes</div>
+    </div>
+    <div class="chip-list" id="tGoalFilter" style="margin-bottom:16px"></div>
+    <div id="tasksList"></div>
+  </div>
+
+  <!-- ── JOURNAL ── -->
+  <div class="tab" id="tab-journal">
+    <div class="sh">
+      <h1 class="st">Journal de progression</h1>
+      <button class="btn btn-p" onclick="openNoteModal()">+ Nouvelle note</button>
+    </div>
+    <div class="chip-list" id="jGoalFilter" style="margin-bottom:16px"></div>
+    <div class="timeline" id="journalList"></div>
+  </div>
+
+  <!-- ── SUCCÈS ── -->
+  <div class="tab" id="tab-achiev">
+    <div class="sh">
+      <h1 class="st">Succès & Badges</h1>
+      <span style="color:var(--muted);font-size:13px"><span id="achOn">0</span> / <span id="achTotal">0</span> débloqués</span>
+    </div>
+    <div class="g4" id="achievGrid"></div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════════════ -->
+
+<!-- GOAL MODAL -->
+<div class="overlay" id="mGoal">
+  <div class="modal">
+    <h2 class="modal-title" id="mGoalTitle">Nouvel objectif</h2>
+    <input type="hidden" id="gEditId" />
+    <div class="fg"><label>Titre *</label><input class="inp" id="gTitle" placeholder="Ex: Épargner 5 000 €" /></div>
+    <div class="fg"><label>Description</label><textarea class="ta" id="gDesc" placeholder="Décris ton objectif..."></textarea></div>
+    <div class="fg">
+      <label>Catégorie</label>
+      <select class="sel" id="gCat">
+        <option value="finance">💰 Finance</option>
+        <option value="code">💻 Code / Projet</option>
+        <option value="sante">🏃 Santé</option>
+        <option value="perso">🌱 Personnel</option>
+        <option value="sport">💪 Sport</option>
+        <option value="autre">⭐ Autre</option>
+      </select>
+    </div>
+    <div class="fg"><label>Icône</label><div class="icon-grid" id="iconGrid"></div></div>
+    <div class="fg">
+      <label>Progression actuelle : <strong id="progVal">0</strong>%</label>
+      <input type="range" id="gProg" min="0" max="100" value="0" style="width:100%;accent-color:var(--cyan);margin-top:4px"
+             oninput="document.getElementById('progVal').textContent=this.value" />
+    </div>
+    <div class="fg"><label>Date limite (optionnel)</label><input type="date" class="inp" id="gDeadline" /></div>
+    <div class="mf">
+      <button class="btn btn-g" onclick="closeM('mGoal')">Annuler</button>
+      <button class="btn btn-p" onclick="saveGoal()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="overlay" id="mTask">
+  <div class="modal">
+    <h2 class="modal-title">Nouvelle tâche</h2>
+    <div class="fg"><label>Titre *</label><input class="inp" id="tTitle" placeholder="Ex: Ouvrir un livret A" /></div>
+    <div class="fg"><label>Description</label><textarea class="ta" id="tDesc" placeholder="Détails..."></textarea></div>
+    <div class="fg"><label>Objectif lié</label><div class="chip-list" id="tGoalChips"></div></div>
+    <div class="fg">
+      <label>Priorité</label>
+      <div style="display:flex;gap:12px;margin-top:5px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
+          <input type="radio" name="tPrio" value="low" style="accent-color:var(--green)" checked> 🟢 Basse
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
+          <input type="radio" name="tPrio" value="medium" style="accent-color:var(--yellow)"> 🟡 Moyenne
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer">
+          <input type="radio" name="tPrio" value="high" style="accent-color:var(--red)"> 🔴 Haute
+        </label>
+      </div>
+    </div>
+    <div class="fg"><label>Date d'échéance (optionnel)</label><input type="date" class="inp" id="tDue" /></div>
+    <div class="mf">
+      <button class="btn btn-g" onclick="closeM('mTask')">Annuler</button>
+      <button class="btn btn-p" onclick="saveTask()">Ajouter (+5 XP)</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="overlay" id="mNote">
+  <div class="modal">
+    <h2 class="modal-title">Nouvelle note de progression</h2>
+    <div class="fg">
+      <label>Comment tu te sens ?</label>
+      <div class="mood-grid">
+        <div class="mood-item sel" data-m="excited" onclick="selMood('excited')">🤩<span>En feu !</span></div>
+        <div class="mood-item"     data-m="good"    onclick="selMood('good')">😊<span>Bien</span></div>
+        <div class="mood-item"     data-m="neutral" onclick="selMood('neutral')">😐<span>Neutre</span></div>
+        <div class="mood-item"     data-m="tough"   onclick="selMood('tough')">😓<span>Difficile</span></div>
+      </div>
+    </div>
+    <div class="fg"><label>Objectif concerné</label><div class="chip-list" id="nGoalChips"></div></div>
+    <div class="fg">
+      <label>Ta note *</label>
+      <textarea class="ta" id="nContent" style="min-height:110px"
+        placeholder="Qu'est-ce que tu as accompli ? Qu'est-ce que tu as appris ? Quels sont tes prochains pas ?"></textarea>
+    </div>
+    <div class="mf">
+      <button class="btn btn-g" onclick="closeM('mNote')">Annuler</button>
+      <button class="btn btn-p" onclick="saveNote()">Publier (+10 XP)</button>
+    </div>
+  </div>
+</div>
+
+<!-- GOAL DETAIL MODAL -->
+<div class="overlay" id="mDetail">
+  <div class="modal wide">
+    <button class="btn btn-g btn-sm" style="margin-bottom:16px" onclick="closeM('mDetail')">← Retour</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- TOASTS & CONFETTI -->
+<div id="toasts"></div>
+<canvas id="confetti"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════ -->
 <script>
-  // 1) Config Supabase (mets bien TES valeurs)
-  const SUPABASE_URL = "https://axoxjkizgtdpgrangsts.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_uaz08Xkwr0CxR1FfSE9YYg_5KPnEekP"; // ta clé "Publishable key"
+// ── DATA ──────────────────────────────────────────────────────
+const DB = {
+  load:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  save:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  id:()=>crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)+Date.now().toString(36),
+};
 
-  // 2) CLIENT SUPABASE
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let S = {
+  goals:  DB.load('qb_goals',  []),
+  tasks:  DB.load('qb_tasks',  []),
+  notes:  DB.load('qb_notes',  []),
+  player: DB.load('qb_player', {xp:0,level:1,streak:0,lastActive:null,totalXP:0,badges:[],tasksDone:0,totalNotes:0}),
+};
 
-  // 3) FONCTIONS AUTH (les tiennes si tu les as déjà plus haut)
-  async function signUp() {
-    const email = document.getElementById('email')?.value.trim();
-    const password = document.getElementById('password')?.value;
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) alert("❌ " + error.message); else alert("✅ Inscription réussie !");
+const save = () => {
+  DB.save('qb_goals',  S.goals);
+  DB.save('qb_tasks',  S.tasks);
+  DB.save('qb_notes',  S.notes);
+  DB.save('qb_player', S.player);
+};
+
+// ── XP / LEVEL ───────────────────────────────────────────────
+const xpNeeded = lvl => 100 + (lvl-1)*60;
+
+function addXP(n, why='') {
+  const p = S.player;
+  p.xp += n; p.totalXP += n;
+  let leveled = false;
+  while (p.xp >= xpNeeded(p.level)) { p.xp -= xpNeeded(p.level); p.level++; leveled=true; }
+  save(); renderHUD();
+  if (leveled) {
+    toast('lvl', `🎉 Niveau ${p.level} atteint !`, 4000);
+    confetti();
+    const b = document.getElementById('hLvl');
+    b?.classList.add('popAnim');
+    setTimeout(()=>b?.classList.remove('popAnim'),500);
   }
-
-  async function signIn() {
-    const email = document.getElementById('email')?.value.trim();
-    const password = document.getElementById('password')?.value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("❌ " + error.message); else alert("✅ Connecté !");
-  }
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) alert("❌ " + error.message); else alert("🔓 Déconnecté !");
-  }
-
-  // --- OBJECTIFS ---
-
-function toggleNewGoal(force) {
-  const box = document.getElementById('newGoalForm');
-  if (!box) return;
-  const show = typeof force === 'boolean'
-    ? force
-    : (box.style.display === 'none' || !box.style.display);
-  box.style.display = show ? 'flex' : 'none';
+  if (why) toast('xp', `+${n} XP — ${why}`);
 }
 
-function escapeHtml(s) {
-  return String(s ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+function renderHUD() {
+  const p = S.player;
+  const pct = Math.min(p.xp/xpNeeded(p.level)*100,100).toFixed(1);
+  document.getElementById('hXP').textContent = p.xp;
+  document.getElementById('hNext').textContent = xpNeeded(p.level);
+  document.getElementById('hFill').style.width = pct+'%';
+  document.getElementById('hLvl').textContent = `Niv. ${p.level}`;
+  document.getElementById('hStreak').textContent = p.streak;
 }
 
-function populateGoalSelect(rows = []) {
-  const sel = document.getElementById('goal');
-  if (!sel) return;
-  sel.innerHTML = rows.map(r =>
-    `<option value="${r.id}">${escapeHtml(r.title || 'Sans titre')}</option>`
+function checkStreak() {
+  const p = S.player;
+  const today = new Date().toDateString();
+  if (p.lastActive === today) return;
+  const yest = new Date(Date.now()-86400000).toDateString();
+  p.streak = p.lastActive === yest ? p.streak+1 : 1;
+  p.lastActive = today;
+  if (p.streak > 1 && p.streak % 7 === 0) toast('lvl', `🔥 ${p.streak} jours de suite !`, 4000);
+  save();
+}
+
+// ── ACHIEVEMENTS ─────────────────────────────────────────────
+const ACHES = [
+  {id:'g1',  icon:'🎯', name:'Premier objectif', desc:'Crée ton premier objectif',  chk:s=>s.goals.length>=1},
+  {id:'g5',  icon:'🏹', name:'Archer',           desc:'5 objectifs créés',           chk:s=>s.goals.length>=5},
+  {id:'t1',  icon:'✅', name:'Action !',          desc:'Complète ta première tâche', chk:s=>s.player.tasksDone>=1},
+  {id:'t10', icon:'⚡', name:'Productif',         desc:'10 tâches terminées',         chk:s=>s.player.tasksDone>=10},
+  {id:'t25', icon:'🚀', name:'Machine',           desc:'25 tâches terminées',         chk:s=>s.player.tasksDone>=25},
+  {id:'n1',  icon:'📝', name:'Journaliste',       desc:'Écris ta première note',      chk:s=>s.notes.length>=1},
+  {id:'n10', icon:'📖', name:'Chroniqueur',       desc:'10 notes de progrès',         chk:s=>s.notes.length>=10},
+  {id:'l5',  icon:'🌟', name:'Étoile montante',   desc:'Atteins le niveau 5',         chk:s=>s.player.level>=5},
+  {id:'l10', icon:'💫', name:'Légende',           desc:'Atteins le niveau 10',        chk:s=>s.player.level>=10},
+  {id:'s7',  icon:'🔥', name:'En feu !',          desc:'7 jours d\'affilée',          chk:s=>s.player.streak>=7},
+  {id:'s30', icon:'🌋', name:'Inarrêtable',       desc:'30 jours d\'affilée',         chk:s=>s.player.streak>=30},
+  {id:'p100',icon:'🏆', name:'Accompli !',        desc:'1 objectif à 100%',           chk:s=>s.goals.some(g=>g.progress>=100)},
+  {id:'xp1k',icon:'💎', name:'Millionnaire XP',   desc:'Cumule 1 000 XP',             chk:s=>s.player.totalXP>=1000},
+];
+
+function checkAch() {
+  let nb=0;
+  for (const a of ACHES) {
+    if (!S.player.badges.includes(a.id) && a.chk(S)) {
+      S.player.badges.push(a.id); nb++;
+      toast('ok', `🏅 Succès : ${a.name} !`, 4000);
+    }
+  }
+  if (nb) save();
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtDate = d => d ? new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '';
+const fmtRel  = d => {
+  if (!d) return '';
+  const diff = Date.now()-new Date(d);
+  if (diff<60000)    return 'à l\'instant';
+  if (diff<3600000)  return `il y a ${Math.floor(diff/60000)} min`;
+  if (diff<86400000) return `il y a ${Math.floor(diff/3600000)} h`;
+  if (diff<604800000)return `il y a ${Math.floor(diff/86400000)} j`;
+  return fmtDate(d);
+};
+
+const MOODS = {excited:'🤩',good:'😊',neutral:'😐',tough:'😓'};
+const CATS  = {finance:'💰 Finance',code:'💻 Code',sante:'🏃 Santé',perso:'🌱 Perso',sport:'💪 Sport',autre:'⭐ Autre'};
+const ICONS = ['🎯','💰','💻','🚀','📚','🏃','💪','🌱','🎨','🎵','✈️','🏠','💼','🔧','📊','🎓','🌍','🎮','🏋️','🧠'];
+const PRIO_COLOR = {low:'var(--green)',medium:'var(--yellow)',high:'var(--red)'};
+
+// ── NAVIGATION ───────────────────────────────────────────────
+let curTab='dash', gFilter='all', tFilter='pending', tGFilter='all', jGFilter='all';
+
+function go(tab) {
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
+  document.querySelector(`.nav-tab[data-tab="${tab}"]`)?.classList.add('active');
+  curTab = tab;
+  renderAll();
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+const openM  = id => document.getElementById(id)?.classList.add('open');
+const closeM = id => document.getElementById(id)?.classList.remove('open');
+
+document.querySelectorAll('.overlay').forEach(el =>
+  el.addEventListener('click', e => { if (e.target===el) el.classList.remove('open'); })
+);
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(type, msg, ms=2400) {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(), ms);
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────
+function confetti() {
+  const cv = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+  const cols = ['#64ffda','#bd93f9','#ff79c6','#f1fa8c','#50fa7b','#ffb86c'];
+  const pts  = Array.from({length:110}, ()=>({
+    x:Math.random()*cv.width, y:-8, r:Math.random()*5+3,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    vx:(Math.random()-.5)*3, vy:Math.random()*3.5+2,
+    ang:Math.random()*360, spin:(Math.random()-.5)*7,
+  }));
+  let fr, tick=0;
+  const draw=()=>{
+    ctx.clearRect(0,0,cv.width,cv.height);
+    pts.forEach(p=>{
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.ang*Math.PI/180);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r); ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.ang+=p.spin; p.vy+=.09;
+    });
+    if(++tick<130) fr=requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  };
+  cancelAnimationFrame(fr); draw();
+}
+
+// ── GOALS ────────────────────────────────────────────────────
+let selIcon='🎯';
+
+function openGoalModal(editId=null) {
+  selIcon = '🎯';
+  document.getElementById('gTitle').value    = '';
+  document.getElementById('gDesc').value     = '';
+  document.getElementById('gCat').value      = 'finance';
+  document.getElementById('gProg').value     = 0;
+  document.getElementById('progVal').textContent = '0';
+  document.getElementById('gDeadline').value = '';
+  document.getElementById('gEditId').value   = editId||'';
+  document.getElementById('mGoalTitle').textContent = editId ? 'Modifier l\'objectif' : 'Nouvel objectif';
+
+  // icon picker
+  document.getElementById('iconGrid').innerHTML = ICONS.map(ic=>
+    `<div class="ig-item ${ic===selIcon?'sel':''}" data-ic="${ic}" onclick="pickIcon('${ic}')">${ic}</div>`
   ).join('');
+
+  if (editId) {
+    const g = S.goals.find(g=>g.id===editId);
+    if (g) {
+      document.getElementById('gTitle').value        = g.title;
+      document.getElementById('gDesc').value         = g.description||'';
+      document.getElementById('gCat').value          = g.category||'autre';
+      document.getElementById('gProg').value         = g.progress;
+      document.getElementById('progVal').textContent = g.progress;
+      document.getElementById('gDeadline').value     = g.deadline||'';
+      selIcon = g.icon||'🎯';
+      document.querySelectorAll('#iconGrid .ig-item').forEach(el=>el.classList.toggle('sel',el.dataset.ic===selIcon));
+    }
+  }
+  openM('mGoal');
 }
 
-function renderObjectives(rows = []) {
-  const panel = document.getElementById('objectivesPanel');
-  const list  = document.getElementById('objectivesList');
-  if (!panel || !list) return;
+function pickIcon(ic) {
+  selIcon = ic;
+  document.querySelectorAll('#iconGrid .ig-item').forEach(el=>el.classList.toggle('sel',el.dataset.ic===ic));
+}
 
-  if (!rows.length) {
-    list.innerHTML = '<li>Aucun objectif pour le moment.</li>';
-    panel.style.display = 'block';
+function saveGoal() {
+  const title = document.getElementById('gTitle').value.trim();
+  if (!title) { toast('','⚠️ Donne un titre à ton objectif'); return; }
+  const editId   = document.getElementById('gEditId').value;
+  const progress = parseInt(document.getElementById('gProg').value)||0;
+
+  if (editId) {
+    const g = S.goals.find(g=>g.id===editId);
+    if (g) {
+      const prev = g.progress;
+      g.title       = title;
+      g.description = document.getElementById('gDesc').value.trim();
+      g.category    = document.getElementById('gCat').value;
+      g.icon        = selIcon;
+      g.progress    = progress;
+      g.deadline    = document.getElementById('gDeadline').value||null;
+      if (progress > prev) addXP(Math.round((progress-prev)*.5), 'Progression mise à jour 📈');
+    }
+  } else {
+    S.goals.push({
+      id:DB.id(), title,
+      description:document.getElementById('gDesc').value.trim(),
+      category:document.getElementById('gCat').value,
+      icon:selIcon, progress,
+      deadline:document.getElementById('gDeadline').value||null,
+      created_at:new Date().toISOString(),
+    });
+    addXP(20, 'Nouvel objectif créé 🎯');
+  }
+
+  save(); closeM('mGoal'); checkAch(); renderAll();
+}
+
+function delGoal(id) {
+  if (!confirm('Supprimer cet objectif ? Les tâches et notes liées seront aussi supprimées.')) return;
+  S.goals = S.goals.filter(g=>g.id!==id);
+  S.tasks = S.tasks.filter(t=>t.goalId!==id);
+  S.notes = S.notes.filter(n=>n.goalId!==id);
+  save(); renderAll(); toast('','🗑️ Objectif supprimé');
+}
+
+function filterGoals(f) {
+  gFilter = f;
+  document.querySelectorAll('#gFilterTabs .stab').forEach(el=>el.classList.toggle('active',el.dataset.f===f));
+  renderGoals();
+}
+
+function renderGoals() {
+  const grid = document.getElementById('goalsGrid');
+  const list = gFilter==='all' ? S.goals : S.goals.filter(g=>g.category===gFilter);
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-icon">🎯</div>
+      <div class="empty-title">Aucun objectif</div>
+      <div style="color:var(--muted);font-size:14px;margin-top:4px">Crée ton premier objectif pour commencer !</div>
+      <button class="btn btn-p" style="margin-top:14px" onclick="openGoalModal()">+ Créer un objectif</button>
+    </div>`;
     return;
   }
 
-  list.innerHTML = rows.map(r => `
-    <li>
-      <strong>${escapeHtml(r.title || '')}</strong>
-      <div>${escapeHtml(r.description || '')}</div>
-      <small>Créé le ${new Date(r.created_at).toLocaleString()}</small>
-    </li>
-  `).join('');
-  panel.style.display = 'block';
+  grid.innerHTML = list.map(g => {
+    const tTotal = S.tasks.filter(t=>t.goalId===g.id).length;
+    const tDone  = S.tasks.filter(t=>t.goalId===g.id&&t.completed).length;
+    const nCount = S.notes.filter(n=>n.goalId===g.id).length;
+    const R=30, C=2*Math.PI*R, off=C-(g.progress/100)*C;
+    return `<div class="gc cat-${g.category||'autre'} reveal" onclick="openGoalDetail('${g.id}')">
+      <button class="del-btn"       onclick="event.stopPropagation();delGoal('${g.id}')">✕</button>
+      <button class="edit-btn-card" onclick="event.stopPropagation();openGoalModal('${g.id}')">✏️</button>
+      <div class="gc-icon">${esc(g.icon)}</div>
+      <div class="gc-title">${esc(g.title)}</div>
+      ${g.description?`<div class="gc-desc">${esc(g.description)}</div>`:''}
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="76" height="76" viewBox="0 0 76 76">
+            <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--border)" stroke-width="7"/>
+            <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--cyan)" stroke-width="7"
+              stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"
+              stroke-linecap="round" style="transition:stroke-dashoffset .6s ease"/>
+          </svg>
+          <div class="ring-txt">${g.progress}%</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted)">Progression</div>
+          <div style="font-size:20px;font-weight:800;color:var(--cyan)">${g.progress}%</div>
+          ${g.deadline?`<div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${fmtDate(g.deadline)}</div>`:''}
+        </div>
+      </div>
+      <div class="gc-meta">
+        <span class="tag">${CATS[g.category]||g.category}</span>
+        ${tTotal?`<span class="tag">✅ ${tDone}/${tTotal}</span>`:''}
+        ${nCount?`<span class="tag">📝 ${nCount}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-async function getObjectives() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) { renderObjectives([]); populateGoalSelect([]); return; }
+// ── GOAL DETAIL ──────────────────────────────────────────────
+function openGoalDetail(id) {
+  const g = S.goals.find(g=>g.id===id);
+  if (!g) return;
+  const tasks = S.tasks.filter(t=>t.goalId===id);
+  const notes = [...S.notes.filter(n=>n.goalId===id)].reverse();
 
-  const { data, error } = await supabase
-    .from('objectives')
-    .select('id,title,description,created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) { alert('❌ ' + error.message); return; }
-
-  renderObjectives(data || []);
-  populateGoalSelect(data || []);
+  document.getElementById('detailContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <span style="font-size:36px">${esc(g.icon)}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:20px;font-weight:800;word-break:break-word">${esc(g.title)}</div>
+        ${g.description?`<div style="color:var(--muted);font-size:13px;margin-top:4px">${esc(g.description)}</div>`:''}
+      </div>
+      <button class="btn btn-g btn-sm" onclick="closeM('mDetail');openGoalModal('${id}')">✏️</button>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-size:13px;color:var(--muted)">Progression globale</span>
+        <span style="font-size:18px;font-weight:700;color:var(--cyan)">${g.progress}%</span>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${g.progress}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-size:15px;font-weight:700">Tâches (${tasks.length})</h3>
+      <button class="btn btn-p btn-sm" onclick="closeM('mDetail');openTaskModal('${id}')">+ Tâche</button>
+    </div>
+    ${tasks.length ? tasks.map(t=>renderTaskItem(t,true)).join('') : '<p style="color:var(--muted);font-size:13px">Aucune tâche. Ajoute-en une !</p>'}
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-size:15px;font-weight:700">Notes (${notes.length})</h3>
+      <button class="btn btn-p btn-sm" onclick="closeM('mDetail');openNoteModal('${id}')">+ Note</button>
+    </div>
+    ${notes.length ? notes.map(n=>`
+      <div class="nc" style="margin-bottom:10px">
+        <div class="nc-head">
+          <span style="font-size:20px">${MOODS[n.mood]||'📝'}</span>
+          <div>
+            <div style="font-weight:600;font-size:13px">${fmtRel(n.created_at)}</div>
+            <div style="font-size:11px;color:var(--muted)">${new Date(n.created_at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</div>
+          </div>
+        </div>
+        <div class="nc-content">${esc(n.content)}</div>
+        <div class="xp-chip">⚡ +${n.xp||10} XP</div>
+      </div>
+    `).join('') : '<p style="color:var(--muted);font-size:13px">Aucune note. Documente tes avancées !</p>'}
+  `;
+  openM('mDetail');
 }
 
-async function confirmAddObjective() {
-  const titleEl = document.getElementById('goalTitle');
-  const descEl  = document.getElementById('goalDesc');
-  const title = titleEl?.value.trim();
-  const description = descEl?.value.trim();
+// ── TASKS ─────────────────────────────────────────────────────
+let selTGoal=null;
 
-  if (!title) return alert('⚠️ Donne au moins un titre');
+function openTaskModal(preGoal=null) {
+  document.getElementById('tTitle').value = '';
+  document.getElementById('tDesc').value  = '';
+  document.getElementById('tDue').value   = '';
+  document.querySelector('input[name="tPrio"][value="medium"]').checked = true;
+  selTGoal = preGoal || S.goals[0]?.id || null;
 
-  const { data: { user }, error: eUser } = await supabase.auth.getUser();
-  if (eUser || !user) return alert("⚠️ Connecte-toi d'abord");
-
-  const { error } = await supabase
-    .from('objectives')
-    .insert([{ user_id: user.id, title, description }]);
-
-  if (error) return alert('❌ ' + error.message);
-
-  titleEl.value = ''; descEl.value = '';
-  toggleNewGoal(false);
-  await getObjectives();
-  alert('🎯 Objectif ajouté !');
+  document.getElementById('tGoalChips').innerHTML = S.goals.map(g=>
+    `<div class="chip ${g.id===selTGoal?'sel':''}" data-g="${g.id}" onclick="pickTGoal('${g.id}')">${esc(g.icon)} ${esc(g.title)}</div>`
+  ).join('') || '<span style="color:var(--muted);font-size:13px">Crée d\'abord un objectif</span>';
+  openM('mTask');
 }
-async function sendMessage() {
-  const input = document.getElementById('msg');
-  const message = input?.value.trim() || '';
-  if (!message) return alert('⚠️ Message vide !');
 
-  const chat = document.getElementById('chat');
-  if (chat) {
-    chat.innerHTML += `<div class="bubble me">${escapeHtml(message)}</div>`;
+function pickTGoal(id) {
+  selTGoal=id;
+  document.querySelectorAll('#tGoalChips .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
+}
+
+function saveTask() {
+  const title = document.getElementById('tTitle').value.trim();
+  if (!title) { toast('','⚠️ Donne un titre à la tâche'); return; }
+  S.tasks.push({
+    id:DB.id(), title,
+    description:document.getElementById('tDesc').value.trim(),
+    goalId:selTGoal,
+    priority:document.querySelector('input[name="tPrio"]:checked')?.value||'medium',
+    dueDate:document.getElementById('tDue').value||null,
+    completed:false, completedAt:null,
+    created_at:new Date().toISOString(),
+  });
+  save(); closeM('mTask'); addXP(5,'Tâche ajoutée'); renderAll();
+}
+
+function toggleTask(id) {
+  const t = S.tasks.find(t=>t.id===id);
+  if (!t) return;
+  t.completed = !t.completed;
+  t.completedAt = t.completed ? new Date().toISOString() : null;
+  if (t.completed) {
+    S.player.tasksDone++;
+    const xpMap={high:30,medium:20,low:10};
+    addXP(xpMap[t.priority]||20,'Tâche complétée ! 🎉');
+    checkAch();
+    if (S.player.tasksDone % 5===0) confetti();
   }
-  input.value = '';
+  save(); renderAll();
+}
 
-  // Essaie d’appeler ton endpoint Vercel s’il existe (ex: /api/coach)
-  try {
-    const goalId = document.getElementById('goal')?.value || null;
-    const res = await fetch('/api/coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, goalId })
-    });
-    if (!res.ok) throw new Error(res.statusText);
-    const json = await res.json();
-    if (chat) {
-      chat.innerHTML += `<div class="bubble bot">${escapeHtml(json.reply || 'Ok.')}</div>`;
-      chat.scrollTop = chat.scrollHeight;
-    }
-  } catch (e) {
-    // Fallback si ton backend n’est pas câblé
-    if (chat) {
-      chat.innerHTML += `<div class="bubble bot muted">⚠️ L’IA n’est pas encore branchée côté serveur.</div>`;
-      chat.scrollTop = chat.scrollHeight;
-    }
+function delTask(id) {
+  S.tasks = S.tasks.filter(t=>t.id!==id);
+  save(); renderAll();
+}
+
+function filterTasks(f) {
+  tFilter=f;
+  document.querySelectorAll('#tFilterTabs .stab').forEach(el=>el.classList.toggle('active',el.dataset.f===f));
+  renderTasks();
+}
+
+function filterTByGoal(id) {
+  tGFilter=id;
+  renderTasks();
+}
+
+function renderTaskItem(t, compact=false) {
+  const g = S.goals.find(g=>g.id===t.goalId);
+  const overdue = t.dueDate && new Date(t.dueDate)<new Date() && !t.completed;
+  return `<div class="ti ${t.completed?'done':''}">
+    <div class="ti-chk ${t.completed?'ok':''}" onclick="toggleTask('${t.id}')">${t.completed?'✓':''}</div>
+    <div class="ti-body">
+      <div class="ti-title">${esc(t.title)}</div>
+      ${t.description?`<div class="ti-desc">${esc(t.description)}</div>`:''}
+      <div class="ti-meta">
+        <div class="pdot" style="background:${PRIO_COLOR[t.priority]||'var(--muted)'}"></div>
+        ${g&&!compact?`<span class="tag">${esc(g.icon)} ${esc(g.title)}</span>`:''}
+        ${t.dueDate?`<span class="tag" style="color:${overdue?'var(--red)':'var(--muted)'}">📅 ${fmtDate(t.dueDate)}</span>`:''}
+        ${t.completed&&t.completedAt?`<span class="tag" style="color:var(--green)">✓ ${fmtRel(t.completedAt)}</span>`:''}
+      </div>
+    </div>
+    ${!compact?`<button class="btn btn-d btn-sm" onclick="delTask('${t.id}')">✕</button>`:''}
+  </div>`;
+}
+
+function renderTasks() {
+  const list = document.getElementById('tasksList');
+  let tasks = [...S.tasks];
+  if (tFilter==='pending') tasks=tasks.filter(t=>!t.completed);
+  else if (tFilter==='done') tasks=tasks.filter(t=>t.completed);
+  if (tGFilter!=='all') tasks=tasks.filter(t=>t.goalId===tGFilter);
+  const po={high:0,medium:1,low:2};
+  tasks.sort((a,b)=>a.completed!==b.completed?(a.completed?1:-1):(po[a.priority]??1)-(po[b.priority]??1));
+
+  // goal filter chips
+  const fc=document.getElementById('tGoalFilter');
+  const mk=(id,lbl)=>`<div class="chip ${tGFilter===id?'sel':''}" onclick="filterTByGoal('${id}')">${lbl}</div>`;
+  fc.innerHTML=mk('all','Tous les objectifs')+S.goals.map(g=>mk(g.id,`${esc(g.icon)} ${esc(g.title)}`)).join('');
+
+  if (!tasks.length) {
+    list.innerHTML=`<div class="empty">
+      <div class="empty-icon">${tFilter==='done'?'🎉':'✅'}</div>
+      <div class="empty-title">${tFilter==='done'?'Aucune tâche terminée':'Tout est à jour !'}</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML=tasks.map(t=>renderTaskItem(t)).join('');
+
+  // pending badge
+  const pending=S.tasks.filter(t=>!t.completed).length;
+  const b=document.getElementById('pendBadge');
+  b.textContent=pending; b.style.display=pending?'inline':'none';
+}
+
+// ── NOTES / JOURNAL ──────────────────────────────────────────
+let selMoodV='excited', selNGoal=null;
+
+function openNoteModal(preGoal=null) {
+  document.getElementById('nContent').value='';
+  selMoodV='excited'; selNGoal=preGoal||S.goals[0]?.id||null;
+  document.querySelectorAll('.mood-item').forEach(el=>el.classList.toggle('sel',el.dataset.m==='excited'));
+  document.getElementById('nGoalChips').innerHTML=S.goals.map(g=>
+    `<div class="chip ${g.id===selNGoal?'sel':''}" data-g="${g.id}" onclick="pickNGoal('${g.id}')">${esc(g.icon)} ${esc(g.title)}</div>`
+  ).join('')||'<span style="color:var(--muted);font-size:13px">Crée d\'abord un objectif</span>';
+  openM('mNote');
+}
+
+function selMood(m) {
+  selMoodV=m;
+  document.querySelectorAll('.mood-item').forEach(el=>el.classList.toggle('sel',el.dataset.m===m));
+}
+
+function pickNGoal(id) {
+  selNGoal=id;
+  document.querySelectorAll('#nGoalChips .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
+}
+
+function saveNote() {
+  const content=document.getElementById('nContent').value.trim();
+  if (!content) { toast('','⚠️ Écris quelque chose dans ta note'); return; }
+  const xp={excited:15,good:10,neutral:10,tough:12}[selMoodV]||10;
+  S.notes.push({id:DB.id(),content,mood:selMoodV,goalId:selNGoal,xp,created_at:new Date().toISOString()});
+  S.player.totalNotes++;
+  save(); closeM('mNote'); addXP(xp,'Note de progression ajoutée 📝'); checkAch(); renderAll();
+}
+
+function delNote(id) {
+  S.notes=S.notes.filter(n=>n.id!==id); save(); renderAll();
+}
+
+function filterJByGoal(id) {
+  jGFilter=id;
+  document.querySelectorAll('#jGoalFilter .chip').forEach(el=>el.classList.toggle('sel',el.dataset.g===id));
+  renderJournal();
+}
+
+function renderJournal() {
+  const fc=document.getElementById('jGoalFilter');
+  const mk=(id,lbl)=>`<div class="chip ${jGFilter===id?'sel':''}" data-g="${id}" onclick="filterJByGoal('${id}')">${lbl}</div>`;
+  fc.innerHTML=mk('all','Tous')+S.goals.map(g=>mk(g.id,`${esc(g.icon)} ${esc(g.title)}`)).join('');
+
+  let notes=[...S.notes].reverse();
+  if (jGFilter!=='all') notes=notes.filter(n=>n.goalId===jGFilter);
+
+  const list=document.getElementById('journalList');
+  if (!notes.length) {
+    list.innerHTML=`<div class="empty">
+      <div class="empty-icon">📝</div>
+      <div class="empty-title">Journal vide</div>
+      <div style="color:var(--muted);font-size:14px;margin-top:4px">Documente tes avancées pour garder la motivation !</div>
+      <button class="btn btn-p" style="margin-top:14px" onclick="openNoteModal()">+ Première note</button>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML=notes.map(n=>{
+    const g=S.goals.find(g=>g.id===n.goalId);
+    return `<div class="tl-item reveal">
+      <div class="tl-dot">${MOODS[n.mood]||'📝'}</div>
+      <div class="nc" style="position:relative">
+        <button class="del-btn" style="opacity:0;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0" onclick="delNote('${n.id}')">✕</button>
+        <div class="nc-head">
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:13px">${fmtRel(n.created_at)}</div>
+            <div style="font-size:11px;color:var(--muted)">${new Date(n.created_at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+          </div>
+          ${g?`<span style="font-size:11px;color:var(--cyan)">${esc(g.icon)} ${esc(g.title)}</span>`:''}
+        </div>
+        <div class="nc-content">${esc(n.content)}</div>
+        <div class="xp-chip">⚡ +${n.xp||10} XP</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // hover fix for delete buttons inside timeline (can't use CSS :hover on parent)
+  list.querySelectorAll('.nc').forEach(nc=>{
+    const b=nc.querySelector('.del-btn');
+    if(!b) return;
+    nc.addEventListener('mouseenter',()=>b.style.opacity='1');
+    nc.addEventListener('mouseleave',()=>b.style.opacity='0');
+  });
+}
+
+// ── ACHIEVEMENTS ─────────────────────────────────────────────
+function renderAchievements() {
+  const grid=document.getElementById('achievGrid');
+  const unlocked=S.player.badges.length;
+  document.getElementById('achOn').textContent=unlocked;
+  document.getElementById('achTotal').textContent=ACHES.length;
+  grid.innerHTML=ACHES.map(a=>{
+    const on=S.player.badges.includes(a.id);
+    return `<div class="ach ${on?'on reveal':''}">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="ach-name">${esc(a.name)}</div>
+      <div class="ach-desc">${esc(a.desc)}</div>
+      ${on?'<div style="font-size:11px;color:var(--xp);margin-top:6px">✓ Débloqué</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────
+function renderDashboard() {
+  document.getElementById('sGoals').textContent = S.goals.length;
+  document.getElementById('sDone').textContent  = S.player.tasksDone;
+  document.getElementById('sNotes').textContent = S.notes.length;
+  document.getElementById('sXP').textContent    = S.player.totalXP;
+
+  const h=new Date().getHours();
+  document.getElementById('greeting').textContent =
+    (h<12?'Bonjour':'h<18'?'Bon après-midi':'Bonsoir')+' 👋';
+
+  // goals preview
+  const dg=document.getElementById('dGoals');
+  if (!S.goals.length) {
+    dg.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
+      Aucun objectif.
+      <button class="btn btn-p btn-sm" style="margin-left:8px;margin-top:4px" onclick="go('goals');openGoalModal()">+ Créer</button>
+    </div>`;
+  } else {
+    dg.innerHTML=S.goals.slice(0,5).map(g=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer;transition:background .2s"
+           onmouseover="this.style.background='var(--panel2)'" onmouseout="this.style.background=''"
+           onclick="openGoalDetail('${g.id}')">
+        <span style="font-size:20px">${esc(g.icon)}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(g.title)}</div>
+          <div class="pbar" style="margin-top:4px;height:5px">
+            <div class="pfill" style="width:${g.progress}%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div>
+          </div>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--cyan)">${g.progress}%</span>
+      </div>
+    `).join('');
+  }
+
+  // tasks preview
+  const dt=document.getElementById('dTasks');
+  const pending=S.tasks.filter(t=>!t.completed).slice(0,5);
+  if (!pending.length) {
+    dt.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
+      🎉 Toutes tes tâches sont faites !
+      <br><button class="btn btn-p btn-sm" style="margin-top:8px" onclick="openTaskModal()">+ Nouvelle tâche</button>
+    </div>`;
+  } else {
+    dt.innerHTML=pending.map(t=>renderTaskItem(t)).join('');
+  }
+
+  // journal preview
+  const dj=document.getElementById('dJournal');
+  const recent=[...S.notes].reverse().slice(0,3);
+  if (!recent.length) {
+    dj.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">
+      Aucune note pour l'instant.
+      <br><button class="btn btn-p btn-sm" style="margin-top:8px" onclick="openNoteModal()">+ Ajouter une note</button>
+    </div>`;
+  } else {
+    dj.innerHTML=recent.map(n=>{
+      const g=S.goals.find(g=>g.id===n.goalId);
+      return `<div style="display:flex;gap:10px;padding:10px;border-radius:10px;background:var(--panel2);margin-bottom:8px">
+        <span style="font-size:20px">${MOODS[n.mood]||'📝'}</span>
+        <div style="flex:1;min-width:0">
+          ${g?`<div style="font-size:11px;color:var(--cyan);margin-bottom:3px">${esc(g.icon)} ${esc(g.title)}</div>`:''}
+          <div style="font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(n.content)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">${fmtRel(n.created_at)}</div>
+        </div>
+      </div>`;
+    }).join('');
   }
 }
-  // 5) EXPOSER AU GLOBAL (OBLIGATOIRE POUR LES onclick DU HTML)
-  window.signIn = signIn;
-  window.signUp = signUp;
-  window.signOut = signOut;
-  window.sendMessage = sendMessage;
-  
-  console.log("✅ Script chargé");
-  
-  window.toggleNewGoal = toggleNewGoal;
-window.confirmAddObjective = confirmAddObjective;
-window.getObjectives = getObjectives;
+
+// ── RENDER ALL ───────────────────────────────────────────────
+function renderAll() {
+  renderHUD();
+  renderDashboard();
+  renderGoals();
+  renderTasks();
+  renderJournal();
+  renderAchievements();
+  const p=S.tasks.filter(t=>!t.completed).length;
+  const b=document.getElementById('pendBadge');
+  b.textContent=p; b.style.display=p?'inline':'none';
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{ checkStreak(); renderAll(); });
 </script>
 </body>
 </html>
