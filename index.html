@@ -328,7 +328,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
   <div class="view active" id="v-home">
     <div class="ph">
       <div><div class="pt">📚 Mes Matières</div><div class="ps" id="home-sub">Choisis une matière pour commencer</div></div>
-      <button class="btn bp" onclick="openModal('m-subject')">+ Nouvelle matière</button>
+      <button class="btn bp" onclick="openSubjectModal()">+ Nouvelle matière</button>
     </div>
     <div class="stats" id="home-stats"></div>
     <div class="sgrid" id="home-grid"></div>
@@ -662,7 +662,7 @@ function renderHome() {
     </div>`;
   });
 
-  html += `<div class="sadd" onclick="openModal('m-subject')"><div class="sadd-ico">➕</div><div class="sadd-txt">Nouvelle matière</div></div>`;
+  html += `<div class="sadd" onclick="openSubjectModal()"><div class="sadd-ico">➕</div><div class="sadd-txt">Nouvelle matière</div></div>`;
   grid.innerHTML = html;
 }
 
@@ -1460,11 +1460,6 @@ ${context ? `Contenu du cours (résumé): ${context}` : ''}
 Réponds en français, de façon concise, claire et encourageante. Utilise des exemples concrets.`;
 
     const msgs_to_send = chatHistory.slice(-10);
-    const raw = await callAI(system, null, 'chat');
-
-    document.getElementById(thinkId)?.remove();
-
-    // We need to send full history
     const r = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1579,7 +1574,7 @@ function openSubjectModal(editId = null) {
     `<div class="ipi ${ic === selIcon ? 'sel' : ''}" data-ic="${ic}" onclick="pickIcon('${ic}')">${ic}</div>`
   ).join('');
 
-  openModal('m-subject');
+  document.getElementById('m-subject')?.classList.add('open');
 }
 
 function pickColor(id) {
@@ -1748,13 +1743,6 @@ function confetti() {
   };
   cancelAnimationFrame(fr); draw();
 }
-
-// Override openModal for subject to init pickers
-const _openModal = openModal;
-window.openModal = (id) => {
-  if (id === 'm-subject') openSubjectModal();
-  else _openModal(id);
-};
 
 // ═══════════════════════════════════════════════════
 //  INIT
