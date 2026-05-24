@@ -339,6 +339,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
       <div class="xpb"><div class="xpf" id="hFill" style="width:0%"></div></div>
     </div>
     <div class="lvl" id="hLvl">Niv. 1</div>
+    <button class="btn bg bsm" onclick="nav('gallery')" style="font-size:16px;padding:5px 10px" title="Galerie photos">🖼️</button>
   </div>
 </header>
 
@@ -380,6 +381,15 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
   <!-- FLASHCARDS VIEW -->
   <div class="view" id="v-flashcards">
     <div class="fcwrap" id="fc-wrap"></div>
+  </div>
+
+  <!-- GALLERY VIEW -->
+  <div class="view" id="v-gallery">
+    <div class="ph">
+      <div><div class="pt">🖼️ Galerie photos</div><div class="ps">Toutes tes photos de cours</div></div>
+      <button class="btn bg" onclick="navBack()">← Retour</button>
+    </div>
+    <div id="gallery-content"></div>
   </div>
 
   <!-- SUMMARY VIEW -->
@@ -572,6 +582,7 @@ function renderView() {
     case 'quiz':       renderQuiz(); break;
     case 'flashcards': renderFlashcards(); break;
     case 'summary':    renderSummary(); break;
+    case 'gallery':    renderGallery(); break;
     case 'ccf-detail': renderCCFDetail(); break;
     case 'bac-detail': renderBACDetail(); break;
   }
@@ -1636,6 +1647,55 @@ function openLightbox(imgId) {
 
 function closeLightbox() {
   document.getElementById('lightbox')?.classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  GALLERY VIEW
+// ═══════════════════════════════════════════════════
+function renderGallery() {
+  const el = document.getElementById('gallery-content');
+  let totalImgs = 0;
+  let html = '';
+
+  S.subjects.forEach(sub => {
+    const subImgs = [];
+    (sub.chapters || []).forEach(ch => {
+      (ch.images || []).filter(i => i.data).forEach(img => {
+        subImgs.push({ ...img, chapterTitle: ch.title, chapterId: ch.id, subjectId: sub.id });
+        totalImgs++;
+      });
+    });
+    if (!subImgs.length) return;
+    const col = COLORS.find(c => c.id === sub.colorId) || COLORS[0];
+    html += `<div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${col.t}"></div>
+        <div style="font-size:15px;font-weight:700">${sub.icon} ${esc(sub.name)}</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        ${subImgs.map(img => `
+          <div style="position:relative;cursor:pointer" onclick="openGalleryImg('${img.subjectId}','${img.chapterId}','${img.id}')">
+            <img src="${img.data}" alt="" style="width:130px;height:130px;object-fit:cover;border-radius:var(--r12);border:2px solid var(--brd);display:block;transition:border-color .2s" onmouseover="this.style.borderColor='${col.t}'" onmouseout="this.style.borderColor='var(--brd)'">
+            <div style="font-size:10px;color:var(--txt2);margin-top:4px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📖 ${esc(img.chapterTitle)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  });
+
+  if (!totalImgs) {
+    html = `<div class="empty"><div class="empty-ico">🖼️</div><div class="empty-t">Aucune photo</div><div class="empty-d">Ajoute des photos de tes notes dans un chapitre<br>pour les retrouver ici.</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function openGalleryImg(subjectId, chapterId, imgId) {
+  const sub = S.subjects.find(s => s.id === subjectId);
+  const ch = sub?.chapters?.find(c => c.id === chapterId);
+  const img = ch?.images?.find(i => i.id === imgId);
+  if (!img?.data) return;
+  document.getElementById('lightbox-img').src = img.data;
+  document.getElementById('lightbox')?.classList.add('open');
 }
 
 // ═══════════════════════════════════════════════════
