@@ -301,6 +301,26 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 .grade-display.g-good{color:var(--green)}.grade-display.g-mid{color:var(--yellow)}.grade-display.g-bad{color:var(--red)}
 .detail-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:24px}
 
+/* ── IMAGE GALLERY ── */
+.img-gallery{display:flex;flex-wrap:wrap;gap:10px;padding:14px 20px;border-top:1px solid var(--brd);min-height:0}
+.img-thumb{position:relative;width:90px;height:90px;border-radius:var(--r8);overflow:hidden;border:2px solid var(--brd);transition:border-color .2s;flex-shrink:0;cursor:pointer}
+.img-thumb:hover{border-color:var(--purple)}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-del{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(239,68,68,.9);border:none;border-radius:50%;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.img-proc{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#fff}
+.img-proc .spin{width:18px;height:18px;border-width:2px}
+.img-add{width:90px;height:90px;border-radius:var(--r8);border:2px dashed var(--brd);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--mut);font-size:11px;transition:all .2s;flex-shrink:0}
+.img-add:hover{border-color:var(--purple);color:var(--purple)}
+/* ── VOICE ── */
+.voice-on{background:rgba(239,68,68,.12)!important;border-color:rgba(239,68,68,.4)!important;color:var(--red)!important}
+.voice-pulse{animation:pulse 1s infinite}
+/* ── LIGHTBOX ── */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:var(--r16);object-fit:contain}
+/* ── TOOLBAR ── */
+.ced-toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){.clayout{grid-template-columns:1fr}.aipanel{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.page{padding:68px 14px 40px}.sgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.pt{font-size:21px}.hdr{padding:0 14px}.xpw{min-width:80px}.bc{display:none}}
@@ -455,6 +475,11 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
       <button class="btn bp" onclick="saveBAC()">Enregistrer</button>
     </div>
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
 </div>
 
 <!-- TOAST CONTAINER -->
@@ -854,11 +879,18 @@ function renderChapter() {
     <div class="ced">
       <div class="ced-head">
         <div class="ced-title">📖 ${esc(ch.title)}</div>
-        <button class="btn bg bsm" onclick="navBack()">← Retour</button>
+        <div class="ced-toolbar">
+          <button class="btn bg bsm" onclick="triggerImgUpload()" title="Ajouter une photo de tes notes">📷 Photo</button>
+          <button class="btn bg bsm" id="voice-btn" onclick="toggleVoice()" title="Dicter à la voix">🎤 Dicter</button>
+          <button class="btn bg bsm" onclick="navBack()">← Retour</button>
+        </div>
       </div>
-      <textarea class="course-ta" id="course-ta" placeholder="Colle ou écris ton cours ici...
-&#10;• Définitions, formules, dates...
-&#10;• Plus ton cours est complet, meilleurs seront le quiz et les flashcards générés par l'IA ✨">${esc(ch.content || '')}</textarea>
+      <input type="file" id="img-upload" accept="image/*" multiple capture="environment" style="display:none" onchange="handleImgUpload(event)">
+      <textarea class="course-ta" id="course-ta" placeholder="Écris ou colle ton cours ici...
+&#10;📷 Prends tes notes en photo — l'IA extrait le texte automatiquement
+&#10;🎤 Dicte à la voix avec le bouton Dicter
+&#10;✨ Plus le cours est complet, meilleurs sont le quiz et les flashcards !">${esc(ch.content || '')}</textarea>
+      <div id="img-gallery" style="display:${(ch.images||[]).length?'flex':'none'}"></div>
       <div class="ced-foot">
         <div class="saved-lbl"><div class="sdot" id="sdot"></div><span id="saved-txt">Sauvegardé</span></div>
         <div style="font-size:12px;color:var(--txt2)" id="char-count">${(ch.content||'').length} caractères</div>
@@ -909,6 +941,9 @@ function renderChapter() {
       </div>
     </div>
   `;
+
+  // Init image gallery
+  renderImgGallery(ch);
 
   // Auto-save course content
   const ta = document.getElementById('course-ta');
@@ -1479,6 +1514,186 @@ Réponds en français, de façon concise, claire et encourageante. Utilise des e
     btn.disabled = false;
     inp.focus();
   }
+}
+
+// ═══════════════════════════════════════════════════
+//  IMAGE UPLOAD & OCR
+// ═══════════════════════════════════════════════════
+function triggerImgUpload() {
+  document.getElementById('img-upload')?.click();
+}
+
+async function handleImgUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  event.target.value = '';
+
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch) return;
+  if (!ch.images) ch.images = [];
+
+  for (const file of files) {
+    const tmpId = DB.id();
+    ch.images.push({ id: tmpId, data: null, name: file.name, processing: true });
+    save();
+    renderImgGallery(ch);
+
+    try {
+      const b64 = await compressImage(file);
+      const imgObj = ch.images.find(i => i.id === tmpId);
+      if (imgObj) { imgObj.data = b64; imgObj.processing = false; }
+      save();
+      renderImgGallery(ch);
+
+      // Extract text via AI vision
+      toast('ai', '🔍 L\'IA lit ta photo...', 6000);
+      const system = `Tu es un assistant qui extrait le texte d'une photo de cours manuscrit ou imprimé.
+Retourne UNIQUEMENT le texte brut extrait, bien formaté, sans commentaire. Si c'est un schéma ou diagramme, décris-le brièvement.
+Réponds en français.`;
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'Extrais le texte de cette image de cours.' }],
+          systemOverride: system,
+          mode: 'ocr',
+          images: [b64]
+        })
+      });
+      const data = await r.json();
+      const extracted = data?.content || '';
+      if (extracted && extracted.length > 10) {
+        const ta = document.getElementById('course-ta');
+        if (ta) {
+          ta.value = (ta.value ? ta.value + '\n\n' : '') + `--- Photo : ${file.name} ---\n${extracted}`;
+          ta.dispatchEvent(new Event('input'));
+        }
+        toast('ok', '✅ Texte extrait de la photo !');
+      }
+    } catch (e) {
+      const imgObj = ch.images.find(i => i.id === tmpId);
+      if (imgObj) imgObj.processing = false;
+      save(); renderImgGallery(ch);
+      toast('err', '❌ Impossible de lire la photo');
+    }
+  }
+}
+
+async function compressImage(file) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const max = 1024;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        if (w > h) { h = Math.round(h * max / w); w = max; }
+        else { w = Math.round(w * max / h); h = max; }
+      }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(cv.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = url;
+  });
+}
+
+function renderImgGallery(ch) {
+  const gallery = document.getElementById('img-gallery');
+  if (!gallery) return;
+  const imgs = ch.images || [];
+  if (!imgs.length) { gallery.style.display = 'none'; gallery.innerHTML = ''; return; }
+  gallery.style.display = 'flex';
+  gallery.innerHTML = imgs.map(img => `
+    <div class="img-thumb">
+      ${img.data ? `<img src="${img.data}" alt="${esc(img.name)}" onclick="openLightbox('${img.id}')">` : '<div style="width:100%;height:100%;background:var(--sur2)"></div>'}
+      ${img.processing ? `<div class="img-proc"><div class="spin"></div><span>IA...</span></div>` : ''}
+      ${!img.processing ? `<button class="img-del" onclick="event.stopPropagation();deleteChapterImg('${img.id}')">✕</button>` : ''}
+    </div>
+  `).join('') + `<div class="img-add" onclick="triggerImgUpload()"><span style="font-size:22px">📷</span><span>Ajouter</span></div>`;
+}
+
+function deleteChapterImg(imgId) {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch) return;
+  ch.images = (ch.images || []).filter(i => i.id !== imgId);
+  save(); renderImgGallery(ch);
+  toast('ok', '🗑️ Photo supprimée');
+}
+
+function openLightbox(imgId) {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  const img = ch?.images?.find(i => i.id === imgId);
+  if (!img?.data) return;
+  document.getElementById('lightbox-img').src = img.data;
+  document.getElementById('lightbox')?.classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox')?.classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  VOICE DICTATION
+// ═══════════════════════════════════════════════════
+let voiceRec = null;
+let voiceActive = false;
+
+function toggleVoice() {
+  voiceActive ? stopVoice() : startVoice();
+}
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('err', '❌ Dictée non supportée sur ce navigateur (utilise Chrome)'); return; }
+
+  voiceRec = new SR();
+  voiceRec.lang = 'fr-FR';
+  voiceRec.continuous = true;
+  voiceRec.interimResults = true;
+
+  const ta = document.getElementById('course-ta');
+  if (!ta) return;
+  let base = ta.value;
+
+  voiceRec.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) base += (base && !base.endsWith(' ') ? ' ' : '') + e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    ta.value = base + (interim ? ' ' + interim : '');
+    ta.dispatchEvent(new Event('input'));
+  };
+
+  voiceRec.onerror = (e) => {
+    if (e.error !== 'no-speech') { toast('err', '❌ Erreur microphone : ' + e.error); stopVoice(); }
+  };
+
+  voiceRec.onend = () => { if (voiceActive) { try { voiceRec.start(); } catch {} } };
+
+  try {
+    voiceRec.start();
+    voiceActive = true;
+    const btn = document.getElementById('voice-btn');
+    if (btn) { btn.innerHTML = '⏹ Stop'; btn.classList.add('voice-on', 'voice-pulse'); }
+    toast('ok', '🎤 Parle — je transcris en direct !');
+  } catch (e) {
+    toast('err', '❌ Impossible d\'accéder au microphone');
+  }
+}
+
+function stopVoice() {
+  voiceActive = false;
+  try { voiceRec?.stop(); } catch {}
+  const btn = document.getElementById('voice-btn');
+  if (btn) { btn.innerHTML = '🎤 Dicter'; btn.classList.remove('voice-on', 'voice-pulse'); }
+  toast('ok', '⏹ Dictée arrêtée');
 }
 
 function appendBubble(container, role, text) {

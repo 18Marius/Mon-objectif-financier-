@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   try { body = typeof raw === 'string' ? JSON.parse(raw || '{}') : (raw || {}); } catch {}
 
   try {
-    const { messages = [], systemOverride = null, mode = 'chat' } = body;
+    const { messages = [], systemOverride = null, mode = 'chat', images = [] } = body;
 
     const defaultSystem = `Tu es "EduXP Assistant", un tuteur IA pédagogique, bienveillant et motivant pour lycéens et étudiants français.
 Tu aides à comprendre les cours, créer des révisions, et répondre aux questions scolaires.
@@ -21,11 +21,26 @@ Sois précis, clair, concis et encourageant. Réponds toujours en français.`;
 
     const system = systemOverride || defaultSystem;
 
+    // Build messages with optional image attachments
+    const builtMessages = messages.map((m, idx) => {
+      if (m.role === 'user' && idx === messages.length - 1 && images.length > 0) {
+        return {
+          role: 'user',
+          content: [
+            { type: 'text', text: m.content || '' },
+            ...images.map(img => ({ type: 'image_url', image_url: { url: img, detail: 'auto' } }))
+          ]
+        };
+      }
+      return m;
+    });
+
+    const useVision = images.length > 0;
     const payload = {
-      model: "gpt-4o-mini",
+      model: useVision ? "gpt-4o" : "gpt-4o-mini",
       temperature: mode === 'quiz' || mode === 'flashcards' ? 0.2 : 0.5,
-      max_tokens: mode === 'summary' ? 1800 : 1200,
-      messages: [{ role: "system", content: system }, ...messages]
+      max_tokens: mode === 'summary' || mode === 'ocr' ? 1800 : 1200,
+      messages: [{ role: "system", content: system }, ...builtMessages]
     };
 
     const r2 = await fetch("https://api.openai.com/v1/chat/completions", {
