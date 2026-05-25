@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EduXP — Mes Cours</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#07080f;--bg2:#0c0e1c;--sur:#111425;--sur2:#171a2e;--sur3:#1e2240;
@@ -321,6 +322,28 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 /* ── TOOLBAR ── */
 .ced-toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 
+/* ── AUTH SCREEN ── */
+#auth-screen{position:fixed;inset:0;background:var(--bg);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:36px;width:100%;max-width:400px;animation:slideUp .3s ease}
+.auth-logo{font-size:32px;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px}
+.auth-sub{text-align:center;font-size:13px;color:var(--txt2);margin-bottom:28px}
+.auth-tabs{display:flex;background:var(--bg2);border-radius:var(--r12);padding:4px;gap:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;border:none;background:transparent;border-radius:var(--r8);color:var(--txt2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.auth-tab.act{background:var(--sur2);color:var(--txt);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.auth-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:var(--r8);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none}
+.auth-err.show{display:block}
+.auth-sep{text-align:center;font-size:12px;color:var(--mut);margin:16px 0;position:relative}
+.auth-sep::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--brd)}
+.auth-sep span{position:relative;background:var(--sur);padding:0 10px}
+.auth-offline{width:100%;padding:9px;background:transparent;border:1px solid var(--brd);border-radius:var(--r12);color:var(--txt2);font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s}
+.auth-offline:hover{border-color:var(--mut);color:var(--txt)}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--sur2);border:1px solid var(--brd);border-radius:20px;padding:4px 10px 4px 4px;cursor:pointer;transition:all .2s}
+.user-chip:hover{border-color:var(--purple)}
+.user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){.clayout{grid-template-columns:1fr}.aipanel{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.page{padding:68px 14px 40px}.sgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.pt{font-size:21px}.hdr{padding:0 14px}.xpw{min-width:80px}.bc{display:none}}
@@ -340,6 +363,11 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
     </div>
     <div class="lvl" id="hLvl">Niv. 1</div>
     <button class="btn bg bsm" onclick="nav('gallery')" style="font-size:16px;padding:5px 10px" title="Galerie photos">🖼️</button>
+    <div class="user-chip" id="user-chip" onclick="handleUserChip()" style="display:none">
+      <div class="user-av" id="user-av">?</div>
+      <div class="user-name" id="user-name">...</div>
+      <div class="sync-dot" id="sync-dot"></div>
+    </div>
   </div>
 </header>
 
@@ -487,6 +515,25 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
   </div>
 </div>
 
+<!-- AUTH SCREEN -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">⚡ EduXP</div>
+    <div class="auth-sub">Ta plateforme d'apprentissage intelligente</div>
+    <div class="auth-tabs">
+      <button class="auth-tab act" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Inscription</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="fg"><label>Email</label><input class="inp" id="auth-email" type="email" placeholder="ton@email.com" autocomplete="email"></div>
+    <div class="fg"><label>Mot de passe</label><input class="inp" id="auth-pwd" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()"></div>
+    <div class="fg" id="fg-confirm" style="display:none"><label>Confirmer le mot de passe</label><input class="inp" id="auth-pwd2" type="password" placeholder="••••••••"></div>
+    <button class="btn bp" style="width:100%;justify-content:center;margin-bottom:4px" id="auth-submit" onclick="submitAuth()">Se connecter</button>
+    <div class="auth-sep"><span>ou</span></div>
+    <button class="auth-offline" onclick="continueOffline()">Continuer sans compte (données locales uniquement)</button>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <img id="lightbox-img" src="" alt="">
@@ -545,6 +592,8 @@ let S = {
 const save = () => {
   DB.save('eduxp_subjects', S.subjects);
   DB.save('eduxp_player', S.player);
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(saveToSupabase, 1500);
 };
 
 // ═══════════════════════════════════════════════════
@@ -2020,13 +2069,198 @@ function confetti() {
 }
 
 // ═══════════════════════════════════════════════════
+//  SUPABASE AUTH & SYNC
+// ═══════════════════════════════════════════════════
+let sbClient = null;
+let currentUser = null;
+let syncTimer = null;
+
+async function initSupabase() {
+  try {
+    const r = await fetch('/api/config');
+    const cfg = await r.json();
+    if (!cfg.url || !cfg.key) { showAuthScreen(); return; }
+
+    sbClient = window.supabase.createClient(cfg.url, cfg.key);
+
+    sbClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        currentUser = session.user;
+        hideAuthScreen();
+        updateUserChip();
+        loadFromSupabase();
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        updateUserChip();
+      }
+    });
+
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      hideAuthScreen();
+      updateUserChip();
+      await loadFromSupabase();
+    } else {
+      showAuthScreen();
+    }
+  } catch (e) {
+    console.warn('Supabase non disponible, mode local activé');
+    continueOffline();
+  }
+}
+
+async function loadFromSupabase() {
+  if (!sbClient || !currentUser) return;
+  setSyncState('syncing');
+  try {
+    const { data, error } = await sbClient
+      .from('eduxp_data')
+      .select('data')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (data?.data) {
+      S.subjects = data.data.subjects || S.subjects;
+      if (data.data.player) S.player = { ...S.player, ...data.data.player };
+      DB.save('eduxp_subjects', S.subjects);
+      DB.save('eduxp_player', S.player);
+      renderView(); renderHUD();
+      toast('ok', '☁️ Données synchronisées !');
+    }
+    setSyncState('ok');
+  } catch (e) {
+    setSyncState('ok');
+    console.warn('Sync load failed:', e);
+  }
+}
+
+async function saveToSupabase() {
+  if (!sbClient || !currentUser) return;
+  setSyncState('syncing');
+  try {
+    const syncData = {
+      subjects: S.subjects.map(sub => ({
+        ...sub,
+        chapters: (sub.chapters || []).map(ch => ({
+          ...ch,
+          images: (ch.images || []).map(img => ({ id: img.id, name: img.name, data: null, processing: false }))
+        }))
+      })),
+      player: S.player
+    };
+    await sbClient.from('eduxp_data').upsert({
+      user_id: currentUser.id,
+      data: syncData,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+    setSyncState('ok');
+  } catch (e) {
+    setSyncState('ok');
+    console.warn('Sync save failed:', e);
+  }
+}
+
+function setSyncState(state) {
+  const dot = document.getElementById('sync-dot');
+  if (dot) dot.classList.toggle('syncing', state === 'syncing');
+}
+
+function updateUserChip() {
+  const chip = document.getElementById('user-chip');
+  const av = document.getElementById('user-av');
+  const name = document.getElementById('user-name');
+  if (!chip) return;
+  if (currentUser) {
+    chip.style.display = 'flex';
+    const email = currentUser.email || '';
+    av.textContent = email[0]?.toUpperCase() || '?';
+    name.textContent = email.split('@')[0];
+  } else {
+    chip.style.display = 'none';
+  }
+}
+
+function handleUserChip() {
+  if (!currentUser) return;
+  if (confirm(`Déconnexion de ${currentUser.email} ?`)) {
+    sbClient?.auth.signOut();
+    toast('ok', '👋 Déconnecté');
+  }
+}
+
+// Auth screen UI
+let authMode = 'login';
+
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+function hideAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'none';
+}
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('tab-login').classList.toggle('act', mode === 'login');
+  document.getElementById('tab-register').classList.toggle('act', mode === 'register');
+  document.getElementById('auth-submit').textContent = mode === 'login' ? 'Se connecter' : "S'inscrire";
+  document.getElementById('fg-confirm').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('auth-err').classList.remove('show');
+  if (mode === 'register') document.getElementById('auth-pwd').autocomplete = 'new-password';
+}
+
+function showAuthErr(msg) {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg; el.classList.add('show');
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pwd = document.getElementById('auth-pwd').value;
+  const btn = document.getElementById('auth-submit');
+
+  if (!email || !pwd) { showAuthErr('Remplis tous les champs.'); return; }
+  if (authMode === 'register') {
+    const pwd2 = document.getElementById('auth-pwd2').value;
+    if (pwd !== pwd2) { showAuthErr('Les mots de passe ne correspondent pas.'); return; }
+    if (pwd.length < 6) { showAuthErr('Mot de passe trop court (6 caractères min).'); return; }
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Chargement...';
+  document.getElementById('auth-err').classList.remove('show');
+
+  try {
+    if (authMode === 'login') {
+      const { error } = await sbClient.auth.signInWithPassword({ email, password: pwd });
+      if (error) showAuthErr(error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : error.message);
+    } else {
+      const { error } = await sbClient.auth.signUp({ email, password: pwd });
+      if (error) showAuthErr(error.message);
+      else { toast('ok', '✅ Compte créé ! Vérifie tes emails.'); switchAuthTab('login'); }
+    }
+  } catch (e) {
+    showAuthErr('Erreur réseau. Réessaie.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
+  }
+}
+
+function continueOffline() {
+  hideAuthScreen();
+  toast('ok', '📱 Mode local — données sur cet appareil uniquement');
+}
+
+// ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   checkStreak();
   renderHUD();
   renderView();
   updateBC();
+  await initSupabase();
 });
 </script>
 </body>
