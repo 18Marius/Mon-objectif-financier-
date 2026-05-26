@@ -448,7 +448,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 
   <!-- CHAPTER VIEW -->
   <div class="view" id="v-chapter">
-    <div class="clayout" id="chapter-layout"></div>
+    <div id="chapter-layout"></div>
   </div>
 
   <!-- QUIZ VIEW -->
@@ -1122,6 +1122,7 @@ function renderChapter() {
   }
 
   document.getElementById('chapter-layout').innerHTML = `
+  <div class="clayout">
     <div class="ced">
       <div class="ced-head">
         <div class="ced-title">📖 ${esc(ch.title)}</div>
@@ -1169,54 +1170,6 @@ function renderChapter() {
 
       ${scores.length ? `<div class="aicard">${scoresHTML}</div>` : ''}
 
-      <div class="aicard">
-        <div class="aicard-head"><span class="spark">🧪</span><div class="aicard-title">Exercices</div></div>
-        <div class="tool-tabs" style="margin:0 0 12px;gap:5px">
-          <button class="tool-tab act" id="ch-ttab-correct" onclick="chTool('correct')">✏️ Corriger</button>
-          <button class="tool-tab" id="ch-ttab-solve" onclick="chTool('solve')">📐 Solveur</button>
-          <button class="tool-tab" id="ch-ttab-calc" onclick="chTool('calc')">🔢 Calc</button>
-          <button class="tool-tab" id="ch-ttab-conv" onclick="chTool('conv')">🔄 Unités</button>
-          <button class="tool-tab" id="ch-ttab-conj" onclick="chTool('conj')">📝 Conjugueur</button>
-        </div>
-        <div id="ch-tool-correct">
-          <textarea class="ta" id="ch-corr-ex" rows="2" placeholder="Énoncé de l'exercice (optionnel)" style="margin-bottom:8px;font-size:13px"></textarea>
-          <textarea class="ta" id="ch-corr-ans" rows="3" placeholder="Ta réponse / ta démarche..." style="margin-bottom:8px;font-size:13px"></textarea>
-          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunCorrection()" id="ch-corr-btn">✅ Corriger avec l'IA</button>
-          <div class="corr-result" id="ch-corr-res"></div>
-        </div>
-        <div id="ch-tool-solve" style="display:none">
-          <textarea class="ta" id="ch-solv-prob" rows="4" placeholder="Ex: Résoudre 2x² − 5x + 3 = 0&#10;Ex: Un objet de 5kg tombe de 10m..." style="margin-bottom:8px;font-size:13px"></textarea>
-          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunSolver()" id="ch-solv-btn">📐 Résoudre étape par étape</button>
-          <div class="corr-result" id="ch-solv-res"></div>
-        </div>
-        <div id="ch-tool-calc" style="display:none">
-          <div class="calc-display" style="margin-bottom:8px"><div class="calc-expr" id="ch-ce"></div><div class="calc-val" id="ch-cv">0</div></div>
-          <div class="calc-btns" id="ch-cb"></div>
-        </div>
-        <div id="ch-tool-conv" style="display:none">
-          <div class="conv-cats" id="ch-conv-cats" style="margin-bottom:10px;gap:5px"></div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-            <input class="inp" id="ch-cv-val" type="number" placeholder="Valeur" style="flex:1;min-width:70px" oninput="chRunConvert()">
-            <select class="inp" id="ch-cv-from" style="flex:1;min-width:70px" onchange="chRunConvert()"></select>
-            <select class="inp" id="ch-cv-to" style="flex:1;min-width:70px" onchange="chRunConvert()"></select>
-          </div>
-          <div style="font-size:22px;font-weight:800;color:var(--cyan);text-align:center;margin:8px 0 2px" id="ch-cv-res">—</div>
-        </div>
-        <div id="ch-tool-conj" style="display:none">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-            <input class="inp" id="ch-conj-v" placeholder="Verbe (ex: aller)" style="flex:1;min-width:100px" onkeydown="if(event.key==='Enter')chRunConjugate()">
-            <select class="inp" id="ch-conj-t" style="flex:1;min-width:120px">
-              <option>Tous les temps principaux</option>
-              <option>Présent</option><option>Imparfait</option><option>Futur simple</option>
-              <option>Passé composé</option><option>Conditionnel présent</option>
-              <option>Subjonctif présent</option><option>Impératif</option>
-            </select>
-          </div>
-          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunConjugate()" id="ch-conj-btn">📝 Conjuguer</button>
-          <div class="corr-result" id="ch-conj-res"></div>
-        </div>
-      </div>
-
       <div class="aichat" id="ai-chat-widget">
         <div class="aichat-head">
           <div class="aichat-av">🤖</div>
@@ -1234,6 +1187,80 @@ function renderChapter() {
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- EXERCICES — pleine largeur sous le cours -->
+  <div style="margin-top:20px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:22px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span style="font-size:20px">🧪</span>
+      <div style="font-size:17px;font-weight:800">Exercices & Outils</div>
+    </div>
+    <div class="tool-tabs" style="margin-bottom:18px">
+      <button class="tool-tab act" id="ch-ttab-correct" onclick="chTool('correct')">✏️ Corriger</button>
+      <button class="tool-tab" id="ch-ttab-solve" onclick="chTool('solve')">📐 Solveur</button>
+      <button class="tool-tab" id="ch-ttab-calc" onclick="chTool('calc')">🔢 Calculatrice</button>
+      <button class="tool-tab" id="ch-ttab-conv" onclick="chTool('conv')">🔄 Convertisseur</button>
+      <button class="tool-tab" id="ch-ttab-conj" onclick="chTool('conj')">📝 Conjugueur</button>
+    </div>
+
+    <div id="ch-tool-correct">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="fg" style="margin:0"><label>Énoncé de l'exercice (optionnel)</label>
+          <textarea class="ta" id="ch-corr-ex" rows="5" placeholder="Colle l'énoncé ici..."></textarea></div>
+        <div class="fg" style="margin:0"><label>Ta réponse / ta démarche *</label>
+          <textarea class="ta" id="ch-corr-ans" rows="5" placeholder="Écris ta réponse ou ta démarche..."></textarea></div>
+      </div>
+      <button class="btn bp" style="margin-top:12px" onclick="chRunCorrection()" id="ch-corr-btn">✅ Corriger avec l'IA</button>
+      <div class="corr-result" id="ch-corr-res"></div>
+    </div>
+
+    <div id="ch-tool-solve" style="display:none">
+      <div class="fg"><label>Problème à résoudre</label>
+        <textarea class="ta" id="ch-solv-prob" rows="5" placeholder="Ex: Résoudre 2x² − 5x + 3 = 0&#10;Ex: Un objet de 5kg tombe de 10m, quelle est sa vitesse ?&#10;Ex: Équilibrer la réaction chimique..."></textarea>
+      </div>
+      <button class="btn bp" onclick="chRunSolver()" id="ch-solv-btn">📐 Résoudre étape par étape</button>
+      <div class="corr-result" id="ch-solv-res"></div>
+    </div>
+
+    <div id="ch-tool-calc" style="display:none">
+      <div class="calc-wrap">
+        <div>
+          <div class="calc-display"><div class="calc-expr" id="ch-ce"></div><div class="calc-val" id="ch-cv">0</div></div>
+          <div class="calc-btns" id="ch-cb"></div>
+        </div>
+        <div class="calc-hist"><div class="calc-hist-t">Historique</div><div id="ch-calc-hist"></div></div>
+      </div>
+    </div>
+
+    <div id="ch-tool-conv" style="display:none">
+      <div class="conv-cats" id="ch-conv-cats"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="fg" style="min-width:120px;margin:0"><label>Valeur</label><input class="inp" id="ch-cv-val" type="number" placeholder="Ex: 100" oninput="chRunConvert()"></div>
+        <div class="fg" style="min-width:120px;margin:0"><label>De</label><select class="inp" id="ch-cv-from" onchange="chRunConvert()"></select></div>
+        <div class="fg" style="min-width:120px;margin:0"><label>Vers</label><select class="inp" id="ch-cv-to" onchange="chRunConvert()"></select></div>
+      </div>
+      <div class="conv-result-big" id="ch-cv-res">—</div>
+      <div class="conv-formula" id="ch-cv-formula"></div>
+    </div>
+
+    <div id="ch-tool-conj" style="display:none">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="fg" style="min-width:180px;margin:0"><label>Verbe</label>
+          <input class="inp" id="ch-conj-v" placeholder="Ex: aller, finir, prendre..." onkeydown="if(event.key==='Enter')chRunConjugate()"></div>
+        <div class="fg" style="min-width:220px;margin:0"><label>Temps / Mode</label>
+          <select class="inp" id="ch-conj-t">
+            <option>Tous les temps principaux</option>
+            <option>Présent de l'indicatif</option><option>Imparfait</option>
+            <option>Futur simple</option><option>Passé composé</option>
+            <option>Conditionnel présent</option><option>Subjonctif présent</option>
+            <option>Impératif présent</option><option>Participes</option>
+          </select></div>
+        <div class="fg" style="margin:0;align-self:flex-end"><label>&nbsp;</label>
+          <button class="btn bp" onclick="chRunConjugate()" id="ch-conj-btn">📝 Conjuguer</button></div>
+      </div>
+      <div class="corr-result" id="ch-conj-res"></div>
+    </div>
+  </div>
   `;
 
   // Init image gallery
@@ -1581,6 +1608,7 @@ function renderFC() {
     <div class="fchead">
       <div class="fcctr">Carte ${fcState.idx + 1} / ${total}</div>
       <button class="btn bg bsm" onclick="shuffleFC()">🔀 Mélanger</button>
+      <button class="btn bg bsm" onclick="exportFlashcards()" title="Télécharger / Enregistrer dans photos">💾 Sauvegarder</button>
     </div>
     <div class="fcscene" onclick="flipFC()">
       <div class="fc" id="fc-card" ${fcState.flipped ? 'class="fc flipped"' : ''}>
@@ -1933,6 +1961,74 @@ function closeLightbox() {
 }
 
 // ═══════════════════════════════════════════════════
+//  EXPORT FLASHCARDS
+// ═══════════════════════════════════════════════════
+function wrapCanvasText(ctx, text, x, y, maxW, lineH) {
+  const words = (text || '').split(' ');
+  let line = '';
+  for (const word of words) {
+    const test = line + word + ' ';
+    if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line.trim(), x, y); y += lineH; line = word + ' '; }
+    else line = test;
+  }
+  if (line.trim()) ctx.fillText(line.trim(), x, y);
+  return y;
+}
+
+async function exportFlashcards() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch  = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch?.flashcards?.length) { toast('warn', 'Aucune flashcard disponible.'); return; }
+  toast('ok', '⏳ Génération des images...');
+  const files = [];
+  for (let i = 0; i < ch.flashcards.length; i++) {
+    const fc = ch.flashcards[i];
+    const W = 900, H = 520;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+    // fond
+    ctx.fillStyle = '#07080f'; ctx.fillRect(0, 0, W, H);
+    // bordure
+    ctx.strokeStyle = '#252a45'; ctx.lineWidth = 2; ctx.strokeRect(1,1,W-2,H-2);
+    // séparateur
+    ctx.fillStyle = '#252a45'; ctx.fillRect(0, H/2, W, 1);
+    // numéro
+    ctx.fillStyle = '#475569'; ctx.font = '13px system-ui, sans-serif';
+    ctx.fillText(`${i+1} / ${ch.flashcards.length}  —  ${ch.title}`, 28, 28);
+    // label QUESTION
+    ctx.fillStyle = '#8b5cf6'; ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.fillText('❓ QUESTION', 28, 58);
+    // texte question
+    ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 20px system-ui, sans-serif';
+    wrapCanvasText(ctx, fc.front, 28, 90, W-56, 30);
+    // label RÉPONSE
+    ctx.fillStyle = '#06b6d4'; ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.fillText('✅ RÉPONSE', 28, H/2 + 30);
+    // texte réponse
+    ctx.fillStyle = '#94a3b8'; ctx.font = '18px system-ui, sans-serif';
+    wrapCanvasText(ctx, fc.back, 28, H/2 + 58, W-56, 26);
+    // watermark
+    ctx.fillStyle = '#1e2240'; ctx.font = '12px system-ui, sans-serif';
+    ctx.fillText('⚡ EduXP', W-80, H-14);
+
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    files.push(new File([blob], `flashcard-${i+1}-${(fc.front||'').slice(0,20).replace(/\s+/g,'_')}.png`, { type:'image/png' }));
+  }
+  // Mobile : Web Share API → "Enregistrer dans Photos"
+  if (navigator.share && navigator.canShare?.({ files })) {
+    try { await navigator.share({ files, title: `Flashcards — ${ch.title}` }); return; }
+    catch(e) { if (e.name === 'AbortError') return; }
+  }
+  // PC : téléchargement direct
+  for (const f of files) {
+    const url = URL.createObjectURL(f);
+    const a = document.createElement('a'); a.href = url; a.download = f.name; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+  toast('ok', `✅ ${files.length} flashcards téléchargées !`);
+}
+
+// ═══════════════════════════════════════════════════
 //  CHAPTER EXERCISES (intégrés dans le chapitre)
 // ═══════════════════════════════════════════════════
 const CH_TOOLS = ['correct','solve','calc','conv','conj'];
@@ -2075,6 +2171,7 @@ function chRunConvert() {
     else if(from==='K'&&to==='°F')result=(val-273.15)*9/5+32;
   } else { const t=CONV_CATS[chConvCat]; result=val*(t[to]/t[from]); }
   el.textContent=parseFloat(result.toFixed(8))+' '+to;
+  const fl=document.getElementById('ch-cv-formula'); if(fl) fl.textContent=val+' '+from+' = '+parseFloat(result.toFixed(8))+' '+to;
 }
 
 // Conjugueur chapitre
