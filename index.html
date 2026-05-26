@@ -3146,13 +3146,16 @@ function switchAuthTab(mode) {
 
 function translateAuthError(msg) {
   if (!msg) return 'Erreur inconnue.';
-  if (msg.includes('Invalid login credentials')) return 'Email ou mot de passe incorrect.';
-  if (msg.includes('Email not confirmed')) return 'Confirme ton email avant de te connecter.';
-  if (msg.includes('User already registered')) return 'Ce compte existe déjà. Connecte-toi.';
-  if (msg.includes('Password should be')) return 'Mot de passe trop court (6 caractères minimum).';
-  if (msg.includes('Invalid path') || msg.includes('invalid') || msg.includes('URL')) return 'URL Supabase invalide. Clique sur "Changer la configuration" ci-dessous.';
-  if (msg.includes('network') || msg.includes('fetch')) return 'Erreur réseau. Vérifie ta connexion.';
-  if (msg.includes('rate limit') || msg.includes('too many')) return 'Trop de tentatives. Réessaie dans quelques minutes.';
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login credentials') || m.includes('invalid credentials')) return 'Email ou mot de passe incorrect.';
+  if (m.includes('email not confirmed')) return 'Confirme ton email avant de te connecter.';
+  if (m.includes('user already registered') || m.includes('already been registered')) return 'Ce compte existe déjà. Connecte-toi plutôt.';
+  if (m.includes('password should be') || m.includes('password is too short') || m.includes('weak password')) return 'Mot de passe trop court (6 caractères minimum).';
+  if (m.includes('invalid path') || m.includes('failed to fetch') || m.includes('networkerror') || m.includes('fetch')) return 'Erreur réseau. Vérifie ta connexion et réessaie.';
+  if (m.includes('rate limit') || m.includes('too many requests') || m.includes('too many')) return 'Trop de tentatives. Attends quelques minutes.';
+  if (m.includes('invalid email') || m.includes('email address') || m.includes('email format') || m.includes('validate email')) return 'Adresse email invalide.';
+  if (m.includes('signup') && m.includes('disabled')) return 'Les inscriptions sont temporairement désactivées.';
+  if (m.includes('over_email_send_rate_limit')) return 'Trop d\'emails envoyés. Attends quelques minutes.';
   return msg;
 }
 
@@ -3188,17 +3191,32 @@ async function submitAuth() {
   document.getElementById('auth-err').classList.remove('show');
 
   try {
-    if (!sbClient) { showAuthErr('Configuration Supabase manquante. Clique sur "Changer la configuration" ci-dessous.'); return; }
+    // Si sbClient absent, on réessaie de récupérer la config automatiquement
+    if (!sbClient) {
+      try {
+        const r = await fetch('/api/config');
+        if (r.ok) { const cfg = await r.json(); if (cfg.url && cfg.key) { sbClient = window.supabase.createClient(cfg.url, cfg.key); } }
+      } catch (_) {}
+    }
+    if (!sbClient) { showAuthErr('Impossible de joindre le serveur. Rafraîchis la page et réessaie.'); btn.disabled=false; btn.textContent=authMode==='login'?'Se connecter':"S'inscrire"; return; }
+
     if (authMode === 'login') {
       const { error } = await sbClient.auth.signInWithPassword({ email, password: pwd });
       if (error) showAuthErr(translateAuthError(error.message));
     } else {
-      const { error } = await sbClient.auth.signUp({ email, password: pwd });
-      if (error) showAuthErr(translateAuthError(error.message));
-      else { toast('ok', '✅ Compte créé ! Vérifie tes emails pour confirmer.'); switchAuthTab('login'); }
+      const { data, error } = await sbClient.auth.signUp({ email, password: pwd });
+      if (error) {
+        showAuthErr(translateAuthError(error.message));
+      } else if (data?.session) {
+        // Email confirmation désactivée → connecté directement
+        toast('ok', '🎉 Compte créé et connexion réussie !');
+      } else {
+        toast('ok', '📧 Compte créé ! Vérifie tes emails pour confirmer ton inscription.');
+        switchAuthTab('login');
+      }
     }
   } catch (e) {
-    showAuthErr('Erreur : ' + (e?.message || String(e) || 'inconnue'));
+    showAuthErr('Erreur : ' + translateAuthError(e?.message || String(e)));
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
