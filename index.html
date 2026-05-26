@@ -351,6 +351,49 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
 
+/* ── EXERCISES / OUTILS ── */
+.tool-tabs{display:flex;gap:8px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tool-tabs::-webkit-scrollbar{display:none}
+.tool-tab{padding:8px 16px;border:1px solid var(--brd);border-radius:20px;background:var(--sur2);color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:inherit}
+.tool-tab.act{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border-color:transparent}
+.tool-panel{display:none}.tool-panel.act{display:block;animation:fadeIn .2s ease}
+.tool-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r16);padding:22px;margin-bottom:18px}
+.tool-card h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.tool-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.tool-row .fg{flex:1;min-width:120px;margin:0}
+.corr-result{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r12);padding:16px;margin-top:16px;font-size:14px;line-height:1.7;white-space:pre-wrap;display:none}
+.corr-result.show{display:block;animation:slideUp .25s ease}
+.corr-ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.07)}
+.corr-err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.07)}
+/* calculatrice */
+.calc-wrap{display:grid;grid-template-columns:1fr 200px;gap:16px}
+.calc-display{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r12);padding:14px 16px;margin-bottom:10px;text-align:right}
+.calc-expr{font-size:12px;color:var(--txt2);min-height:18px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calc-val{font-size:28px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calc-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-btn{padding:12px 6px;border:none;border-radius:var(--r8);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.cb-num{background:var(--sur2);color:var(--txt)}
+.cb-num:hover{background:var(--brd)}
+.cb-op{background:rgba(139,92,246,.2);color:#c4b5fd}
+.cb-op:hover{background:rgba(139,92,246,.35)}
+.cb-eq{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff}
+.cb-eq:hover{filter:brightness(1.1)}
+.cb-fn{background:rgba(6,182,212,.12);color:#67e8f9;font-size:12px}
+.cb-fn:hover{background:rgba(6,182,212,.25)}
+.cb-cl{background:rgba(239,68,68,.15);color:#fca5a5}
+.cb-cl:hover{background:rgba(239,68,68,.3)}
+.calc-hist{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r12);padding:12px;max-height:320px;overflow-y:auto}
+.calc-hist-t{font-size:12px;color:var(--txt2);font-weight:600;margin-bottom:8px}
+.calc-hist-item{font-size:12px;padding:5px 0;border-bottom:1px solid var(--brd);color:var(--txt2)}
+.calc-hist-item:last-child{border:none}
+.calc-hist-item span{color:var(--txt);font-weight:600}
+/* convertisseur */
+.conv-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.conv-cat{padding:6px 13px;border:1px solid var(--brd);border-radius:20px;background:var(--sur2);color:var(--txt2);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.conv-cat.act{background:var(--purple);color:#fff;border-color:transparent}
+.conv-result-big{font-size:32px;font-weight:800;color:var(--cyan);margin:12px 0 4px;text-align:center}
+.conv-formula{font-size:12px;color:var(--txt2);text-align:center}
+@media(max-width:700px){.calc-wrap{grid-template-columns:1fr}.calc-hist{max-height:160px}}
 /* ── RESPONSIVE ── */
 @media(max-width:900px){.clayout{grid-template-columns:1fr}.aipanel{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.page{padding:68px 14px 40px}.sgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.pt{font-size:21px}.hdr{padding:0 14px}.xpw{min-width:80px}.bc{display:none}}
@@ -369,6 +412,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
       <div class="xpb"><div class="xpf" id="hFill" style="width:0%"></div></div>
     </div>
     <div class="lvl" id="hLvl">Niv. 1</div>
+    <button class="btn bg bsm" onclick="nav('exercises')" style="font-size:16px;padding:5px 10px" title="Exercices & Outils">🧪</button>
     <button class="btn bg bsm" onclick="nav('gallery')" style="font-size:16px;padding:5px 10px" title="Galerie photos">🖼️</button>
     <div class="user-chip" id="user-chip" onclick="handleUserChip()" style="display:none">
       <div class="user-av" id="user-av">?</div>
@@ -416,6 +460,122 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
   <!-- FLASHCARDS VIEW -->
   <div class="view" id="v-flashcards">
     <div class="fcwrap" id="fc-wrap"></div>
+  </div>
+
+  <!-- EXERCISES VIEW -->
+  <div class="view" id="v-exercises">
+    <div class="page">
+      <div class="ph">
+        <div><div class="pt">🧪 Exercices & Outils</div><div class="ps">Entraîne-toi et fais corriger ton travail par l'IA</div></div>
+        <button class="btn bg" onclick="navBack()">← Retour</button>
+      </div>
+      <div class="tool-tabs">
+        <button class="tool-tab act" id="ttab-correction" onclick="openTool('correction')">✏️ Correction IA</button>
+        <button class="tool-tab" id="ttab-solver" onclick="openTool('solver')">📐 Solveur</button>
+        <button class="tool-tab" id="ttab-calc" onclick="openTool('calc')">🔢 Calculatrice</button>
+        <button class="tool-tab" id="ttab-convert" onclick="openTool('convert')">🔄 Convertisseur</button>
+        <button class="tool-tab" id="ttab-conjugate" onclick="openTool('conjugate')">📝 Conjugueur</button>
+      </div>
+
+      <!-- CORRECTION IA -->
+      <div class="tool-panel act" id="tool-correction">
+        <div class="tool-card">
+          <h3>✏️ Correction libre — toutes matières</h3>
+          <div class="fg"><label>Matière / contexte (optionnel)</label>
+            <select class="inp" id="corr-subject">
+              <option value="">-- Choisir --</option>
+              <option>Mathématiques</option><option>Physique-Chimie</option>
+              <option>SVT / Biologie</option><option>Français</option>
+              <option>Histoire-Géographie</option><option>Anglais</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="fg"><label>Énoncé de l'exercice (optionnel)</label>
+            <textarea class="ta" id="corr-exercise" rows="3" placeholder="Ex: Calculer la dérivée de f(x) = 3x² + 2x − 5"></textarea>
+          </div>
+          <div class="fg"><label>Ta réponse / ton travail *</label>
+            <textarea class="ta" id="corr-answer" rows="5" placeholder="Écris ta réponse ou ta démarche ici..."></textarea>
+          </div>
+          <button class="btn bp" onclick="runCorrection()" id="corr-btn">✅ Corriger avec l'IA</button>
+          <div class="corr-result" id="corr-result"></div>
+        </div>
+      </div>
+
+      <!-- SOLVEUR -->
+      <div class="tool-panel" id="tool-solver">
+        <div class="tool-card">
+          <h3>📐 Solveur — résolution étape par étape</h3>
+          <div class="fg"><label>Matière</label>
+            <select class="inp" id="solv-subject">
+              <option>Mathématiques</option><option>Physique</option>
+              <option>Chimie</option><option>SVT</option><option>Autre</option>
+            </select>
+          </div>
+          <div class="fg"><label>Problème à résoudre *</label>
+            <textarea class="ta" id="solv-problem" rows="4" placeholder="Ex: Résoudre 2x² − 5x + 3 = 0&#10;Ex: Un objet de 5kg tombe de 10m, quelle est sa vitesse à l'impact ?"></textarea>
+          </div>
+          <button class="btn bp" onclick="runSolver()" id="solv-btn">📐 Résoudre avec l'IA</button>
+          <div class="corr-result" id="solv-result"></div>
+        </div>
+      </div>
+
+      <!-- CALCULATRICE -->
+      <div class="tool-panel" id="tool-calc">
+        <div class="tool-card">
+          <h3>🔢 Calculatrice scientifique</h3>
+          <div class="calc-wrap">
+            <div>
+              <div class="calc-display">
+                <div class="calc-expr" id="calc-expr"></div>
+                <div class="calc-val" id="calc-val">0</div>
+              </div>
+              <div class="calc-btns" id="calc-btns"></div>
+            </div>
+            <div class="calc-hist">
+              <div class="calc-hist-t">Historique</div>
+              <div id="calc-hist-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERTISSEUR -->
+      <div class="tool-panel" id="tool-convert">
+        <div class="tool-card">
+          <h3>🔄 Convertisseur d'unités</h3>
+          <div class="conv-cats" id="conv-cats"></div>
+          <div class="tool-row">
+            <div class="fg"><label>Valeur</label><input class="inp" id="conv-val" type="number" placeholder="Ex: 100" oninput="runConvert()"></div>
+            <div class="fg"><label>De</label><select class="inp" id="conv-from" onchange="runConvert()"></select></div>
+            <div class="fg"><label>Vers</label><select class="inp" id="conv-to" onchange="runConvert()"></select></div>
+          </div>
+          <div class="conv-result-big" id="conv-result">—</div>
+          <div class="conv-formula" id="conv-formula"></div>
+        </div>
+      </div>
+
+      <!-- CONJUGUEUR -->
+      <div class="tool-panel" id="tool-conjugate">
+        <div class="tool-card">
+          <h3>📝 Conjugueur français</h3>
+          <div class="tool-row">
+            <div class="fg"><label>Verbe *</label><input class="inp" id="conj-verb" placeholder="Ex: aller, finir, prendre..." onkeydown="if(event.key==='Enter')runConjugate()"></div>
+            <div class="fg"><label>Temps / Mode</label>
+              <select class="inp" id="conj-tense">
+                <option>Tous les temps principaux</option>
+                <option>Présent de l'indicatif</option><option>Imparfait</option>
+                <option>Futur simple</option><option>Passé composé</option>
+                <option>Conditionnel présent</option><option>Subjonctif présent</option>
+                <option>Impératif présent</option><option>Participes</option>
+              </select>
+            </div>
+            <div class="fg" style="flex:0 0 auto"><label>&nbsp;</label><button class="btn bp" onclick="runConjugate()" id="conj-btn">📝 Conjuguer</button></div>
+          </div>
+          <div class="corr-result" id="conj-result"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- GALLERY VIEW -->
@@ -658,6 +818,7 @@ function renderView() {
     case 'flashcards': renderFlashcards(); break;
     case 'summary':    renderSummary(); break;
     case 'gallery':    renderGallery(); break;
+    case 'exercises':  openTool('correction'); break;
     case 'ccf-detail': renderCCFDetail(); break;
     case 'bac-detail': renderBACDetail(); break;
   }
@@ -1722,6 +1883,207 @@ function openLightbox(imgId) {
 
 function closeLightbox() {
   document.getElementById('lightbox')?.classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  EXERCISES & TOOLS
+// ═══════════════════════════════════════════════════
+function openTool(name) {
+  document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('act'));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('act'));
+  document.getElementById('ttab-' + name)?.classList.add('act');
+  document.getElementById('tool-' + name)?.classList.add('act');
+  if (name === 'calc') initCalc();
+  if (name === 'convert') initConvert();
+}
+
+// ── Correction IA ──
+async function runCorrection() {
+  const exercise = document.getElementById('corr-exercise').value.trim();
+  const answer = document.getElementById('corr-answer').value.trim();
+  const subject = document.getElementById('corr-subject').value;
+  const btn = document.getElementById('corr-btn');
+  const res = document.getElementById('corr-result');
+  if (!answer) { toast('warn', 'Écris ta réponse d\'abord.'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Correction en cours...';
+  res.className = 'corr-result'; res.style.display = 'none';
+  const system = `Tu es un professeur correcteur bienveillant${subject ? ' en ' + subject : ''}. L'élève te soumet un exercice et sa réponse. Tu dois :\n1. Indiquer clairement si c'est correct ✅ ou incorrect ❌\n2. Expliquer les erreurs s'il y en a, avec pédagogie\n3. Donner la correction complète étape par étape\n4. Terminer par un encouragement\nRéponds en français, de façon claire et structurée.`;
+  const userMsg = (exercise ? `Énoncé : ${exercise}\n\n` : '') + `Réponse de l'élève : ${answer}`;
+  try {
+    const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: userMsg }], systemOverride: system, mode: 'chat' }) });
+    const d = await r.json();
+    const text = d.content || 'Pas de réponse.';
+    res.textContent = text;
+    res.className = 'corr-result show ' + (text.includes('✅') ? 'corr-ok' : text.includes('❌') ? 'corr-err' : '');
+  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
+  btn.disabled = false; btn.textContent = '✅ Corriger avec l\'IA';
+}
+
+// ── Solveur ──
+async function runSolver() {
+  const problem = document.getElementById('solv-problem').value.trim();
+  const subject = document.getElementById('solv-subject').value;
+  const btn = document.getElementById('solv-btn');
+  const res = document.getElementById('solv-result');
+  if (!problem) { toast('warn', 'Entre un problème à résoudre.'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Résolution en cours...';
+  res.className = 'corr-result'; res.style.display = 'none';
+  const system = `Tu es un professeur expert en ${subject}. Résous le problème de l'élève en détaillant chaque étape clairement, avec les formules utilisées, les calculs intermédiaires et la réponse finale encadrée. Sois pédagogique et précis. Réponds en français.`;
+  try {
+    const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: problem }], systemOverride: system, mode: 'chat' }) });
+    const d = await r.json();
+    res.textContent = d.content || 'Pas de réponse.';
+    res.className = 'corr-result show';
+  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
+  btn.disabled = false; btn.textContent = '📐 Résoudre avec l\'IA';
+}
+
+// ── Calculatrice ──
+let calcExpr = '', calcJustEvaled = false, calcHistoryArr = [];
+function initCalc() {
+  if (document.getElementById('calc-btns').childElementCount > 0) return;
+  const rows = [
+    [['sin(','fn'],['cos(','fn'],['tan(','fn'],['π','fn']],
+    [['log(','fn'],['ln(','fn'],['√(','fn'],['x²','fn']],
+    [['(','op'],[')',  'op'],['%','op'],['C','cl']],
+    [['7','num'],['8','num'],['9','num'],['÷','op']],
+    [['4','num'],['5','num'],['6','num'],['×','op']],
+    [['1','num'],['2','num'],['3','num'],['−','op']],
+    [['0','num'],['.','num'],['⌫','cl'],[ '+','op']],
+    [['=','eq','wide']],
+  ];
+  const btns = document.getElementById('calc-btns');
+  rows.forEach(row => row.forEach(([lbl, cls]) => {
+    const b = document.createElement('button');
+    b.className = `calc-btn cb-${cls}`; b.textContent = lbl;
+    if (lbl === '=') b.style.gridColumn = 'span 4';
+    b.onclick = () => calcPress(lbl);
+    btns.appendChild(b);
+  }));
+  calcRender();
+}
+function calcPress(v) {
+  if (v === 'C') { calcExpr = ''; calcJustEvaled = false; }
+  else if (v === '⌫') { calcExpr = calcExpr.slice(0, -1); }
+  else if (v === '=') {
+    try {
+      if (!calcExpr) return;
+      let expr = calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
+        .replace(/π/g, Math.PI).replace(/√\(/g,'Math.sqrt(')
+        .replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(')
+        .replace(/tan\(/g,'Math.tan(').replace(/log\(/g,'Math.log10(')
+        .replace(/ln\(/g,'Math.log(');
+      // handle x²
+      expr = expr.replace(/(\d+(?:\.\d+)?)²/g,'($1**2)');
+      // safe eval
+      const allowed = /^[0-9+\-*/.()Math.,\s_a-zA-Z]+$/;
+      if (!allowed.test(expr)) throw new Error('Expression invalide');
+      const result = Function('"use strict"; return (' + expr + ')')();
+      if (!isFinite(result)) throw new Error('Résultat infini');
+      const res = parseFloat(result.toFixed(10)).toString();
+      calcHistoryArr.unshift(calcExpr + ' = ' + res);
+      calcHistoryArr = calcHistoryArr.slice(0, 20);
+      calcUpdateHist();
+      calcExpr = res; calcJustEvaled = true;
+    } catch(e) { calcExpr = 'Erreur'; }
+  } else if (v === 'x²') {
+    calcExpr += '²';
+  } else {
+    if (calcJustEvaled && /[\d.(]/.test(v)) calcExpr = '';
+    calcJustEvaled = false;
+    calcExpr += v;
+  }
+  calcRender();
+}
+function calcRender() {
+  document.getElementById('calc-val').textContent = calcExpr || '0';
+  document.getElementById('calc-expr').textContent = '';
+}
+function calcUpdateHist() {
+  const el = document.getElementById('calc-hist-list');
+  el.innerHTML = calcHistoryArr.map(h => {
+    const parts = h.split(' = ');
+    return `<div class="calc-hist-item">${parts[0]} = <span>${parts[1]}</span></div>`;
+  }).join('');
+}
+
+// ── Convertisseur ──
+const CONV_CATS = {
+  '📏 Longueur': { m:1, cm:100, mm:1000, km:0.001, 'mi':0.000621371, 'ft':3.28084, 'in':39.3701 },
+  '⚖️ Masse':   { kg:1, g:1000, mg:1e6, t:0.001, lb:2.20462, oz:35.274 },
+  '🌡️ Température': null,
+  '🧪 Volume':  { L:1, mL:1000, 'm³':0.001, 'cm³':1000, 'ft³':0.0353147, 'gal':0.264172 },
+  '⚡ Vitesse': { 'm/s':1, 'km/h':3.6, 'mph':2.23694, 'nœud':1.94384 },
+  '📐 Angle':   { deg:1, rad: 180/Math.PI, grad: 400/360 },
+  '⏱️ Temps':   { s:1, min:1/60, h:1/3600, ms:1000, 'μs':1e6 },
+};
+let convCat = '📏 Longueur';
+function initConvert() {
+  if (document.getElementById('conv-cats').childElementCount > 0) return;
+  const cats = document.getElementById('conv-cats');
+  Object.keys(CONV_CATS).forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'conv-cat' + (k === convCat ? ' act' : '');
+    b.textContent = k;
+    b.onclick = () => { convCat = k; document.querySelectorAll('.conv-cat').forEach(x=>x.classList.remove('act')); b.classList.add('act'); fillConvSelects(); runConvert(); };
+    cats.appendChild(b);
+  });
+  fillConvSelects();
+}
+function fillConvSelects() {
+  const isTemp = convCat === '🌡️ Température';
+  const units = isTemp ? ['°C','°F','K'] : Object.keys(CONV_CATS[convCat]);
+  ['conv-from','conv-to'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = units.map((u,j) => `<option value="${u}" ${(i===0&&j===0)||(i===1&&j===1)?'selected':''}>${u}</option>`).join('');
+  });
+  runConvert();
+}
+function runConvert() {
+  const val = parseFloat(document.getElementById('conv-val').value);
+  const from = document.getElementById('conv-from').value;
+  const to = document.getElementById('conv-to').value;
+  const resEl = document.getElementById('conv-result');
+  const fmEl = document.getElementById('conv-formula');
+  if (isNaN(val)) { resEl.textContent = '—'; fmEl.textContent = ''; return; }
+  let result;
+  if (convCat === '🌡️ Température') {
+    if (from === to) { result = val; }
+    else if (from === '°C' && to === '°F') result = val * 9/5 + 32;
+    else if (from === '°C' && to === 'K')  result = val + 273.15;
+    else if (from === '°F' && to === '°C') result = (val-32)*5/9;
+    else if (from === '°F' && to === 'K')  result = (val-32)*5/9 + 273.15;
+    else if (from === 'K'  && to === '°C') result = val - 273.15;
+    else if (from === 'K'  && to === '°F') result = (val-273.15)*9/5 + 32;
+  } else {
+    const tbl = CONV_CATS[convCat];
+    result = val * (tbl[to] / tbl[from]);
+  }
+  resEl.textContent = parseFloat(result.toFixed(8)) + ' ' + to;
+  fmEl.textContent = val + ' ' + from + ' = ' + parseFloat(result.toFixed(8)) + ' ' + to;
+}
+
+// ── Conjugueur ──
+async function runConjugate() {
+  const verb = document.getElementById('conj-verb').value.trim();
+  const tense = document.getElementById('conj-tense').value;
+  const btn = document.getElementById('conj-btn');
+  const res = document.getElementById('conj-result');
+  if (!verb) { toast('warn', 'Entre un verbe à conjuguer.'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Conjugaison...';
+  res.className = 'corr-result'; res.style.display = 'none';
+  const system = `Tu es un expert en grammaire française. Conjugue le verbe demandé au(x) temps indiqué(s) avec tous les pronoms (je, tu, il/elle, nous, vous, ils/elles). Présente la conjugaison de façon claire et structurée. Indique le groupe du verbe et les particularités. Réponds en français.`;
+  const userMsg = `Conjugue le verbe "${verb}" — ${tense}`;
+  try {
+    const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: userMsg }], systemOverride: system, mode: 'chat' }) });
+    const d = await r.json();
+    res.textContent = d.content || 'Pas de réponse.';
+    res.className = 'corr-result show';
+  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
+  btn.disabled = false; btn.textContent = '📝 Conjuguer';
 }
 
 // ═══════════════════════════════════════════════════
