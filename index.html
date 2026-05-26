@@ -322,6 +322,13 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 /* ── TOOLBAR ── */
 .ced-toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 
+/* ── SETUP SCREEN ── */
+#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.setup-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:36px;width:100%;max-width:460px;animation:slideUp .3s ease}
+.setup-logo{font-size:32px;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px}
+.setup-sub{text-align:center;font-size:13px;color:var(--txt2);margin-bottom:24px}
+.setup-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd;border-radius:var(--r8);padding:12px 14px;font-size:13px;margin-bottom:22px;line-height:1.6}
+.setup-info b{color:#bfdbfe}
 /* ── AUTH SCREEN ── */
 #auth-screen{position:fixed;inset:0;background:var(--bg);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px}
 .auth-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:36px;width:100%;max-width:400px;animation:slideUp .3s ease}
@@ -512,6 +519,22 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
       <button class="btn bg" onclick="closeModal('m-bac')">Annuler</button>
       <button class="btn bp" onclick="saveBAC()">Enregistrer</button>
     </div>
+  </div>
+</div>
+
+<!-- SETUP SCREEN (Supabase config) -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">⚡ EduXP</div>
+    <div class="setup-sub">Configuration initiale — une seule fois</div>
+    <div class="setup-info">
+      Pour synchroniser tes données entre appareils, entre ton <b>URL Supabase</b> et ta <b>clé anon/publique</b>.<br>
+      Tu les trouves dans ton projet Supabase → <b>Paramètres → API</b>.
+    </div>
+    <div class="fg"><label>URL du projet Supabase</label><input class="inp" id="setup-url" type="url" placeholder="https://xxxx.supabase.co" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="fg"><label>Clé anon / publique</label><input class="inp" id="setup-key" type="text" placeholder="eyJhbGciOi..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <button class="btn bp" style="width:100%;justify-content:center;margin-bottom:12px" onclick="submitSetup()">💾 Enregistrer et continuer</button>
+    <button class="auth-offline" onclick="continueOffline()">Continuer sans compte (données locales uniquement)</button>
   </div>
 </div>
 
@@ -2076,12 +2099,16 @@ let currentUser = null;
 let syncTimer = null;
 
 async function initSupabase() {
-  try {
-    const r = await fetch('/api/config');
-    const cfg = await r.json();
-    if (!cfg.url || !cfg.key) { showAuthScreen(); return; }
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
 
-    sbClient = window.supabase.createClient(cfg.url, cfg.key);
+  if (!url || !key) {
+    showSetupScreen();
+    return;
+  }
+
+  try {
+    sbClient = window.supabase.createClient(url, key);
 
     sbClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
@@ -2105,9 +2132,25 @@ async function initSupabase() {
       showAuthScreen();
     }
   } catch (e) {
-    console.warn('Supabase non disponible, mode local activé');
+    console.warn('Supabase init failed:', e);
     continueOffline();
   }
+}
+
+function showSetupScreen() {
+  document.getElementById('setup-screen').style.display = 'flex';
+}
+
+async function submitSetup() {
+  const url = document.getElementById('setup-url').value.trim();
+  const key = document.getElementById('setup-key').value.trim();
+  if (!url || !key) { alert('Remplis les deux champs.'); return; }
+  if (!url.includes('supabase.co')) { alert('L\'URL doit contenir supabase.co'); return; }
+
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  document.getElementById('setup-screen').style.display = 'none';
+  await initSupabase();
 }
 
 async function loadFromSupabase() {
