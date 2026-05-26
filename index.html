@@ -3152,11 +3152,30 @@ function translateAuthError(msg) {
   if (m.includes('user already registered') || m.includes('already been registered')) return 'Ce compte existe déjà. Connecte-toi plutôt.';
   if (m.includes('password should be') || m.includes('password is too short') || m.includes('weak password')) return 'Mot de passe trop court (6 caractères minimum).';
   if (m.includes('invalid path') || m.includes('failed to fetch') || m.includes('networkerror') || m.includes('fetch')) return 'Erreur réseau. Vérifie ta connexion et réessaie.';
-  if (m.includes('rate limit') || m.includes('too many requests') || m.includes('too many')) return 'Trop de tentatives. Attends quelques minutes.';
+  if (m.includes('rate limit') || m.includes('too many requests') || m.includes('too many') || m.includes('over_email_send_rate_limit')) return '__RATE_LIMIT__';
   if (m.includes('invalid email') || m.includes('email address') || m.includes('email format') || m.includes('validate email')) return 'Adresse email invalide.';
   if (m.includes('signup') && m.includes('disabled')) return 'Les inscriptions sont temporairement désactivées.';
-  if (m.includes('over_email_send_rate_limit')) return 'Trop d\'emails envoyés. Attends quelques minutes.';
   return msg;
+}
+
+function startRateLimitCooldown() {
+  const btn = document.getElementById('auth-submit');
+  const err = document.getElementById('auth-err');
+  let secs = 60;
+  btn.disabled = true;
+  err.textContent = `⏳ Trop de tentatives. Réessaie dans ${secs}s.`;
+  err.classList.add('show');
+  const iv = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(iv);
+      btn.disabled = false;
+      err.classList.remove('show');
+      btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
+    } else {
+      err.textContent = `⏳ Trop de tentatives. Réessaie dans ${secs}s.`;
+    }
+  }, 1000);
 }
 
 function showAuthErr(msg) {
@@ -3179,6 +3198,8 @@ async function submitAuth() {
   const pwd = document.getElementById('auth-pwd').value;
   const btn = document.getElementById('auth-submit');
 
+  if (btn.disabled) return;
+
   if (!email || !pwd) { showAuthErr('Remplis tous les champs.'); return; }
   if (authMode === 'register') {
     const pwd2 = document.getElementById('auth-pwd2').value;
@@ -3200,15 +3221,20 @@ async function submitAuth() {
     }
     if (!sbClient) { showAuthErr('Impossible de joindre le serveur. Rafraîchis la page et réessaie.'); btn.disabled=false; btn.textContent=authMode==='login'?'Se connecter':"S'inscrire"; return; }
 
+    const handleErr = (msg) => {
+      const t = translateAuthError(msg);
+      if (t === '__RATE_LIMIT__') { startRateLimitCooldown(); }
+      else showAuthErr(t);
+    };
+
     if (authMode === 'login') {
       const { error } = await sbClient.auth.signInWithPassword({ email, password: pwd });
-      if (error) showAuthErr(translateAuthError(error.message));
+      if (error) handleErr(error.message);
     } else {
       const { data, error } = await sbClient.auth.signUp({ email, password: pwd });
       if (error) {
-        showAuthErr(translateAuthError(error.message));
+        handleErr(error.message);
       } else if (data?.session) {
-        // Email confirmation désactivée → connecté directement
         toast('ok', '🎉 Compte créé et connexion réussie !');
       } else {
         toast('ok', '📧 Compte créé ! Vérifie tes emails pour confirmer ton inscription.');
@@ -3216,7 +3242,9 @@ async function submitAuth() {
       }
     }
   } catch (e) {
-    showAuthErr('Erreur : ' + translateAuthError(e?.message || String(e)));
+    const t = translateAuthError(e?.message || String(e));
+    if (t === '__RATE_LIMIT__') startRateLimitCooldown();
+    else showAuthErr('Erreur : ' + t);
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
