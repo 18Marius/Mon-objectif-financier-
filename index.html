@@ -2039,14 +2039,15 @@ const SUBJECT_TOOLS = {
     A('m-mat','🔳','Matrices & Vecteurs','Calcul matriciel','ai',{sys:'Tu es prof de maths. Effectue les opérations matricielles ou vectorielles demandées étape par étape. Réponds en français.',lbl:'Opération',ph:'Ex: Calculer le déterminant de A = [[1,2],[3,4]]'}),
     A('m-lim','∞','Limites','Calcul de limites','ai',{sys:'Tu es prof de maths. Calcule la limite demandée étape par étape avec les règles utilisées. Réponds en français.',lbl:'Limite à calculer',ph:'Ex: lim(x→∞) de (2x²+3x)/(x²−1)'}),
     A('m-conv','🔄','Convertisseur','Unités, angles','local-conv'),
-    A('m-corr','✅','Corriger ma copie','L\'IA corrige ton exercice','ai2',{sys:'Tu es prof de maths correcteur. Dis ✅ correct ou ❌ incorrect, explique les erreurs, donne la solution complète. Réponds en français.',lbl1:'Énoncé (optionnel)',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta démarche...'}),
+    A('m-corr','✅','Corriger ma copie','L\'IA corrige ton exercice','ai2',{img:true,sys:'Tu es prof de maths correcteur. Dis ✅ correct ou ❌ incorrect, explique les erreurs, donne la solution complète. Réponds en français.',lbl1:'Énoncé (optionnel)',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta démarche... (ou envoie une photo de ta copie)'}),
     A('m-expli','💡','Expliquer un concept','Comprendre simplement','ai',{sys:'Tu es prof de maths bienveillant. Explique simplement avec des exemples concrets. Réponds en français.',lbl:'Concept',ph:'Ex: Les limites, la dérivée, les probabilités...'}),
     A('m-aide','📋','Aide-mémoire','Formules essentielles','ai',{sys:'Tu es prof de maths. Donne un aide-mémoire complet et bien organisé avec toutes les formules importantes. Réponds en français.',lbl:'Thème',ph:'Ex: Trigonométrie, dérivées, probabilités, suites...'}),
+    A('m-exo','🎯','Génère des exercices','Entraîne-toi sur le cours','ai',{sys:'Tu es prof de maths. Génère 5 exercices variés et progressifs sur le thème demandé. Pour chaque exercice : un énoncé clair, le niveau (⭐ facile / ⭐⭐ moyen / ⭐⭐⭐ difficile), puis la correction complète étape par étape. Réponds en français.',lbl:'Thème ou chapitre',ph:'Ex: Dérivées, probabilités, suites arithmétiques...'}),
   ],
   '📝 Français': [
     A('fr-conj','📝','Conjugueur','Tous les temps et modes','local-conj'),
     A('fr-syn','🔤','Synonymes & Antonymes','Enrichir le vocabulaire','ai',{sys:'Tu es expert en langue française. Donne les synonymes, antonymes et nuances pour le mot demandé, organisés clairement.',lbl:'Mot ou expression',ph:'Ex: heureux, rapide, montrer...'}),
-    A('fr-corr','✅','Correcteur','Corriger et améliorer','ai',{sys:'Tu es correcteur expert en français. Corrige les fautes, améliore le style et explique chaque correction.',lbl:'Texte à corriger',ph:'Colle ton texte ici...'}),
+    A('fr-corr','✅','Correcteur','Corriger et améliorer','ai',{img:true,sys:'Tu es correcteur expert en français. Corrige les fautes, améliore le style et explique chaque correction. Si une image est fournie, analyse-la et corrige le texte qu\'elle contient.',lbl:'Texte à corriger',ph:'Colle ton texte ici... (ou envoie une photo)'}),
     A('fr-reform','✍️','Reformuler','Réécrire autrement','ai',{sys:'Tu es expert en français. Reformule le texte de plusieurs façons différentes (soutenu, neutre, simplifié). Explique les choix.',lbl:'Texte à reformuler',ph:'Colle ton texte...'}),
     A('fr-gram','🔍','Analyse grammaticale','Nature et fonction','ai',{sys:'Tu es prof de français. Fais l\'analyse grammaticale complète (nature, fonction, temps, mode). Réponds en français.',lbl:'Mot, groupe ou phrase',ph:'Ex: analyser "jouent" dans "Les enfants jouent dans le jardin"'}),
     A('fr-dissert','🖊️','Plan de dissertation','I, II, III structuré','ai',{sys:'Tu es prof de français. Construis un plan de dissertation complet (intro, thèse/antithèse/synthèse avec arguments et exemples). Réponds en français.',lbl:'Sujet',ph:'Ex: La littérature peut-elle changer le monde ?'}),
@@ -2054,6 +2055,7 @@ const SUBJECT_TOOLS = {
     A('fr-figures','🎭','Figures de style','Identifier et expliquer','ai',{sys:'Tu es prof de français. Identifie et explique toutes les figures de style. Réponds en français.',lbl:'Texte ou phrase',ph:'Ex: "Cette voix est un couteau de lumière"'}),
     A('fr-ortho','🔠','Règles d\'orthographe','Accord, pluriel, accents','ai',{sys:'Tu es expert en orthographe française. Explique la règle, donne des exemples et des exceptions. Réponds en français.',lbl:'Règle ou cas à expliquer',ph:'Ex: accord du participe passé avec avoir, pluriel des noms composés...'}),
     A('fr-vocab','📖','Vocabulaire littéraire','Champs lexicaux, registres','ai',{sys:'Tu es prof de français. Explique les notions de vocabulaire littéraire demandées avec des exemples. Réponds en français.',lbl:'Notion ou champ lexical',ph:'Ex: registre tragique, champ lexical de la nature, polysémie...'}),
+    A('fr-exo','🎯','Génère des exercices','Grammaire, ortho, expression','ai',{sys:'Tu es prof de français. Génère 5 exercices variés (orthographe, grammaire, conjugaison, rédaction) sur le thème. Pour chaque : une consigne claire, le niveau (⭐/⭐⭐/⭐⭐⭐), l\'exercice, puis la correction. Réponds en français.',lbl:'Thème',ph:'Ex: Accord du participe passé, figures de style, argumentation...'}),
   ],
   '⚗️ Physique-Chimie': [
     A('pc-calc','🔢','Calculatrice','Calculs scientifiques','local-calc'),
@@ -2065,7 +2067,8 @@ const SUBJECT_TOOLS = {
     A('pc-mecanique','🚀','Mécanique','Forces, mouvement, énergie','ai',{sys:'Tu es prof de physique mécanique. Résous le problème avec les lois de Newton, formules d\'énergie ou de cinématique. Réponds en français.',lbl:'Problème de mécanique',ph:'Ex: Un objet de 5kg tombe de 10m — vitesse à l\'impact ?'}),
     A('pc-optique','🌈','Optique','Lumière, lentilles, réfraction','ai',{sys:'Tu es prof de physique optique. Explique et calcule. Réponds en français.',lbl:'Problème ou question',ph:'Ex: Lentille convergente f=5cm, objet à 20cm. Trouver l\'image.'}),
     A('pc-concept','💡','Expliquer un concept','Physique ou chimie','ai',{sys:'Tu es prof de physique-chimie. Explique simplement avec des exemples du quotidien. Réponds en français.',lbl:'Concept',ph:'Ex: La loi d\'Ohm, les liaisons chimiques, le mouvement uniformément accéléré...'}),
-    A('pc-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{sys:'Tu es prof de physique-chimie correcteur. Évalue, identifie les erreurs et donne la correction complète avec unités. Réponds en français.',lbl1:'Énoncé',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta réponse...'}),
+    A('pc-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{img:true,sys:'Tu es prof de physique-chimie correcteur. Évalue, identifie les erreurs et donne la correction complète avec unités. Réponds en français. Si une image est fournie, lis et corrige l\'exercice qu\'elle contient.',lbl1:'Énoncé',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta réponse... (ou envoie une photo de ta copie)'}),
+    A('pc-exo','🎯','Génère des exercices','Problèmes à résoudre','ai',{sys:'Tu es prof de physique-chimie. Génère 5 exercices numériques sur le thème. Pour chaque exercice : les données, la ou les questions, le niveau (⭐/⭐⭐/⭐⭐⭐), puis la correction complète avec toutes les unités. Réponds en français.',lbl:'Chapitre / thème',ph:'Ex: Cinématique, loi d\'Ohm, équations chimiques, optique...'}),
   ],
   '🌍 Histoire-Géo': [
     A('hg-plan','🖊️','Plan de composition','Structure ton devoir','ai',{sys:'Tu es prof d\'histoire-géographie. Construis un plan structuré (intro, parties avec arguments et exemples, conclusion). Réponds en français.',lbl:'Sujet de composition',ph:'Ex: La France dans la Seconde Guerre mondiale'}),
@@ -2074,7 +2077,8 @@ const SUBJECT_TOOLS = {
     A('hg-carto','🗺️','Croquis de géographie','Éléments à représenter','ai',{sys:'Tu es prof de géographie. Décris les éléments à représenter sur un croquis, leur légende et organisation. Réponds en français.',lbl:'Thème du croquis',ph:'Ex: La mondialisation, l\'organisation du territoire français...'}),
     A('hg-contexte','🏛️','Contextualiser','Causes, acteurs, enjeux','ai',{sys:'Tu es prof d\'histoire-géo. Explique le contexte historique/géographique, les causes, les acteurs et les enjeux. Réponds en français.',lbl:'Événement ou notion',ph:'Ex: La montée du nazisme, la mondialisation...'}),
     A('hg-notion','📖','Expliquer une notion','Définitions et exemples','ai',{sys:'Tu es prof d\'histoire-géographie. Définis la notion, donne des exemples concrets et son importance. Réponds en français.',lbl:'Notion',ph:'Ex: État-nation, géopolitique, urbanisation, totalitarisme...'}),
-    A('hg-corr','✅','Corriger ma copie','L\'IA évalue ton devoir','ai2',{sys:'Tu es prof d\'histoire-géo correcteur. Évalue : fond historique, méthode, structure. Donne une note indicative et des conseils. Réponds en français.',lbl1:'Sujet',ph1:'Le sujet...',lbl2:'Ta réponse',ph2:'Colle ta réponse...'}),
+    A('hg-corr','✅','Corriger ma copie','L\'IA évalue ton devoir','ai2',{img:true,sys:'Tu es prof d\'histoire-géo correcteur. Évalue : fond historique, méthode, structure. Donne une note indicative et des conseils. Réponds en français. Si une image est fournie, lis et évalue le devoir qu\'elle contient.',lbl1:'Sujet',ph1:'Le sujet...',lbl2:'Ta réponse',ph2:'Colle ta réponse... (ou envoie une photo)'}),
+    A('hg-exo','🎯','Sujets d\'entraînement','Questions et compositions','ai',{sys:'Tu es prof d\'histoire-géographie. Génère 5 questions ou sujets d\'entraînement variés sur le thème (Q/R, mise en contexte, sujet de composition). Pour chaque : type d\'exercice, sujet, niveau (⭐/⭐⭐/⭐⭐⭐), puis éléments de réponse attendus. Réponds en français.',lbl:'Thème / période',ph:'Ex: La Seconde Guerre mondiale, la mondialisation, la décolonisation...'}),
   ],
   '🧬 SVT': [
     A('svt-expli','🧬','Expliquer un concept','Biologie et sciences','ai',{sys:'Tu es prof de SVT. Explique clairement avec exemples, schémas décrits et mots-clés. Réponds en français.',lbl:'Concept',ph:'Ex: La mitose, la photosynthèse, la méiose...'}),
@@ -2083,24 +2087,27 @@ const SUBJECT_TOOLS = {
     A('svt-gene','🧪','Génétique','Croisements et hérédité','ai',{sys:'Tu es prof de SVT spé génétique. Résous le problème (croisements, phénotypes, génotypes) étape par étape. Réponds en français.',lbl:'Problème de génétique',ph:'Ex: Parents AA x aa — donner génotypes et phénotypes des descendants'}),
     A('svt-corps','❤️','Corps humain','Organes et systèmes','ai',{sys:'Tu es prof de SVT. Explique le fonctionnement de l\'organe ou système demandé. Réponds en français.',lbl:'Organe ou système',ph:'Ex: Le cœur, le système nerveux, les reins, la digestion...'}),
     A('svt-ecologie','🌍','Écologie','Écosystèmes et environnement','ai',{sys:'Tu es prof de SVT spé écologie. Explique les concepts écologiques demandés avec des exemples. Réponds en français.',lbl:'Question ou concept',ph:'Ex: Chaîne alimentaire, biodiversité, changement climatique...'}),
-    A('svt-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{sys:'Tu es prof de SVT correcteur. Évalue, identifie les erreurs et donne la correction. Réponds en français.',lbl1:'Question',ph1:'La question posée...',lbl2:'Ta réponse',ph2:'Ta réponse...'}),
+    A('svt-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{img:true,sys:'Tu es prof de SVT correcteur. Évalue, identifie les erreurs et donne la correction. Réponds en français. Si une image est fournie (schéma, tableau, exercice), lis et corrige ce qu\'elle contient.',lbl1:'Question',ph1:'La question posée...',lbl2:'Ta réponse',ph2:'Ta réponse... (ou envoie une photo)'}),
+    A('svt-exo','🎯','Exercices pratiques','QCM, schémas, questions','ai',{sys:'Tu es prof de SVT. Génère 5 exercices variés (QCM, texte à compléter, schéma à légender, question ouverte) sur le thème. Pour chaque : consigne claire, niveau (⭐/⭐⭐/⭐⭐⭐), puis correction. Réponds en français.',lbl:'Chapitre / thème',ph:'Ex: La photosynthèse, la mitose, l\'ADN, l\'immunité...'}),
   ],
   '🇬🇧 Anglais': [
     A('en-trad','🌐','Traducteur','FR ↔ EN et autres langues','ai',{sys:'Tu es traducteur expert. Traduis le texte, donne les nuances importantes et expressions idiomatiques si pertinent.',lbl:'Texte à traduire (précise la langue cible)',ph:'Ex: [FR→EN] Bonjour, comment allez-vous ?'}),
-    A('en-corr','✅','Correcteur anglais','Grammar & style','ai',{sys:'You are an expert English teacher. Correct all grammar, spelling and style errors. Explain each correction in French. Be very detailed.',lbl:'Texte anglais à corriger',ph:'Ex: I go to school yesterday and I seen my friends...'}),
+    A('en-corr','✅','Correcteur anglais','Grammar & style','ai',{img:true,sys:'You are an expert English teacher. Correct all grammar, spelling and style errors. Explain each correction in French. Be very detailed. If an image is provided, read and correct the English text it contains.',lbl:'Texte anglais à corriger',ph:'Ex: I go to school yesterday and I seen my friends... (ou envoie une photo)'}),
     A('en-conj','📝','Conjugueur anglais','All tenses','ai',{sys:'Tu es prof d\'anglais. Conjugue le verbe à tous les temps principaux (Present, Past, Future, Perfect...) avec exemples de phrases. En français et anglais.',lbl:'Verbe anglais',ph:'Ex: to go, to have, to be, to make...'}),
     A('en-vocab','🔤','Vocabulaire thématique','Mots et expressions','ai',{sys:'Tu es prof d\'anglais. Donne le vocabulaire thématique complet avec traductions et exemples de phrases. Réponds en français.',lbl:'Thème',ph:'Ex: The environment, social media, health, technology...'}),
     A('en-express','💬','Expressions idiomatiques','Idioms & phrasal verbs','ai',{sys:'Tu es prof d\'anglais. Explique les expressions et phrasal verbs avec exemples. Réponds en français.',lbl:'Expression',ph:'Ex: to give up, to run into, it\'s raining cats and dogs...'}),
     A('en-redac','✍️','Aide à la rédaction','Essay, email, article','ai',{sys:'Tu es prof d\'anglais. Améliore le texte anglais : grammaire, structure, vocabulaire. Propose une version améliorée et explique en français.',lbl:'Ton texte anglais',ph:'Colle ton texte ici...'}),
     A('en-comprehension','📖','Compréhension de texte','Analyser un document anglais','ai',{sys:'Tu es prof d\'anglais. Aide à comprendre le texte anglais : vocabulaire difficile, idées principales, analyse. Réponds en français.',lbl:'Texte anglais',ph:'Colle le texte anglais ici...'}),
+    A('en-exo','🎯','Exercices pratiques','Grammaire, vocab, expression','ai',{sys:'You are an English teacher. Generate 5 varied exercises (gap fill, translation, questions, writing task) on the requested topic. For each: clear instructions (in French), the exercise, difficulty level (⭐/⭐⭐/⭐⭐⭐), then the correction.',lbl:'Thème / point de grammaire',ph:'Ex: Past tenses, modal verbs, conditionals, food vocabulary...'}),
   ],
   '💻 Informatique': [
     A('info-algo','💻','Aide algorithmique','Concevoir un algorithme','ai',{sys:'Tu es prof d\'informatique. Aide à concevoir et comprendre l\'algorithme. Explique en pseudo-code et donne une implémentation Python. Réponds en français.',lbl:'Problème à résoudre',ph:'Ex: Trier une liste, trouver le max, recherche dichotomique...'}),
-    A('info-debug','🐛','Déboguer du code','Trouver et corriger les bugs','ai',{sys:'Tu es expert développeur. Analyse le code, identifie les bugs, explique pourquoi ça ne marche pas et donne le code corrigé. Réponds en français.',lbl:'Code à déboguer',ph:'Colle ton code ici...'}),
+    A('info-debug','🐛','Déboguer du code','Trouver et corriger les bugs','ai',{img:true,sys:'Tu es expert développeur. Analyse le code, identifie les bugs, explique pourquoi ça ne marche pas et donne le code corrigé. Réponds en français. Si une image est fournie, lis le code qu\'elle contient.',lbl:'Code à déboguer',ph:'Colle ton code ici... (ou envoie une photo de ton écran)'}),
     A('info-expli','📖','Expliquer du code','Comprendre ligne par ligne','ai',{sys:'Tu es prof d\'informatique. Explique le code ligne par ligne en termes simples. Identifie les concepts. Réponds en français.',lbl:'Code à expliquer',ph:'Colle ton code ici...'}),
     A('info-bases','🔢','Bases numériques','Binaire, octal, hexadécimal','ai',{sys:'Tu es prof d\'informatique. Effectue la conversion en montrant toutes les étapes. Réponds en français.',lbl:'Conversion',ph:'Ex: 42 en binaire, 0xFF en décimal, 1010 en décimal...'}),
     A('info-struct','🗂️','Structures de données','Tableaux, listes, arbres...','ai',{sys:'Tu es prof d\'informatique. Explique la structure avec propriétés, opérations et exemples. Réponds en français.',lbl:'Structure à expliquer',ph:'Ex: Liste chaînée, pile, file, arbre binaire, dictionnaire...'}),
     A('info-complexite','📊','Complexité & Big O','Analyser les performances','ai',{sys:'Tu es prof d\'informatique. Explique la complexité algorithmique et le Big O. Donne des exemples concrets. Réponds en français.',lbl:'Algorithme ou question',ph:'Ex: Quelle est la complexité d\'un tri à bulles ? Expliquer O(n log n)...'}),
+    A('info-exo','🎯','Exercices de code','Algorithmes à implémenter','ai',{sys:'Tu es prof d\'informatique. Génère 5 exercices de programmation sur le thème. Pour chaque : énoncé clair, niveau (⭐/⭐⭐/⭐⭐⭐), contraintes et exemples d\'entrée/sortie, puis la solution complète commentée en Python. Réponds en français.',lbl:'Thème / langage',ph:'Ex: Récursivité, tris, listes, dictionnaires Python, arbres...'}),
   ],
 };
 
@@ -2112,7 +2119,7 @@ const EXO_SUBJ_MATCH = {
   'informatique':'💻 Informatique','nsi':'💻 Informatique',
 };
 
-let exoSubject = '📐 Maths', exoActiveTool = null;
+let exoSubject = '📐 Maths', exoActiveTool = null, exoImgData = null;
 
 function initExoSection(subHint) {
   const el = document.getElementById('exo-subjects');
@@ -2158,15 +2165,32 @@ function exoOpenTool(toolId) {
   res.className = 'corr-result'; res.style.display=''; res.textContent='';
   const body = document.getElementById('exo-tool-body');
 
+  exoImgData = null;
+  const imgUploadHtml = `<div class="fg" style="margin-bottom:12px">
+    <label>📎 Photo / Document (optionnel)</label>
+    <label for="exo-img-in" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px dashed var(--brd);border-radius:var(--r12);color:var(--txt2);font-size:13px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--brd)'">
+      <span style="font-size:26px">📷</span>
+      <span id="exo-img-lbl">Prendre une photo ou choisir un fichier image</span>
+    </label>
+    <input type="file" id="exo-img-in" accept="image/*" capture="environment" style="display:none" onchange="exoImgChange(this)">
+    <div id="exo-img-prev" style="display:none;margin-top:8px;position:relative;display:inline-block">
+      <img id="exo-img-thumb" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain;border:1px solid var(--brd);display:block">
+      <button onclick="exoClearImg()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:16px;line-height:26px;padding:0">×</button>
+    </div>
+  </div>`;
+
   if (tool.type === 'ai') {
     body.innerHTML = `<div class="fg"><label>${tool.lbl}</label>
       <textarea class="ta" id="exo-inp" rows="5" placeholder="${tool.ph}"></textarea></div>
+      ${tool.img ? imgUploadHtml : ''}
       <button class="btn bp" style="margin-top:4px" onclick="exoRunAI()" id="exo-btn">✨ ${tool.name}</button>`;
   } else if (tool.type === 'ai2') {
     body.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div class="fg" style="margin:0"><label>${tool.lbl1}</label><textarea class="ta" id="exo-inp1" rows="5" placeholder="${tool.ph1}"></textarea></div>
       <div class="fg" style="margin:0"><label>${tool.lbl2}</label><textarea class="ta" id="exo-inp2" rows="5" placeholder="${tool.ph2}"></textarea></div>
-    </div><button class="btn bp" onclick="exoRunAI()" id="exo-btn">✨ ${tool.name}</button>`;
+    </div>
+    ${tool.img ? imgUploadHtml : ''}
+    <button class="btn bp" onclick="exoRunAI()" id="exo-btn">✨ ${tool.name}</button>`;
   } else if (tool.type === 'local-calc') {
     body.innerHTML = `<div class="calc-wrap"><div>
       <div class="calc-display"><div class="calc-expr" id="exo-ce"></div><div class="calc-val" id="exo-cv">0</div></div>
@@ -2225,13 +2249,39 @@ async function exoRunAI() {
   btn.disabled=true; btn.textContent='⏳ Génération...';
   res.className='corr-result'; res.textContent='';
   try {
-    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:userMsg}],systemOverride:system,mode:'chat'})});
+    const payload = {messages:[{role:'user',content:userMsg}],systemOverride:system,mode:'chat'};
+    if (exoImgData) payload.images = [exoImgData];
+    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d = await r.json();
     res.textContent = d.content||'Pas de réponse.';
     res.className = 'corr-result show'+(d.content?.includes('✅')?' corr-ok':d.content?.includes('❌')?' corr-err':'');
   } catch(e) { res.textContent='Erreur : '+e.message; res.className='corr-result show corr-err'; }
   btn.disabled=false; btn.textContent=origTxt;
+}
+
+function exoImgChange(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    exoImgData = e.target.result;
+    const thumb = document.getElementById('exo-img-thumb');
+    const prev  = document.getElementById('exo-img-prev');
+    const lbl   = document.getElementById('exo-img-lbl');
+    if (thumb) thumb.src = exoImgData;
+    if (prev)  { prev.style.display = 'inline-block'; }
+    if (lbl)   lbl.textContent = '✅ ' + file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function exoClearImg() {
+  exoImgData = null;
+  const inp  = document.getElementById('exo-img-in');
+  const prev = document.getElementById('exo-img-prev');
+  const lbl  = document.getElementById('exo-img-lbl');
+  if (inp)  inp.value = '';
+  if (prev) prev.style.display = 'none';
+  if (lbl)  lbl.textContent = 'Prendre une photo ou choisir un fichier image';
 }
 
 // Calculatrice exo
