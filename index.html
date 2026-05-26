@@ -412,7 +412,6 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
       <div class="xpb"><div class="xpf" id="hFill" style="width:0%"></div></div>
     </div>
     <div class="lvl" id="hLvl">Niv. 1</div>
-    <button class="btn bg bsm" onclick="nav('exercises')" style="font-size:16px;padding:5px 10px" title="Exercices & Outils">🧪</button>
     <button class="btn bg bsm" onclick="nav('gallery')" style="font-size:16px;padding:5px 10px" title="Galerie photos">🖼️</button>
     <div class="user-chip" id="user-chip" onclick="handleUserChip()" style="display:none">
       <div class="user-av" id="user-av">?</div>
@@ -1170,6 +1169,54 @@ function renderChapter() {
 
       ${scores.length ? `<div class="aicard">${scoresHTML}</div>` : ''}
 
+      <div class="aicard">
+        <div class="aicard-head"><span class="spark">🧪</span><div class="aicard-title">Exercices</div></div>
+        <div class="tool-tabs" style="margin:0 0 12px;gap:5px">
+          <button class="tool-tab act" id="ch-ttab-correct" onclick="chTool('correct')">✏️ Corriger</button>
+          <button class="tool-tab" id="ch-ttab-solve" onclick="chTool('solve')">📐 Solveur</button>
+          <button class="tool-tab" id="ch-ttab-calc" onclick="chTool('calc')">🔢 Calc</button>
+          <button class="tool-tab" id="ch-ttab-conv" onclick="chTool('conv')">🔄 Unités</button>
+          <button class="tool-tab" id="ch-ttab-conj" onclick="chTool('conj')">📝 Conjugueur</button>
+        </div>
+        <div id="ch-tool-correct">
+          <textarea class="ta" id="ch-corr-ex" rows="2" placeholder="Énoncé de l'exercice (optionnel)" style="margin-bottom:8px;font-size:13px"></textarea>
+          <textarea class="ta" id="ch-corr-ans" rows="3" placeholder="Ta réponse / ta démarche..." style="margin-bottom:8px;font-size:13px"></textarea>
+          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunCorrection()" id="ch-corr-btn">✅ Corriger avec l'IA</button>
+          <div class="corr-result" id="ch-corr-res"></div>
+        </div>
+        <div id="ch-tool-solve" style="display:none">
+          <textarea class="ta" id="ch-solv-prob" rows="4" placeholder="Ex: Résoudre 2x² − 5x + 3 = 0&#10;Ex: Un objet de 5kg tombe de 10m..." style="margin-bottom:8px;font-size:13px"></textarea>
+          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunSolver()" id="ch-solv-btn">📐 Résoudre étape par étape</button>
+          <div class="corr-result" id="ch-solv-res"></div>
+        </div>
+        <div id="ch-tool-calc" style="display:none">
+          <div class="calc-display" style="margin-bottom:8px"><div class="calc-expr" id="ch-ce"></div><div class="calc-val" id="ch-cv">0</div></div>
+          <div class="calc-btns" id="ch-cb"></div>
+        </div>
+        <div id="ch-tool-conv" style="display:none">
+          <div class="conv-cats" id="ch-conv-cats" style="margin-bottom:10px;gap:5px"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            <input class="inp" id="ch-cv-val" type="number" placeholder="Valeur" style="flex:1;min-width:70px" oninput="chRunConvert()">
+            <select class="inp" id="ch-cv-from" style="flex:1;min-width:70px" onchange="chRunConvert()"></select>
+            <select class="inp" id="ch-cv-to" style="flex:1;min-width:70px" onchange="chRunConvert()"></select>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:var(--cyan);text-align:center;margin:8px 0 2px" id="ch-cv-res">—</div>
+        </div>
+        <div id="ch-tool-conj" style="display:none">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <input class="inp" id="ch-conj-v" placeholder="Verbe (ex: aller)" style="flex:1;min-width:100px" onkeydown="if(event.key==='Enter')chRunConjugate()">
+            <select class="inp" id="ch-conj-t" style="flex:1;min-width:120px">
+              <option>Tous les temps principaux</option>
+              <option>Présent</option><option>Imparfait</option><option>Futur simple</option>
+              <option>Passé composé</option><option>Conditionnel présent</option>
+              <option>Subjonctif présent</option><option>Impératif</option>
+            </select>
+          </div>
+          <button class="btn bp bsm" style="width:100%;justify-content:center" onclick="chRunConjugate()" id="ch-conj-btn">📝 Conjuguer</button>
+          <div class="corr-result" id="ch-conj-res"></div>
+        </div>
+      </div>
+
       <div class="aichat" id="ai-chat-widget">
         <div class="aichat-head">
           <div class="aichat-av">🤖</div>
@@ -1883,6 +1930,169 @@ function openLightbox(imgId) {
 
 function closeLightbox() {
   document.getElementById('lightbox')?.classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  CHAPTER EXERCISES (intégrés dans le chapitre)
+// ═══════════════════════════════════════════════════
+const CH_TOOLS = ['correct','solve','calc','conv','conj'];
+function chTool(name) {
+  CH_TOOLS.forEach(t => {
+    document.getElementById('ch-ttab-'+t)?.classList.remove('act');
+    const p = document.getElementById('ch-tool-'+t);
+    if (p) p.style.display = 'none';
+  });
+  document.getElementById('ch-ttab-'+name)?.classList.add('act');
+  const panel = document.getElementById('ch-tool-'+name);
+  if (panel) { panel.style.display = 'block'; panel.style.animation = 'fadeIn .2s ease'; }
+  if (name === 'calc') initChCalc();
+  if (name === 'conv') initChConvert();
+}
+
+async function chRunCorrection() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  const exercise = document.getElementById('ch-corr-ex').value.trim();
+  const answer = document.getElementById('ch-corr-ans').value.trim();
+  const btn = document.getElementById('ch-corr-btn');
+  const res = document.getElementById('ch-corr-res');
+  if (!answer) { toast('warn', 'Écris ta réponse d\'abord.'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Correction...';
+  res.style.display = 'none';
+  const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
+  const system = `Tu es un professeur correcteur bienveillant${sub ? ' en ' + sub.name : ''}.${ctx}\nCorrige l'exercice de l'élève : dis si c'est ✅ correct ou ❌ incorrect, explique les erreurs, donne la correction complète et encourage l'élève. Réponds en français.`;
+  try {
+    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages:[{role:'user',content:(exercise?'Énoncé : '+exercise+'\n\n':'')+'Réponse : '+answer}], systemOverride:system, mode:'chat'}) });
+    const d = await r.json();
+    res.textContent = d.content || 'Pas de réponse.';
+    res.className = 'corr-result show ' + (d.content?.includes('✅')?'corr-ok':d.content?.includes('❌')?'corr-err':'');
+  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
+  btn.disabled = false; btn.textContent = '✅ Corriger avec l\'IA';
+}
+
+async function chRunSolver() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  const problem = document.getElementById('ch-solv-prob').value.trim();
+  const btn = document.getElementById('ch-solv-btn');
+  const res = document.getElementById('ch-solv-res');
+  if (!problem) { toast('warn', 'Entre un problème à résoudre.'); return; }
+  btn.disabled = true; btn.textContent = '⏳ Résolution...';
+  res.style.display = 'none';
+  const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
+  const system = `Tu es un professeur expert${sub ? ' en ' + sub.name : ''}.${ctx}\nRésous le problème en détaillant chaque étape, les formules utilisées et la réponse finale. Sois pédagogique. Réponds en français.`;
+  try {
+    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages:[{role:'user',content:problem}], systemOverride:system, mode:'chat'}) });
+    const d = await r.json();
+    res.textContent = d.content || 'Pas de réponse.';
+    res.className = 'corr-result show';
+  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
+  btn.disabled = false; btn.textContent = '📐 Résoudre étape par étape';
+}
+
+// Calculatrice chapitre
+let chCalcExpr = '', chCalcEvaled = false;
+function initChCalc() {
+  const btns = document.getElementById('ch-cb');
+  if (!btns || btns.childElementCount > 0) return;
+  const layout = [
+    ['sin(','cos(','tan(','C'],['log(','ln(','√(','⌫'],
+    ['7','8','9','÷'],['4','5','6','×'],['1','2','3','−'],
+    ['0','.','x²','+'],['(',')','π','=']
+  ];
+  layout.forEach(row => row.forEach(lbl => {
+    const b = document.createElement('button');
+    const isFn = ['sin(','cos(','tan(','log(','ln(','√(','π'].includes(lbl);
+    const isOp = ['÷','×','−','+','(',')'].includes(lbl);
+    const isCl = ['C','⌫'].includes(lbl);
+    const isEq = lbl === '=';
+    b.className = `calc-btn ${isEq?'cb-eq':isCl?'cb-cl':isFn?'cb-fn':isOp?'cb-op':'cb-num'}`;
+    b.textContent = lbl;
+    if (lbl === '=') b.style.gridColumn = 'span 2';
+    b.onclick = () => chCalcPress(lbl);
+    btns.appendChild(b);
+  }));
+}
+function chCalcPress(v) {
+  if (v === 'C') { chCalcExpr = ''; chCalcEvaled = false; }
+  else if (v === '⌫') { chCalcExpr = chCalcExpr.slice(0,-1); }
+  else if (v === '=') {
+    try {
+      let expr = chCalcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
+        .replace(/π/g,Math.PI).replace(/√\(/g,'Math.sqrt(').replace(/sin\(/g,'Math.sin(')
+        .replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(')
+        .replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(')
+        .replace(/(\d+(?:\.\d+)?)²/g,'($1**2)');
+      const allowed = /^[0-9+\-*/.()Math.,\s_a-zA-Z]+$/;
+      if (!allowed.test(expr)) throw new Error('invalide');
+      const result = parseFloat(Function('"use strict";return('+expr+')')().toFixed(10)).toString();
+      chCalcExpr = result; chCalcEvaled = true;
+    } catch { chCalcExpr = 'Erreur'; }
+  } else if (v === 'x²') { chCalcExpr += '²'; }
+  else { if (chCalcEvaled && /[\d.(]/.test(v)) chCalcExpr=''; chCalcEvaled=false; chCalcExpr+=v; }
+  const cv = document.getElementById('ch-cv'); if(cv) cv.textContent = chCalcExpr||'0';
+}
+
+// Convertisseur chapitre
+let chConvCat = '📏 Longueur';
+function initChConvert() {
+  const cats = document.getElementById('ch-conv-cats');
+  if (!cats || cats.childElementCount > 0) return;
+  Object.keys(CONV_CATS).forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'conv-cat' + (k===chConvCat?' act':'');
+    b.textContent = k; b.style.fontSize = '11px'; b.style.padding = '4px 10px';
+    b.onclick = () => { chConvCat=k; document.querySelectorAll('#ch-conv-cats .conv-cat').forEach(x=>x.classList.remove('act')); b.classList.add('act'); chFillConv(); chRunConvert(); };
+    cats.appendChild(b);
+  });
+  chFillConv();
+}
+function chFillConv() {
+  const isTemp = chConvCat==='🌡️ Température';
+  const units = isTemp?['°C','°F','K']:Object.keys(CONV_CATS[chConvCat]);
+  ['ch-cv-from','ch-cv-to'].forEach((id,i)=>{
+    const s=document.getElementById(id); if(!s)return;
+    s.innerHTML=units.map((u,j)=>`<option value="${u}"${(i===0&&j===0)||(i===1&&j===1)?' selected':''}>${u}</option>`).join('');
+  });
+  chRunConvert();
+}
+function chRunConvert() {
+  const val=parseFloat(document.getElementById('ch-cv-val')?.value);
+  const from=document.getElementById('ch-cv-from')?.value;
+  const to=document.getElementById('ch-cv-to')?.value;
+  const el=document.getElementById('ch-cv-res'); if(!el)return;
+  if(isNaN(val)){el.textContent='—';return;}
+  let result;
+  if(chConvCat==='🌡️ Température'){
+    if(from===to)result=val;
+    else if(from==='°C'&&to==='°F')result=val*9/5+32;
+    else if(from==='°C'&&to==='K')result=val+273.15;
+    else if(from==='°F'&&to==='°C')result=(val-32)*5/9;
+    else if(from==='°F'&&to==='K')result=(val-32)*5/9+273.15;
+    else if(from==='K'&&to==='°C')result=val-273.15;
+    else if(from==='K'&&to==='°F')result=(val-273.15)*9/5+32;
+  } else { const t=CONV_CATS[chConvCat]; result=val*(t[to]/t[from]); }
+  el.textContent=parseFloat(result.toFixed(8))+' '+to;
+}
+
+// Conjugueur chapitre
+async function chRunConjugate() {
+  const verb=document.getElementById('ch-conj-v').value.trim();
+  const tense=document.getElementById('ch-conj-t').value;
+  const btn=document.getElementById('ch-conj-btn');
+  const res=document.getElementById('ch-conj-res');
+  if(!verb){toast('warn','Entre un verbe.');return;}
+  btn.disabled=true; btn.textContent='⏳...';
+  res.style.display='none';
+  try {
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:`Conjugue "${verb}" — ${tense}`}],
+      systemOverride:`Tu es expert en grammaire française. Conjugue le verbe avec tous les pronoms, indique le groupe et les particularités. Clair et structuré. En français.`,mode:'chat'})});
+    const d=await r.json(); res.textContent=d.content||'Pas de réponse.'; res.className='corr-result show';
+  } catch(e){res.textContent='Erreur : '+e.message;res.className='corr-result show corr-err';}
+  btn.disabled=false; btn.textContent='📝 Conjuguer';
 }
 
 // ═══════════════════════════════════════════════════
