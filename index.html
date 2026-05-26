@@ -554,6 +554,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
     <button class="btn bp" style="width:100%;justify-content:center;margin-bottom:4px" id="auth-submit" onclick="submitAuth()">Se connecter</button>
     <div class="auth-sep"><span>ou</span></div>
     <button class="auth-offline" onclick="continueOffline()">Continuer sans compte (données locales uniquement)</button>
+    <div style="text-align:center;margin-top:14px">
+      <button style="background:none;border:none;color:var(--mut);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline" onclick="resetSupabaseConfig()">🔧 Changer la configuration Supabase</button>
+    </div>
   </div>
 </div>
 
@@ -2252,9 +2255,31 @@ function switchAuthTab(mode) {
   if (mode === 'register') document.getElementById('auth-pwd').autocomplete = 'new-password';
 }
 
+function translateAuthError(msg) {
+  if (!msg) return 'Erreur inconnue.';
+  if (msg.includes('Invalid login credentials')) return 'Email ou mot de passe incorrect.';
+  if (msg.includes('Email not confirmed')) return 'Confirme ton email avant de te connecter.';
+  if (msg.includes('User already registered')) return 'Ce compte existe déjà. Connecte-toi.';
+  if (msg.includes('Password should be')) return 'Mot de passe trop court (6 caractères minimum).';
+  if (msg.includes('Invalid path') || msg.includes('invalid') || msg.includes('URL')) return 'URL Supabase invalide. Clique sur "Changer la configuration" ci-dessous.';
+  if (msg.includes('network') || msg.includes('fetch')) return 'Erreur réseau. Vérifie ta connexion.';
+  if (msg.includes('rate limit') || msg.includes('too many')) return 'Trop de tentatives. Réessaie dans quelques minutes.';
+  return msg;
+}
+
 function showAuthErr(msg) {
   const el = document.getElementById('auth-err');
   el.textContent = msg; el.classList.add('show');
+}
+
+function resetSupabaseConfig() {
+  localStorage.removeItem('sb_url');
+  localStorage.removeItem('sb_key');
+  sbClient = null;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('setup-url').value = '';
+  document.getElementById('setup-key').value = '';
 }
 
 async function submitAuth() {
@@ -2274,14 +2299,14 @@ async function submitAuth() {
   document.getElementById('auth-err').classList.remove('show');
 
   try {
-    if (!sbClient) { showAuthErr('Connexion Supabase non configurée. Vérifie les variables Vercel.'); return; }
+    if (!sbClient) { showAuthErr('Configuration Supabase manquante. Clique sur "Changer la configuration" ci-dessous.'); return; }
     if (authMode === 'login') {
       const { error } = await sbClient.auth.signInWithPassword({ email, password: pwd });
-      if (error) showAuthErr(error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : error.message);
+      if (error) showAuthErr(translateAuthError(error.message));
     } else {
       const { error } = await sbClient.auth.signUp({ email, password: pwd });
-      if (error) showAuthErr(error.message);
-      else { toast('ok', '✅ Compte créé ! Vérifie tes emails.'); switchAuthTab('login'); }
+      if (error) showAuthErr(translateAuthError(error.message));
+      else { toast('ok', '✅ Compte créé ! Vérifie tes emails pour confirmer.'); switchAuthTab('login'); }
     }
   } catch (e) {
     showAuthErr('Erreur réseau. Réessaie.');
