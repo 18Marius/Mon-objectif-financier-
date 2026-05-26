@@ -2309,7 +2309,14 @@ async function submitAuth() {
       else { toast('ok', '✅ Compte créé ! Vérifie tes emails pour confirmer.'); switchAuthTab('login'); }
     }
   } catch (e) {
-    showAuthErr('Erreur réseau. Réessaie.');
+    const msg = e?.message || String(e) || '';
+    if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+      showAuthErr('Erreur réseau — vérifie ton URL Supabase (🔧 Changer la configuration).');
+    } else if (msg.includes('Invalid') || msg.includes('invalid') || msg.includes('JWT') || msg.includes('apikey')) {
+      showAuthErr('Clé API invalide — clique sur 🔧 Changer la configuration et entre la bonne clé anon.');
+    } else {
+      showAuthErr('Erreur : ' + (msg || 'Réessaie.'));
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
