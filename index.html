@@ -2182,7 +2182,9 @@ async function loadFromSupabase() {
       .eq('user_id', currentUser.id)
       .maybeSingle();
 
-    if (data?.data) {
+    if (error) {
+      toast('err', '❌ Chargement cloud échoué : ' + error.message);
+    } else if (data?.data) {
       S.subjects = data.data.subjects || S.subjects;
       if (data.data.player) S.player = { ...S.player, ...data.data.player };
       DB.save('eduxp_subjects', S.subjects);
@@ -2192,6 +2194,7 @@ async function loadFromSupabase() {
     }
     setSyncState('ok');
   } catch (e) {
+    toast('err', '❌ Sync échouée : ' + (e?.message || e));
     setSyncState('ok');
     console.warn('Sync load failed:', e);
   }
@@ -2211,16 +2214,22 @@ async function saveToSupabase() {
       })),
       player: S.player
     };
-    await sbClient.from('eduxp_data').upsert({
+    const { error } = await sbClient.from('eduxp_data').upsert({
       user_id: currentUser.id,
       data: syncData,
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' });
-    setSyncState('ok');
+    if (error) {
+      toast('err', '❌ Sauvegarde cloud échouée : ' + error.message);
+      console.warn('Sync save error:', error);
+    } else {
+      setSyncState('ok');
+    }
   } catch (e) {
-    setSyncState('ok');
+    toast('err', '❌ Sauvegarde cloud échouée : ' + (e?.message || e));
     console.warn('Sync save failed:', e);
   }
+  setSyncState('ok');
 }
 
 function setSyncState(state) {
