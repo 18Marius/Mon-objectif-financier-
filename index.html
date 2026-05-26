@@ -351,6 +351,13 @@ html,body{min-height:100vh;background:var(--bg);color:var(--txt);font:15px/1.5 '
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite}
 
+/* ── EXO TOOL CARDS ── */
+.exo-tc{background:var(--sur2);border:1px solid var(--brd);border-radius:var(--r12);padding:14px 10px;cursor:pointer;transition:all .2s;text-align:center;user-select:none}
+.exo-tc:hover{border-color:var(--purple);transform:translateY(-2px);background:rgba(139,92,246,.07)}
+.exo-tc.act{border-color:var(--purple);background:rgba(139,92,246,.12)}
+.exo-tc-ico{font-size:26px;margin-bottom:6px}
+.exo-tc-n{font-size:12px;font-weight:700;margin-bottom:3px;line-height:1.3}
+.exo-tc-d{font-size:10px;color:var(--txt2);line-height:1.3}
 /* ── EXERCISES / OUTILS ── */
 .tool-tabs{display:flex;gap:8px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .tool-tabs::-webkit-scrollbar{display:none}
@@ -1189,82 +1196,24 @@ function renderChapter() {
     </div>
   </div>
 
-  <!-- EXERCICES — pleine largeur sous le cours -->
-  <div style="margin-top:20px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:22px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <span style="font-size:20px">🧪</span>
-      <div style="font-size:17px;font-weight:800">Exercices & Outils</div>
-    </div>
-    <div class="tool-tabs" style="margin-bottom:18px">
-      <button class="tool-tab act" id="ch-ttab-correct" onclick="chTool('correct')">✏️ Corriger</button>
-      <button class="tool-tab" id="ch-ttab-solve" onclick="chTool('solve')">📐 Solveur</button>
-      <button class="tool-tab" id="ch-ttab-calc" onclick="chTool('calc')">🔢 Calculatrice</button>
-      <button class="tool-tab" id="ch-ttab-conv" onclick="chTool('conv')">🔄 Convertisseur</button>
-      <button class="tool-tab" id="ch-ttab-conj" onclick="chTool('conj')">📝 Conjugueur</button>
-    </div>
-
-    <div id="ch-tool-correct">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="fg" style="margin:0"><label>Énoncé de l'exercice (optionnel)</label>
-          <textarea class="ta" id="ch-corr-ex" rows="5" placeholder="Colle l'énoncé ici..."></textarea></div>
-        <div class="fg" style="margin:0"><label>Ta réponse / ta démarche *</label>
-          <textarea class="ta" id="ch-corr-ans" rows="5" placeholder="Écris ta réponse ou ta démarche..."></textarea></div>
-      </div>
-      <button class="btn bp" style="margin-top:12px" onclick="chRunCorrection()" id="ch-corr-btn">✅ Corriger avec l'IA</button>
-      <div class="corr-result" id="ch-corr-res"></div>
-    </div>
-
-    <div id="ch-tool-solve" style="display:none">
-      <div class="fg"><label>Problème à résoudre</label>
-        <textarea class="ta" id="ch-solv-prob" rows="5" placeholder="Ex: Résoudre 2x² − 5x + 3 = 0&#10;Ex: Un objet de 5kg tombe de 10m, quelle est sa vitesse ?&#10;Ex: Équilibrer la réaction chimique..."></textarea>
-      </div>
-      <button class="btn bp" onclick="chRunSolver()" id="ch-solv-btn">📐 Résoudre étape par étape</button>
-      <div class="corr-result" id="ch-solv-res"></div>
-    </div>
-
-    <div id="ch-tool-calc" style="display:none">
-      <div class="calc-wrap">
-        <div>
-          <div class="calc-display"><div class="calc-expr" id="ch-ce"></div><div class="calc-val" id="ch-cv">0</div></div>
-          <div class="calc-btns" id="ch-cb"></div>
-        </div>
-        <div class="calc-hist"><div class="calc-hist-t">Historique</div><div id="ch-calc-hist"></div></div>
-      </div>
-    </div>
-
-    <div id="ch-tool-conv" style="display:none">
-      <div class="conv-cats" id="ch-conv-cats"></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-        <div class="fg" style="min-width:120px;margin:0"><label>Valeur</label><input class="inp" id="ch-cv-val" type="number" placeholder="Ex: 100" oninput="chRunConvert()"></div>
-        <div class="fg" style="min-width:120px;margin:0"><label>De</label><select class="inp" id="ch-cv-from" onchange="chRunConvert()"></select></div>
-        <div class="fg" style="min-width:120px;margin:0"><label>Vers</label><select class="inp" id="ch-cv-to" onchange="chRunConvert()"></select></div>
-      </div>
-      <div class="conv-result-big" id="ch-cv-res">—</div>
-      <div class="conv-formula" id="ch-cv-formula"></div>
-    </div>
-
-    <div id="ch-tool-conj" style="display:none">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-        <div class="fg" style="min-width:180px;margin:0"><label>Verbe</label>
-          <input class="inp" id="ch-conj-v" placeholder="Ex: aller, finir, prendre..." onkeydown="if(event.key==='Enter')chRunConjugate()"></div>
-        <div class="fg" style="min-width:220px;margin:0"><label>Temps / Mode</label>
-          <select class="inp" id="ch-conj-t">
-            <option>Tous les temps principaux</option>
-            <option>Présent de l'indicatif</option><option>Imparfait</option>
-            <option>Futur simple</option><option>Passé composé</option>
-            <option>Conditionnel présent</option><option>Subjonctif présent</option>
-            <option>Impératif présent</option><option>Participes</option>
-          </select></div>
-        <div class="fg" style="margin:0;align-self:flex-end"><label>&nbsp;</label>
-          <button class="btn bp" onclick="chRunConjugate()" id="ch-conj-btn">📝 Conjuguer</button></div>
-      </div>
-      <div class="corr-result" id="ch-conj-res"></div>
+  <!-- EXERCICES pleine largeur -->
+  <div style="margin-top:20px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--r20);padding:24px">
+    <div style="font-size:18px;font-weight:800;margin-bottom:16px">🧪 Exercices & Outils</div>
+    <div id="exo-subjects" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px"></div>
+    <div id="exo-tools-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px"></div>
+    <div id="exo-active-tool" style="display:none">
+      <div id="exo-tool-title" style="font-size:16px;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--brd)"></div>
+      <div id="exo-tool-body"></div>
+      <div id="exo-tool-result"></div>
     </div>
   </div>
   `;
 
   // Init image gallery
   renderImgGallery(ch);
+  // Init exercises section (auto-detect subject)
+  const subHint = sub?.name || '';
+  initExoSection(subHint);
 
   // Auto-save course content
   const ta = document.getElementById('course-ta');
@@ -2074,166 +2023,310 @@ async function exportFlashcards() {
 }
 
 // ═══════════════════════════════════════════════════
-//  CHAPTER EXERCISES (intégrés dans le chapitre)
+//  EXERCISES — config outils par matière
 // ═══════════════════════════════════════════════════
-const CH_TOOLS = ['correct','solve','calc','conv','conj'];
-function chTool(name) {
-  CH_TOOLS.forEach(t => {
-    document.getElementById('ch-ttab-'+t)?.classList.remove('act');
-    const p = document.getElementById('ch-tool-'+t);
-    if (p) p.style.display = 'none';
-  });
-  document.getElementById('ch-ttab-'+name)?.classList.add('act');
-  const panel = document.getElementById('ch-tool-'+name);
-  if (panel) { panel.style.display = 'block'; panel.style.animation = 'fadeIn .2s ease'; }
-  if (name === 'calc') initChCalc();
-  if (name === 'conv') initChConvert();
+const A = (id,ico,name,desc,type,opts={}) => ({id,ico,name,desc,type,...opts});
+const SUBJECT_TOOLS = {
+  '📐 Maths': [
+    A('m-calc','🔢','Calculatrice','Scientifique complète','local-calc'),
+    A('m-solve','📐','Solveur','Résolution étape par étape','ai',{sys:'Tu es prof de maths. Résous le problème étape par étape avec toutes les étapes détaillées. Réponds en français.',lbl:'Problème / équation',ph:'Ex: Résoudre 2x²−5x+3=0'}),
+    A('m-deriv','📈','Dérivée & Intégrale','Calcul et explication','ai',{sys:'Tu es prof de maths. Calcule et explique la dérivée ou intégrale étape par étape. Réponds en français.',lbl:'Fonction',ph:'Ex: f(x)=3x²+2x−5, calculer f\'(x)'}),
+    A('m-stats','📊','Statistiques','Moyenne, médiane, écart-type','ai',{sys:'Tu es prof de maths. Calcule les statistiques demandées avec toutes les étapes. Réponds en français.',lbl:'Données / question',ph:'Ex: Série: 2,4,6,8,10 — calculer moyenne et écart-type'}),
+    A('m-geo','📏','Géométrie','Aires, volumes, Pythagore','ai',{sys:'Tu es prof de géométrie. Résous avec les formules et toutes les étapes. Réponds en français.',lbl:'Problème géométrique',ph:'Ex: Triangle ABC, AB=3, BC=4, angle B=90°. Calculer AC.'}),
+    A('m-proba','🎲','Probabilités','Calculs et lois','ai',{sys:'Tu es prof de maths spé probabilités. Résous étape par étape. Réponds en français.',lbl:'Problème',ph:'Ex: On lance un dé 6 fois, P(obtenir 3 fois un 6) = ?'}),
+    A('m-trig','📐','Trigonométrie','sin, cos, tan, cercle','ai',{sys:'Tu es prof de maths. Résous le problème de trigonométrie avec détail des calculs. Réponds en français.',lbl:'Problème / calcul',ph:'Ex: sin(30°), cos(π/3), résoudre sin(x)=0.5'}),
+    A('m-suite','∑','Suites & Séries','Arithmétiques, géométriques','ai',{sys:'Tu es prof de maths. Explique et calcule tout sur les suites et séries. Réponds en français.',lbl:'Question',ph:'Ex: Suite arith. u0=3, r=2 — calculer u10 et la somme des 10 premiers termes'}),
+    A('m-mat','🔳','Matrices & Vecteurs','Calcul matriciel','ai',{sys:'Tu es prof de maths. Effectue les opérations matricielles ou vectorielles demandées étape par étape. Réponds en français.',lbl:'Opération',ph:'Ex: Calculer le déterminant de A = [[1,2],[3,4]]'}),
+    A('m-lim','∞','Limites','Calcul de limites','ai',{sys:'Tu es prof de maths. Calcule la limite demandée étape par étape avec les règles utilisées. Réponds en français.',lbl:'Limite à calculer',ph:'Ex: lim(x→∞) de (2x²+3x)/(x²−1)'}),
+    A('m-conv','🔄','Convertisseur','Unités, angles','local-conv'),
+    A('m-corr','✅','Corriger ma copie','L\'IA corrige ton exercice','ai2',{sys:'Tu es prof de maths correcteur. Dis ✅ correct ou ❌ incorrect, explique les erreurs, donne la solution complète. Réponds en français.',lbl1:'Énoncé (optionnel)',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta démarche...'}),
+    A('m-expli','💡','Expliquer un concept','Comprendre simplement','ai',{sys:'Tu es prof de maths bienveillant. Explique simplement avec des exemples concrets. Réponds en français.',lbl:'Concept',ph:'Ex: Les limites, la dérivée, les probabilités...'}),
+    A('m-aide','📋','Aide-mémoire','Formules essentielles','ai',{sys:'Tu es prof de maths. Donne un aide-mémoire complet et bien organisé avec toutes les formules importantes. Réponds en français.',lbl:'Thème',ph:'Ex: Trigonométrie, dérivées, probabilités, suites...'}),
+  ],
+  '📝 Français': [
+    A('fr-conj','📝','Conjugueur','Tous les temps et modes','local-conj'),
+    A('fr-syn','🔤','Synonymes & Antonymes','Enrichir le vocabulaire','ai',{sys:'Tu es expert en langue française. Donne les synonymes, antonymes et nuances pour le mot demandé, organisés clairement.',lbl:'Mot ou expression',ph:'Ex: heureux, rapide, montrer...'}),
+    A('fr-corr','✅','Correcteur','Corriger et améliorer','ai',{sys:'Tu es correcteur expert en français. Corrige les fautes, améliore le style et explique chaque correction.',lbl:'Texte à corriger',ph:'Colle ton texte ici...'}),
+    A('fr-reform','✍️','Reformuler','Réécrire autrement','ai',{sys:'Tu es expert en français. Reformule le texte de plusieurs façons différentes (soutenu, neutre, simplifié). Explique les choix.',lbl:'Texte à reformuler',ph:'Colle ton texte...'}),
+    A('fr-gram','🔍','Analyse grammaticale','Nature et fonction','ai',{sys:'Tu es prof de français. Fais l\'analyse grammaticale complète (nature, fonction, temps, mode). Réponds en français.',lbl:'Mot, groupe ou phrase',ph:'Ex: analyser "jouent" dans "Les enfants jouent dans le jardin"'}),
+    A('fr-dissert','🖊️','Plan de dissertation','I, II, III structuré','ai',{sys:'Tu es prof de français. Construis un plan de dissertation complet (intro, thèse/antithèse/synthèse avec arguments et exemples). Réponds en français.',lbl:'Sujet',ph:'Ex: La littérature peut-elle changer le monde ?'}),
+    A('fr-analyse','📚','Analyse de texte','Commentaire littéraire','ai',{sys:'Tu es prof de littérature française. Analyse l\'extrait : contexte, thèmes, procédés stylistiques, sens. Réponds en français.',lbl:'Extrait littéraire',ph:'Colle l\'extrait ici...'}),
+    A('fr-figures','🎭','Figures de style','Identifier et expliquer','ai',{sys:'Tu es prof de français. Identifie et explique toutes les figures de style. Réponds en français.',lbl:'Texte ou phrase',ph:'Ex: "Cette voix est un couteau de lumière"'}),
+    A('fr-ortho','🔠','Règles d\'orthographe','Accord, pluriel, accents','ai',{sys:'Tu es expert en orthographe française. Explique la règle, donne des exemples et des exceptions. Réponds en français.',lbl:'Règle ou cas à expliquer',ph:'Ex: accord du participe passé avec avoir, pluriel des noms composés...'}),
+    A('fr-vocab','📖','Vocabulaire littéraire','Champs lexicaux, registres','ai',{sys:'Tu es prof de français. Explique les notions de vocabulaire littéraire demandées avec des exemples. Réponds en français.',lbl:'Notion ou champ lexical',ph:'Ex: registre tragique, champ lexical de la nature, polysémie...'}),
+  ],
+  '⚗️ Physique-Chimie': [
+    A('pc-calc','🔢','Calculatrice','Calculs scientifiques','local-calc'),
+    A('pc-conv','🔄','Convertisseur','Unités physiques','local-conv'),
+    A('pc-form','⚡','Appliquer une formule','Calcul guidé','ai',{sys:'Tu es prof de physique-chimie. Identifie la formule, remplace les valeurs et calcule. Montre chaque étape avec les unités. Réponds en français.',lbl:'Formule et données',ph:'Ex: F=ma, m=5kg, a=3m/s². Calculer F.'}),
+    A('pc-equil','⚗️','Équations chimiques','Équilibrer et expliquer','ai',{sys:'Tu es prof de chimie. Équilibre l\'équation, explique les réactifs/produits et les coefficients. Réponds en français.',lbl:'Équation à équilibrer',ph:'Ex: H₂ + O₂ → H₂O'}),
+    A('pc-elem','🔬','Tableau périodique','Infos sur les éléments','ai',{sys:'Tu es expert en chimie. Donne toutes les infos : numéro atomique, masse, configuration électronique, propriétés, usages. Réponds en français.',lbl:'Élément chimique',ph:'Ex: Carbone, fer, Na, Fe...'}),
+    A('pc-circuit','💡','Loi d\'Ohm & Circuits','Calcul électrique','ai',{sys:'Tu es prof de physique. Résous le problème de circuit électrique (loi d\'Ohm, Kirchhoff, puissance). Étape par étape avec unités. Réponds en français.',lbl:'Circuit ou données',ph:'Ex: V=12V, R=4Ω, calculer I et la puissance'}),
+    A('pc-mecanique','🚀','Mécanique','Forces, mouvement, énergie','ai',{sys:'Tu es prof de physique mécanique. Résous le problème avec les lois de Newton, formules d\'énergie ou de cinématique. Réponds en français.',lbl:'Problème de mécanique',ph:'Ex: Un objet de 5kg tombe de 10m — vitesse à l\'impact ?'}),
+    A('pc-optique','🌈','Optique','Lumière, lentilles, réfraction','ai',{sys:'Tu es prof de physique optique. Explique et calcule. Réponds en français.',lbl:'Problème ou question',ph:'Ex: Lentille convergente f=5cm, objet à 20cm. Trouver l\'image.'}),
+    A('pc-concept','💡','Expliquer un concept','Physique ou chimie','ai',{sys:'Tu es prof de physique-chimie. Explique simplement avec des exemples du quotidien. Réponds en français.',lbl:'Concept',ph:'Ex: La loi d\'Ohm, les liaisons chimiques, le mouvement uniformément accéléré...'}),
+    A('pc-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{sys:'Tu es prof de physique-chimie correcteur. Évalue, identifie les erreurs et donne la correction complète avec unités. Réponds en français.',lbl1:'Énoncé',ph1:'Colle l\'énoncé...',lbl2:'Ta réponse',ph2:'Ta réponse...'}),
+  ],
+  '🌍 Histoire-Géo': [
+    A('hg-plan','🖊️','Plan de composition','Structure ton devoir','ai',{sys:'Tu es prof d\'histoire-géographie. Construis un plan structuré (intro, parties avec arguments et exemples, conclusion). Réponds en français.',lbl:'Sujet de composition',ph:'Ex: La France dans la Seconde Guerre mondiale'}),
+    A('hg-doc','🗺️','Analyse de document','Méthode complète','ai',{sys:'Tu es prof d\'histoire-géographie. Guide l\'analyse : nature, contexte, idée principale, mise en relation. Réponds en français.',lbl:'Document ou description',ph:'Colle le texte du document ou décris-le...'}),
+    A('hg-chrono','📅','Frise chronologique','Dates et événements clés','ai',{sys:'Tu es prof d\'histoire. Donne une frise chronologique structurée avec dates et événements clés. Réponds en français.',lbl:'Période ou thème',ph:'Ex: La Révolution française, La Guerre froide...'}),
+    A('hg-carto','🗺️','Croquis de géographie','Éléments à représenter','ai',{sys:'Tu es prof de géographie. Décris les éléments à représenter sur un croquis, leur légende et organisation. Réponds en français.',lbl:'Thème du croquis',ph:'Ex: La mondialisation, l\'organisation du territoire français...'}),
+    A('hg-contexte','🏛️','Contextualiser','Causes, acteurs, enjeux','ai',{sys:'Tu es prof d\'histoire-géo. Explique le contexte historique/géographique, les causes, les acteurs et les enjeux. Réponds en français.',lbl:'Événement ou notion',ph:'Ex: La montée du nazisme, la mondialisation...'}),
+    A('hg-notion','📖','Expliquer une notion','Définitions et exemples','ai',{sys:'Tu es prof d\'histoire-géographie. Définis la notion, donne des exemples concrets et son importance. Réponds en français.',lbl:'Notion',ph:'Ex: État-nation, géopolitique, urbanisation, totalitarisme...'}),
+    A('hg-corr','✅','Corriger ma copie','L\'IA évalue ton devoir','ai2',{sys:'Tu es prof d\'histoire-géo correcteur. Évalue : fond historique, méthode, structure. Donne une note indicative et des conseils. Réponds en français.',lbl1:'Sujet',ph1:'Le sujet...',lbl2:'Ta réponse',ph2:'Colle ta réponse...'}),
+  ],
+  '🧬 SVT': [
+    A('svt-expli','🧬','Expliquer un concept','Biologie et sciences','ai',{sys:'Tu es prof de SVT. Explique clairement avec exemples, schémas décrits et mots-clés. Réponds en français.',lbl:'Concept',ph:'Ex: La mitose, la photosynthèse, la méiose...'}),
+    A('svt-exp','🔬','Analyser une expérience','Hypothèse, résultats, conclusion','ai',{sys:'Tu es prof de SVT. Guide l\'analyse : protocole, hypothèse, résultats, interprétation, conclusion. Réponds en français.',lbl:'Description de l\'expérience',ph:'Ex: Expérience sur la photosynthèse avec et sans lumière...'}),
+    A('svt-schema','🌱','Décrire un schéma','Légendes et fonctionnement','ai',{sys:'Tu es prof de SVT. Décris le schéma en détail avec légendes et fonctionnement. Réponds en français.',lbl:'Schéma ou structure',ph:'Ex: Cellule animale, coupe d\'une feuille, neurone...'}),
+    A('svt-gene','🧪','Génétique','Croisements et hérédité','ai',{sys:'Tu es prof de SVT spé génétique. Résous le problème (croisements, phénotypes, génotypes) étape par étape. Réponds en français.',lbl:'Problème de génétique',ph:'Ex: Parents AA x aa — donner génotypes et phénotypes des descendants'}),
+    A('svt-corps','❤️','Corps humain','Organes et systèmes','ai',{sys:'Tu es prof de SVT. Explique le fonctionnement de l\'organe ou système demandé. Réponds en français.',lbl:'Organe ou système',ph:'Ex: Le cœur, le système nerveux, les reins, la digestion...'}),
+    A('svt-ecologie','🌍','Écologie','Écosystèmes et environnement','ai',{sys:'Tu es prof de SVT spé écologie. Explique les concepts écologiques demandés avec des exemples. Réponds en français.',lbl:'Question ou concept',ph:'Ex: Chaîne alimentaire, biodiversité, changement climatique...'}),
+    A('svt-corr','✅','Corriger mon exercice','L\'IA évalue ta réponse','ai2',{sys:'Tu es prof de SVT correcteur. Évalue, identifie les erreurs et donne la correction. Réponds en français.',lbl1:'Question',ph1:'La question posée...',lbl2:'Ta réponse',ph2:'Ta réponse...'}),
+  ],
+  '🇬🇧 Anglais': [
+    A('en-trad','🌐','Traducteur','FR ↔ EN et autres langues','ai',{sys:'Tu es traducteur expert. Traduis le texte, donne les nuances importantes et expressions idiomatiques si pertinent.',lbl:'Texte à traduire (précise la langue cible)',ph:'Ex: [FR→EN] Bonjour, comment allez-vous ?'}),
+    A('en-corr','✅','Correcteur anglais','Grammar & style','ai',{sys:'You are an expert English teacher. Correct all grammar, spelling and style errors. Explain each correction in French. Be very detailed.',lbl:'Texte anglais à corriger',ph:'Ex: I go to school yesterday and I seen my friends...'}),
+    A('en-conj','📝','Conjugueur anglais','All tenses','ai',{sys:'Tu es prof d\'anglais. Conjugue le verbe à tous les temps principaux (Present, Past, Future, Perfect...) avec exemples de phrases. En français et anglais.',lbl:'Verbe anglais',ph:'Ex: to go, to have, to be, to make...'}),
+    A('en-vocab','🔤','Vocabulaire thématique','Mots et expressions','ai',{sys:'Tu es prof d\'anglais. Donne le vocabulaire thématique complet avec traductions et exemples de phrases. Réponds en français.',lbl:'Thème',ph:'Ex: The environment, social media, health, technology...'}),
+    A('en-express','💬','Expressions idiomatiques','Idioms & phrasal verbs','ai',{sys:'Tu es prof d\'anglais. Explique les expressions et phrasal verbs avec exemples. Réponds en français.',lbl:'Expression',ph:'Ex: to give up, to run into, it\'s raining cats and dogs...'}),
+    A('en-redac','✍️','Aide à la rédaction','Essay, email, article','ai',{sys:'Tu es prof d\'anglais. Améliore le texte anglais : grammaire, structure, vocabulaire. Propose une version améliorée et explique en français.',lbl:'Ton texte anglais',ph:'Colle ton texte ici...'}),
+    A('en-comprehension','📖','Compréhension de texte','Analyser un document anglais','ai',{sys:'Tu es prof d\'anglais. Aide à comprendre le texte anglais : vocabulaire difficile, idées principales, analyse. Réponds en français.',lbl:'Texte anglais',ph:'Colle le texte anglais ici...'}),
+  ],
+  '💻 Informatique': [
+    A('info-algo','💻','Aide algorithmique','Concevoir un algorithme','ai',{sys:'Tu es prof d\'informatique. Aide à concevoir et comprendre l\'algorithme. Explique en pseudo-code et donne une implémentation Python. Réponds en français.',lbl:'Problème à résoudre',ph:'Ex: Trier une liste, trouver le max, recherche dichotomique...'}),
+    A('info-debug','🐛','Déboguer du code','Trouver et corriger les bugs','ai',{sys:'Tu es expert développeur. Analyse le code, identifie les bugs, explique pourquoi ça ne marche pas et donne le code corrigé. Réponds en français.',lbl:'Code à déboguer',ph:'Colle ton code ici...'}),
+    A('info-expli','📖','Expliquer du code','Comprendre ligne par ligne','ai',{sys:'Tu es prof d\'informatique. Explique le code ligne par ligne en termes simples. Identifie les concepts. Réponds en français.',lbl:'Code à expliquer',ph:'Colle ton code ici...'}),
+    A('info-bases','🔢','Bases numériques','Binaire, octal, hexadécimal','ai',{sys:'Tu es prof d\'informatique. Effectue la conversion en montrant toutes les étapes. Réponds en français.',lbl:'Conversion',ph:'Ex: 42 en binaire, 0xFF en décimal, 1010 en décimal...'}),
+    A('info-struct','🗂️','Structures de données','Tableaux, listes, arbres...','ai',{sys:'Tu es prof d\'informatique. Explique la structure avec propriétés, opérations et exemples. Réponds en français.',lbl:'Structure à expliquer',ph:'Ex: Liste chaînée, pile, file, arbre binaire, dictionnaire...'}),
+    A('info-complexite','📊','Complexité & Big O','Analyser les performances','ai',{sys:'Tu es prof d\'informatique. Explique la complexité algorithmique et le Big O. Donne des exemples concrets. Réponds en français.',lbl:'Algorithme ou question',ph:'Ex: Quelle est la complexité d\'un tri à bulles ? Expliquer O(n log n)...'}),
+  ],
+};
+
+const EXO_SUBJ_MATCH = {
+  'math':'📐 Maths','physique':'⚗️ Physique-Chimie','chimie':'⚗️ Physique-Chimie',
+  'français':'📝 Français','francais':'📝 Français','histoire':'🌍 Histoire-Géo',
+  'géographie':'🌍 Histoire-Géo','geographie':'🌍 Histoire-Géo','svt':'🧬 SVT',
+  'biologie':'🧬 SVT','anglais':'🇬🇧 Anglais','english':'🇬🇧 Anglais',
+  'informatique':'💻 Informatique','nsi':'💻 Informatique',
+};
+
+let exoSubject = '📐 Maths', exoActiveTool = null;
+
+function initExoSection(subHint) {
+  const el = document.getElementById('exo-subjects');
+  if (!el) return;
+  // Auto-detect subject
+  const hint = (subHint||'').toLowerCase();
+  for (const [k, v] of Object.entries(EXO_SUBJ_MATCH)) { if (hint.includes(k)) { exoSubject = v; break; } }
+  exoActiveTool = null;
+  el.innerHTML = Object.keys(SUBJECT_TOOLS).map(s =>
+    `<button class="conv-cat${s===exoSubject?' act':''}" onclick="exoSelectSubj('${s.replace(/'/g,"\\'")}')">${s}</button>`
+  ).join('');
+  renderExoGrid();
 }
 
-async function chRunCorrection() {
-  const sub = S.subjects.find(s => s.id === R.subjectId);
-  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
-  const exercise = document.getElementById('ch-corr-ex').value.trim();
-  const answer = document.getElementById('ch-corr-ans').value.trim();
-  const btn = document.getElementById('ch-corr-btn');
-  const res = document.getElementById('ch-corr-res');
-  if (!answer) { toast('warn', 'Écris ta réponse d\'abord.'); return; }
-  btn.disabled = true; btn.textContent = '⏳ Correction...';
-  res.style.display = '';res.className = 'corr-result';
-  const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
-  const system = `Tu es un professeur correcteur bienveillant${sub ? ' en ' + sub.name : ''}.${ctx}\nCorrige l'exercice de l'élève : dis si c'est ✅ correct ou ❌ incorrect, explique les erreurs, donne la correction complète et encourage l'élève. Réponds en français.`;
+function exoSelectSubj(s) {
+  exoSubject = s; exoActiveTool = null;
+  document.querySelectorAll('#exo-subjects .conv-cat').forEach(b => b.classList.toggle('act', b.textContent===s));
+  document.getElementById('exo-active-tool').style.display = 'none';
+  renderExoGrid();
+}
+
+function renderExoGrid() {
+  const grid = document.getElementById('exo-tools-grid');
+  if (!grid) return;
+  const tools = SUBJECT_TOOLS[exoSubject] || [];
+  grid.innerHTML = tools.map(t =>
+    `<div class="exo-tc${exoActiveTool?.id===t.id?' act':''}" onclick="exoOpenTool('${t.id}')">
+      <div class="exo-tc-ico">${t.ico}</div>
+      <div class="exo-tc-n">${t.name}</div>
+      <div class="exo-tc-d">${t.desc}</div>
+    </div>`
+  ).join('');
+}
+
+function exoOpenTool(toolId) {
+  const tool = (SUBJECT_TOOLS[exoSubject]||[]).find(t=>t.id===toolId);
+  if (!tool) return;
+  exoActiveTool = tool;
+  renderExoGrid();
+  const panel = document.getElementById('exo-active-tool');
+  document.getElementById('exo-tool-title').innerHTML = `${tool.ico} <strong>${tool.name}</strong> <span style="font-size:13px;color:var(--txt2);font-weight:400">— ${tool.desc}</span>`;
+  const res = document.getElementById('exo-tool-result');
+  res.className = 'corr-result'; res.style.display=''; res.textContent='';
+  const body = document.getElementById('exo-tool-body');
+
+  if (tool.type === 'ai') {
+    body.innerHTML = `<div class="fg"><label>${tool.lbl}</label>
+      <textarea class="ta" id="exo-inp" rows="5" placeholder="${tool.ph}"></textarea></div>
+      <button class="btn bp" style="margin-top:4px" onclick="exoRunAI()" id="exo-btn">✨ ${tool.name}</button>`;
+  } else if (tool.type === 'ai2') {
+    body.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="fg" style="margin:0"><label>${tool.lbl1}</label><textarea class="ta" id="exo-inp1" rows="5" placeholder="${tool.ph1}"></textarea></div>
+      <div class="fg" style="margin:0"><label>${tool.lbl2}</label><textarea class="ta" id="exo-inp2" rows="5" placeholder="${tool.ph2}"></textarea></div>
+    </div><button class="btn bp" onclick="exoRunAI()" id="exo-btn">✨ ${tool.name}</button>`;
+  } else if (tool.type === 'local-calc') {
+    body.innerHTML = `<div class="calc-wrap"><div>
+      <div class="calc-display"><div class="calc-expr" id="exo-ce"></div><div class="calc-val" id="exo-cv">0</div></div>
+      <div class="calc-btns" id="exo-cb"></div></div>
+      <div class="calc-hist"><div class="calc-hist-t">Historique</div><div id="exo-ch"></div></div></div>`;
+    initExoCalc();
+  } else if (tool.type === 'local-conv') {
+    body.innerHTML = `<div class="conv-cats" id="exo-cc" style="margin-bottom:12px"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="fg" style="flex:1;min-width:100px;margin:0"><label>Valeur</label><input class="inp" id="exo-vv" type="number" placeholder="Ex: 100" oninput="exoConvert()"></div>
+        <div class="fg" style="flex:1;min-width:100px;margin:0"><label>De</label><select class="inp" id="exo-vf" onchange="exoConvert()"></select></div>
+        <div class="fg" style="flex:1;min-width:100px;margin:0"><label>Vers</label><select class="inp" id="exo-vt" onchange="exoConvert()"></select></div>
+      </div>
+      <div class="conv-result-big" id="exo-vr">—</div><div class="conv-formula" id="exo-vfml"></div>`;
+    initExoConv();
+  } else if (tool.type === 'local-conj') {
+    body.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div class="fg" style="min-width:180px;margin:0"><label>Verbe</label>
+        <input class="inp" id="exo-cjv" placeholder="Ex: aller, finir, prendre..." onkeydown="if(event.key==='Enter')exoConjugate()"></div>
+      <div class="fg" style="min-width:220px;margin:0"><label>Temps / Mode</label>
+        <select class="inp" id="exo-cjt">
+          <option>Tous les temps principaux</option><option>Présent de l'indicatif</option>
+          <option>Imparfait</option><option>Futur simple</option><option>Passé composé</option>
+          <option>Conditionnel présent</option><option>Subjonctif présent</option>
+          <option>Impératif présent</option><option>Participes</option>
+        </select></div>
+      <div class="fg" style="margin:0;align-self:flex-end"><label>&nbsp;</label>
+        <button class="btn bp" onclick="exoConjugate()" id="exo-cjbtn">📝 Conjuguer</button></div>
+    </div>`;
+  }
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function exoRunAI() {
+  const tool = exoActiveTool; if (!tool) return;
+  const btn = document.getElementById('exo-btn');
+  const res = document.getElementById('exo-tool-result');
+  let userMsg;
+  if (tool.type==='ai') {
+    const v = document.getElementById('exo-inp')?.value.trim();
+    if (!v) { toast('warn','Entre quelque chose.'); return; }
+    userMsg = v;
+  } else {
+    const v1 = document.getElementById('exo-inp1')?.value.trim();
+    const v2 = document.getElementById('exo-inp2')?.value.trim();
+    if (!v2) { toast('warn','Remplis au moins le 2ème champ.'); return; }
+    userMsg = (v1 ? tool.lbl1+' : '+v1+'\n\n' : '') + tool.lbl2+' : '+v2;
+  }
+  const sub = S.subjects.find(s=>s.id===R.subjectId);
+  const ch  = sub?.chapters?.find(c=>c.id===R.chapterId);
+  const ctx = ch?.content ? '\n\nContexte du cours : "'+ch.content.slice(0,500)+'"' : '';
+  const system = tool.sys + ctx;
+  const origTxt = btn.textContent;
+  btn.disabled=true; btn.textContent='⏳ Génération...';
+  res.className='corr-result'; res.textContent='';
   try {
-    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ messages:[{role:'user',content:(exercise?'Énoncé : '+exercise+'\n\n':'')+'Réponse : '+answer}], systemOverride:system, mode:'chat'}) });
+    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:userMsg}],systemOverride:system,mode:'chat'})});
     const d = await r.json();
-    res.textContent = d.content || 'Pas de réponse.';
-    res.className = 'corr-result show ' + (d.content?.includes('✅')?'corr-ok':d.content?.includes('❌')?'corr-err':'');
-  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
-  btn.disabled = false; btn.textContent = '✅ Corriger avec l\'IA';
+    res.textContent = d.content||'Pas de réponse.';
+    res.className = 'corr-result show'+(d.content?.includes('✅')?' corr-ok':d.content?.includes('❌')?' corr-err':'');
+  } catch(e) { res.textContent='Erreur : '+e.message; res.className='corr-result show corr-err'; }
+  btn.disabled=false; btn.textContent=origTxt;
 }
 
-async function chRunSolver() {
-  const sub = S.subjects.find(s => s.id === R.subjectId);
-  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
-  const problem = document.getElementById('ch-solv-prob').value.trim();
-  const btn = document.getElementById('ch-solv-btn');
-  const res = document.getElementById('ch-solv-res');
-  if (!problem) { toast('warn', 'Entre un problème à résoudre.'); return; }
-  btn.disabled = true; btn.textContent = '⏳ Résolution...';
-  res.style.display = '';res.className = 'corr-result';
-  const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
-  const system = `Tu es un professeur expert${sub ? ' en ' + sub.name : ''}.${ctx}\nRésous le problème en détaillant chaque étape, les formules utilisées et la réponse finale. Sois pédagogique. Réponds en français.`;
-  try {
-    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ messages:[{role:'user',content:problem}], systemOverride:system, mode:'chat'}) });
-    const d = await r.json();
-    res.textContent = d.content || 'Pas de réponse.';
-    res.className = 'corr-result show';
-  } catch(e) { res.textContent = 'Erreur : ' + e.message; res.className = 'corr-result show corr-err'; }
-  btn.disabled = false; btn.textContent = '📐 Résoudre étape par étape';
-}
-
-// Calculatrice chapitre
-let chCalcExpr = '', chCalcEvaled = false;
-function initChCalc() {
-  const btns = document.getElementById('ch-cb');
-  if (!btns || btns.childElementCount > 0) return;
-  const layout = [
-    ['sin(','cos(','tan(','C'],['log(','ln(','√(','⌫'],
-    ['7','8','9','÷'],['4','5','6','×'],['1','2','3','−'],
-    ['0','.','x²','+'],['(',')','π','=']
-  ];
-  layout.forEach(row => row.forEach(lbl => {
-    const b = document.createElement('button');
-    const isFn = ['sin(','cos(','tan(','log(','ln(','√(','π'].includes(lbl);
-    const isOp = ['÷','×','−','+','(',')'].includes(lbl);
-    const isCl = ['C','⌫'].includes(lbl);
-    const isEq = lbl === '=';
-    b.className = `calc-btn ${isEq?'cb-eq':isCl?'cb-cl':isFn?'cb-fn':isOp?'cb-op':'cb-num'}`;
-    b.textContent = lbl;
-    if (lbl === '=') b.style.gridColumn = 'span 2';
-    b.onclick = () => chCalcPress(lbl);
-    btns.appendChild(b);
+// Calculatrice exo
+let exoCE='', exoCEv=false, exoCHist=[];
+function initExoCalc() {
+  const btns=document.getElementById('exo-cb'); if(!btns||btns.childElementCount>0)return;
+  [['sin(','cos(','tan(','π'],['log(','ln(','√(','x²'],['7','8','9','÷'],['4','5','6','×'],
+   ['1','2','3','−'],['0','.','⌫','+'],[['(','op'],[')',  'op'],['C','cl'],['=','eq']]
+  ].forEach(row=>(Array.isArray(row)?row:[row]).forEach?.(raw=>{
+    const [lbl,hint]= Array.isArray(raw)?raw:[raw,''];
+    const b=document.createElement('button');
+    const fn=['sin(','cos(','tan(','log(','ln(','√(','π'].includes(lbl);
+    const op=['÷','×','−','+','(',')'].includes(lbl)||hint==='op';
+    const cl=['C','⌫'].includes(lbl)||hint==='cl';
+    b.className=`calc-btn ${lbl==='='||hint==='eq'?'cb-eq':cl?'cb-cl':fn?'cb-fn':op?'cb-op':'cb-num'}`;
+    b.textContent=lbl; if(lbl==='=')b.style.gridColumn='span 1';
+    b.onclick=()=>exoCalcPress(lbl); btns.appendChild(b);
   }));
 }
-function chCalcPress(v) {
-  if (v === 'C') { chCalcExpr = ''; chCalcEvaled = false; }
-  else if (v === '⌫') { chCalcExpr = chCalcExpr.slice(0,-1); }
-  else if (v === '=') {
-    try {
-      let expr = chCalcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
+function exoCalcPress(v) {
+  if(v==='C'){exoCE='';exoCEv=false;}
+  else if(v==='⌫'){exoCE=exoCE.slice(0,-1);}
+  else if(v==='='){
+    try{
+      let e=exoCE.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
         .replace(/π/g,Math.PI).replace(/√\(/g,'Math.sqrt(').replace(/sin\(/g,'Math.sin(')
         .replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(')
         .replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(')
         .replace(/(\d+(?:\.\d+)?)²/g,'($1**2)');
-      const allowed = /^[0-9+\-*/.()Math.,\s_a-zA-Z]+$/;
-      if (!allowed.test(expr)) throw new Error('invalide');
-      const result = parseFloat(Function('"use strict";return('+expr+')')().toFixed(10)).toString();
-      chCalcExpr = result; chCalcEvaled = true;
-    } catch { chCalcExpr = 'Erreur'; }
-  } else if (v === 'x²') { chCalcExpr += '²'; }
-  else { if (chCalcEvaled && /[\d.(]/.test(v)) chCalcExpr=''; chCalcEvaled=false; chCalcExpr+=v; }
-  const cv = document.getElementById('ch-cv'); if(cv) cv.textContent = chCalcExpr||'0';
+      if(!/^[0-9+\-*/.()Math.,\s_a-zA-Z]+$/.test(e))throw 0;
+      const res=parseFloat(Function('"use strict";return('+e+')')().toFixed(10)).toString();
+      exoCHist.unshift(exoCE+' = '+res); exoCHist=exoCHist.slice(0,20);
+      const hl=document.getElementById('exo-ch');
+      if(hl)hl.innerHTML=exoCHist.map(h=>{const p=h.split(' = ');return`<div class="calc-hist-item">${p[0]} = <span>${p[1]}</span></div>`;}).join('');
+      exoCE=res; exoCEv=true;
+    }catch{exoCE='Erreur';}
+  } else if(v==='x²'){exoCE+='²';}
+  else{if(exoCEv&&/[\d.(]/.test(v))exoCE='';exoCEv=false;exoCE+=v;}
+  const cv=document.getElementById('exo-cv'); if(cv)cv.textContent=exoCE||'0';
 }
 
-// Convertisseur chapitre
-let chConvCat = '📏 Longueur';
-function initChConvert() {
-  const cats = document.getElementById('ch-conv-cats');
-  if (!cats || cats.childElementCount > 0) return;
-  Object.keys(CONV_CATS).forEach(k => {
-    const b = document.createElement('button');
-    b.className = 'conv-cat' + (k===chConvCat?' act':'');
-    b.textContent = k; b.style.fontSize = '11px'; b.style.padding = '4px 10px';
-    b.onclick = () => { chConvCat=k; document.querySelectorAll('#ch-conv-cats .conv-cat').forEach(x=>x.classList.remove('act')); b.classList.add('act'); chFillConv(); chRunConvert(); };
+// Convertisseur exo
+let exoCC='📏 Longueur';
+function initExoConv() {
+  const cats=document.getElementById('exo-cc'); if(!cats||cats.childElementCount>0)return;
+  Object.keys(CONV_CATS).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='conv-cat'+(k===exoCC?' act':''); b.textContent=k;
+    b.style.cssText='font-size:11px;padding:4px 10px';
+    b.onclick=()=>{exoCC=k;document.querySelectorAll('#exo-cc .conv-cat').forEach(x=>x.classList.remove('act'));b.classList.add('act');exoFillConv();exoConvert();};
     cats.appendChild(b);
-  });
-  chFillConv();
+  }); exoFillConv();
 }
-function chFillConv() {
-  const isTemp = chConvCat==='🌡️ Température';
-  const units = isTemp?['°C','°F','K']:Object.keys(CONV_CATS[chConvCat]);
-  ['ch-cv-from','ch-cv-to'].forEach((id,i)=>{
-    const s=document.getElementById(id); if(!s)return;
-    s.innerHTML=units.map((u,j)=>`<option value="${u}"${(i===0&&j===0)||(i===1&&j===1)?' selected':''}>${u}</option>`).join('');
-  });
-  chRunConvert();
+function exoFillConv(){
+  const isT=exoCC==='🌡️ Température';
+  const u=isT?['°C','°F','K']:Object.keys(CONV_CATS[exoCC]);
+  ['exo-vf','exo-vt'].forEach((id,i)=>{const s=document.getElementById(id);if(!s)return;s.innerHTML=u.map((v,j)=>`<option${(i===0&&j===0)||(i===1&&j===1)?' selected':''}>${v}</option>`).join('');});
+  exoConvert();
 }
-function chRunConvert() {
-  const val=parseFloat(document.getElementById('ch-cv-val')?.value);
-  const from=document.getElementById('ch-cv-from')?.value;
-  const to=document.getElementById('ch-cv-to')?.value;
-  const el=document.getElementById('ch-cv-res'); if(!el)return;
+function exoConvert(){
+  const val=parseFloat(document.getElementById('exo-vv')?.value);
+  const from=document.getElementById('exo-vf')?.value;
+  const to=document.getElementById('exo-vt')?.value;
+  const el=document.getElementById('exo-vr'); if(!el)return;
   if(isNaN(val)){el.textContent='—';return;}
-  let result;
-  if(chConvCat==='🌡️ Température'){
-    if(from===to)result=val;
-    else if(from==='°C'&&to==='°F')result=val*9/5+32;
-    else if(from==='°C'&&to==='K')result=val+273.15;
-    else if(from==='°F'&&to==='°C')result=(val-32)*5/9;
-    else if(from==='°F'&&to==='K')result=(val-32)*5/9+273.15;
-    else if(from==='K'&&to==='°C')result=val-273.15;
-    else if(from==='K'&&to==='°F')result=(val-273.15)*9/5+32;
-  } else { const t=CONV_CATS[chConvCat]; result=val*(t[to]/t[from]); }
-  el.textContent=parseFloat(result.toFixed(8))+' '+to;
-  const fl=document.getElementById('ch-cv-formula'); if(fl) fl.textContent=val+' '+from+' = '+parseFloat(result.toFixed(8))+' '+to;
+  let res;
+  if(exoCC==='🌡️ Température'){
+    if(from===to)res=val;
+    else if(from==='°C'&&to==='°F')res=val*9/5+32;
+    else if(from==='°C'&&to==='K')res=val+273.15;
+    else if(from==='°F'&&to==='°C')res=(val-32)*5/9;
+    else if(from==='°F'&&to==='K')res=(val-32)*5/9+273.15;
+    else if(from==='K'&&to==='°C')res=val-273.15;
+    else if(from==='K'&&to==='°F')res=(val-273.15)*9/5+32;
+  } else {const t=CONV_CATS[exoCC];res=val*(t[to]/t[from]);}
+  const rv=parseFloat(res.toFixed(8));
+  el.textContent=rv+' '+to;
+  const fl=document.getElementById('exo-vfml'); if(fl)fl.textContent=val+' '+from+' = '+rv+' '+to;
 }
 
-// Conjugueur chapitre
-async function chRunConjugate() {
-  const verb=document.getElementById('ch-conj-v').value.trim();
-  const tense=document.getElementById('ch-conj-t').value;
-  const btn=document.getElementById('ch-conj-btn');
-  const res=document.getElementById('ch-conj-res');
-  if(!verb){toast('warn','Entre un verbe.');return;}
+// Conjugueur exo
+async function exoConjugate(){
+  const v=document.getElementById('exo-cjv')?.value.trim();
+  const t=document.getElementById('exo-cjt')?.value;
+  const btn=document.getElementById('exo-cjbtn');
+  const res=document.getElementById('exo-tool-result');
+  if(!v){toast('warn','Entre un verbe.');return;}
   btn.disabled=true; btn.textContent='⏳...';
-  res.style.display=''; res.className='corr-result';
-  try {
+  res.className='corr-result'; res.textContent='';
+  try{
     const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:`Conjugue "${verb}" — ${tense}`}],
-      systemOverride:`Tu es expert en grammaire française. Conjugue le verbe avec tous les pronoms, indique le groupe et les particularités. Clair et structuré. En français.`,mode:'chat'})});
+      body:JSON.stringify({messages:[{role:'user',content:`Conjugue "${v}" — ${t}`}],
+      systemOverride:'Tu es expert en grammaire française. Conjugue le verbe avec tous les pronoms, indique le groupe et les particularités. Clair et structuré.',mode:'chat'})});
     const d=await r.json(); res.textContent=d.content||'Pas de réponse.'; res.className='corr-result show';
-  } catch(e){res.textContent='Erreur : '+e.message;res.className='corr-result show corr-err';}
+  }catch(e){res.textContent='Erreur : '+e.message;res.className='corr-result show corr-err';}
   btn.disabled=false; btn.textContent='📝 Conjuguer';
 }
 
