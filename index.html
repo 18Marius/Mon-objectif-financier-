@@ -1746,6 +1746,7 @@ function renderSummary() {
     <div class="ph" style="margin-bottom:16px">
       <div></div>
       <div style="display:flex;gap:8px">
+        <button class="btn bg bsm" onclick="exportSummary()">💾 Sauvegarder</button>
         <button class="btn bg bsm" onclick="regenSummary()">🔄 Régénérer</button>
         <button class="btn bg bsm" onclick="navBack()">← Retour</button>
       </div>
@@ -1762,6 +1763,50 @@ async function regenSummary() {
   save();
   document.getElementById('sum-content').innerHTML = `<div class="loader-wrap"><div class="spin"></div><div class="loader-t">Régénération de la fiche...</div></div>`;
   await generateSummary(sub, ch);
+}
+
+async function exportSummary() {
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch  = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!ch?.summary) return;
+  const date = new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Fiche — ${ch.title}</title>
+<style>
+body{font-family:Georgia,serif;max-width:820px;margin:40px auto;padding:24px 32px;color:#111;line-height:1.75}
+h1{color:#6d28d9;border-bottom:3px solid #6d28d9;padding-bottom:8px;font-size:26px}
+h2{color:#4338ca;margin-top:28px;font-size:20px}
+h3{color:#1e40af;font-size:17px}
+strong{font-weight:700}
+code{background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:.9em;font-family:monospace}
+blockquote{border-left:4px solid #8b5cf6;padding-left:16px;color:#555;margin:12px 0}
+li{margin:5px 0}ul,ol{padding-left:24px}
+.hdr{text-align:center;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid #e5e7eb}
+.subj{color:#7c3aed;font-size:13px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.chap{font-size:28px;font-weight:800;margin:8px 0}
+.dt{color:#9ca3af;font-size:13px}
+@media print{body{margin:10px}}
+</style></head><body>
+<div class="hdr"><div class="subj">${sub.name}</div><div class="chap">${ch.title}</div><div class="dt">⚡ EduXP — ${date}</div></div>
+${parseMarkdown(ch.summary)}
+</body></html>`;
+
+  // Mobile : Web Share API
+  if (navigator.share) {
+    const blob = new Blob([html], {type:'text/html'});
+    const file = new File([blob], `fiche-${ch.title.replace(/\s+/g,'-')}.html`, {type:'text/html'});
+    if (navigator.canShare?.({files:[file]})) {
+      try { await navigator.share({files:[file], title:`Fiche — ${ch.title}`}); return; } catch(e) { if(e.name==='AbortError') return; }
+    }
+    try { await navigator.share({title:`Fiche — ${ch.title}`, text: ch.summary}); return; } catch(e) { if(e.name==='AbortError') return; }
+  }
+
+  // PC : ouvre dans un nouvel onglet + impression (PDF)
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
 }
 
 function parseMarkdown(text) {
