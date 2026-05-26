@@ -2102,8 +2102,24 @@ let currentUser = null;
 let syncTimer = null;
 
 async function initSupabase() {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
+  let url = localStorage.getItem('sb_url');
+  let key = localStorage.getItem('sb_key');
+
+  // Essaie de récupérer depuis Vercel (marche sur tous les appareils automatiquement)
+  try {
+    const r = await fetch('/api/config');
+    if (r.ok) {
+      const cfg = await r.json();
+      if (cfg.url && cfg.key) {
+        url = cfg.url;
+        key = cfg.key;
+        localStorage.setItem('sb_url', url);
+        localStorage.setItem('sb_key', key);
+      }
+    }
+  } catch (e) {
+    console.warn('api/config indisponible, utilisation du cache local');
+  }
 
   if (!url || !key) {
     showSetupScreen();
