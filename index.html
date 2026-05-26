@@ -2231,6 +2231,7 @@ async function submitAuth() {
   document.getElementById('auth-err').classList.remove('show');
 
   try {
+    if (!sbClient) { showAuthErr('Connexion Supabase non configurée. Vérifie les variables Vercel.'); return; }
     if (authMode === 'login') {
       const { error } = await sbClient.auth.signInWithPassword({ email, password: pwd });
       if (error) showAuthErr(error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : error.message);
