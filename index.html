@@ -2099,7 +2099,7 @@ async function chRunCorrection() {
   const res = document.getElementById('ch-corr-res');
   if (!answer) { toast('warn', 'Écris ta réponse d\'abord.'); return; }
   btn.disabled = true; btn.textContent = '⏳ Correction...';
-  res.style.display = 'none';
+  res.style.display = '';res.className = 'corr-result';
   const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
   const system = `Tu es un professeur correcteur bienveillant${sub ? ' en ' + sub.name : ''}.${ctx}\nCorrige l'exercice de l'élève : dis si c'est ✅ correct ou ❌ incorrect, explique les erreurs, donne la correction complète et encourage l'élève. Réponds en français.`;
   try {
@@ -2120,7 +2120,7 @@ async function chRunSolver() {
   const res = document.getElementById('ch-solv-res');
   if (!problem) { toast('warn', 'Entre un problème à résoudre.'); return; }
   btn.disabled = true; btn.textContent = '⏳ Résolution...';
-  res.style.display = 'none';
+  res.style.display = '';res.className = 'corr-result';
   const ctx = ch?.content ? '\n\nContexte du cours : "' + ch.content.slice(0, 600) + '"' : '';
   const system = `Tu es un professeur expert${sub ? ' en ' + sub.name : ''}.${ctx}\nRésous le problème en détaillant chaque étape, les formules utilisées et la réponse finale. Sois pédagogique. Réponds en français.`;
   try {
@@ -2227,7 +2227,7 @@ async function chRunConjugate() {
   const res=document.getElementById('ch-conj-res');
   if(!verb){toast('warn','Entre un verbe.');return;}
   btn.disabled=true; btn.textContent='⏳...';
-  res.style.display='none';
+  res.style.display=''; res.className='corr-result';
   try {
     const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:[{role:'user',content:`Conjugue "${verb}" — ${tense}`}],
@@ -2258,7 +2258,7 @@ async function runCorrection() {
   const res = document.getElementById('corr-result');
   if (!answer) { toast('warn', 'Écris ta réponse d\'abord.'); return; }
   btn.disabled = true; btn.textContent = '⏳ Correction en cours...';
-  res.className = 'corr-result'; res.style.display = 'none';
+  res.className = 'corr-result'; res.style.display = '';res.className = 'corr-result';
   const system = `Tu es un professeur correcteur bienveillant${subject ? ' en ' + subject : ''}. L'élève te soumet un exercice et sa réponse. Tu dois :\n1. Indiquer clairement si c'est correct ✅ ou incorrect ❌\n2. Expliquer les erreurs s'il y en a, avec pédagogie\n3. Donner la correction complète étape par étape\n4. Terminer par un encouragement\nRéponds en français, de façon claire et structurée.`;
   const userMsg = (exercise ? `Énoncé : ${exercise}\n\n` : '') + `Réponse de l'élève : ${answer}`;
   try {
@@ -2280,7 +2280,7 @@ async function runSolver() {
   const res = document.getElementById('solv-result');
   if (!problem) { toast('warn', 'Entre un problème à résoudre.'); return; }
   btn.disabled = true; btn.textContent = '⏳ Résolution en cours...';
-  res.className = 'corr-result'; res.style.display = 'none';
+  res.className = 'corr-result'; res.style.display = '';res.className = 'corr-result';
   const system = `Tu es un professeur expert en ${subject}. Résous le problème de l'élève en détaillant chaque étape clairement, avec les formules utilisées, les calculs intermédiaires et la réponse finale encadrée. Sois pédagogique et précis. Réponds en français.`;
   try {
     const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -2425,7 +2425,7 @@ async function runConjugate() {
   const res = document.getElementById('conj-result');
   if (!verb) { toast('warn', 'Entre un verbe à conjuguer.'); return; }
   btn.disabled = true; btn.textContent = '⏳ Conjugaison...';
-  res.className = 'corr-result'; res.style.display = 'none';
+  res.className = 'corr-result'; res.style.display = '';res.className = 'corr-result';
   const system = `Tu es un expert en grammaire française. Conjugue le verbe demandé au(x) temps indiqué(s) avec tous les pronoms (je, tu, il/elle, nous, vous, ils/elles). Présente la conjugaison de façon claire et structurée. Indique le groupe du verbe et les particularités. Réponds en français.`;
   const userMsg = `Conjugue le verbe "${verb}" — ${tense}`;
   try {
