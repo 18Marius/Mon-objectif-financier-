@@ -59,21 +59,34 @@ input,textarea,select{font-family:inherit}
   z-index:200;
 }
 .sb-logo{
-  display:flex;align-items:center;gap:10px;
-  padding:18px 16px 14px;cursor:pointer;
+  display:flex;align-items:center;gap:11px;
+  padding:16px 16px 14px;cursor:pointer;
   border-bottom:1px solid var(--brd);flex-shrink:0;
 }
 .sb-logo-mark{
-  width:28px;height:28px;border-radius:var(--r8);
-  background:var(--accent);display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-.5px;
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#6366F1,#8B5CF6);
+  box-shadow:0 0 0 1px rgba(99,102,241,.3),0 4px 14px rgba(99,102,241,.35);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;position:relative;overflow:hidden;
 }
-.sb-logo-text{font-size:14px;font-weight:700;letter-spacing:-.25px}
+.sb-logo-mark::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 60%);
+}
+.sb-logo-name{display:flex;flex-direction:column;gap:1px}
+.sb-logo-text{
+  font-size:15px;font-weight:800;letter-spacing:-.4px;
+  background:linear-gradient(90deg,#F4F4F5,#A1A1AA);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
 .sb-logo-badge{
-  margin-left:auto;font-size:9px;font-weight:700;
-  background:var(--acdim);color:var(--accent);
-  border:1px solid rgba(99,102,241,.2);border-radius:3px;
-  padding:2px 5px;letter-spacing:.3px;text-transform:uppercase;
+  font-size:8px;font-weight:700;
+  background:rgba(99,102,241,.15);color:var(--accent);
+  border:1px solid rgba(99,102,241,.25);border-radius:3px;
+  padding:1px 5px;letter-spacing:.5px;text-transform:uppercase;
+  width:fit-content;
 }
 
 .sb-scroll{flex:1;overflow-y:auto;padding:8px}
@@ -574,9 +587,15 @@ input,textarea,select{font-family:inherit}
   <!-- ═══════════ SIDEBAR ═══════════ -->
   <nav class="sidebar" id="sidebar">
     <div class="sb-logo" onclick="nav('home');closeSidebar()">
-      <div class="sb-logo-mark">E</div>
-      <div class="sb-logo-text">EduXP</div>
-      <div class="sb-logo-badge">Beta</div>
+      <div class="sb-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style="position:relative;z-index:1">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <div class="sb-logo-name">
+        <div class="sb-logo-text">EduXP</div>
+        <div class="sb-logo-badge">Beta</div>
+      </div>
     </div>
 
     <div class="sb-scroll">
