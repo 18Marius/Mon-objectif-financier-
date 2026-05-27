@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EduXP — Mes Cours</title>
+<title>EducXP — Mes Cours</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
@@ -610,7 +610,7 @@ input,textarea,select{font-family:inherit}
         </svg>
       </div>
       <div class="sb-logo-name">
-        <div class="sb-logo-text">EduXP</div>
+        <div class="sb-logo-text">EducXP</div>
         <div class="sb-logo-badge">Beta</div>
       </div>
     </div>
@@ -950,7 +950,7 @@ input,textarea,select{font-family:inherit}
 <!-- SETUP SCREEN -->
 <div id="setup-screen">
   <div class="setup-card">
-    <div class="setup-logo">EduXP</div>
+    <div class="setup-logo">EducXP</div>
     <div class="setup-sub">Configuration initiale — une seule fois</div>
     <div class="setup-info">
       Pour synchroniser tes données entre appareils, entre ton <b>URL Supabase</b> et ta <b>clé anon/publique</b>.<br>
@@ -966,7 +966,7 @@ input,textarea,select{font-family:inherit}
 <!-- AUTH SCREEN -->
 <div id="auth-screen" style="display:none">
   <div class="auth-card">
-    <div class="auth-logo">EduXP</div>
+    <div class="auth-logo">EducXP</div>
     <div class="auth-tagline">Ta plateforme d'apprentissage intelligente<br><span style="color:var(--accent);opacity:.7;font-size:11px">Cours · IA · Exercices · Révisions</span></div>
     <div class="auth-tabs">
       <button class="auth-tab act" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
@@ -1210,7 +1210,7 @@ function renderHome() {
   const totalQuiz = S.subjects.reduce((a,s)=>(s.chapters||[]).reduce((b,c)=>b+(c.quizScores?.length||0),a),0);
   const extra = document.getElementById('home-extra');
   const tips = [
-    { title: 'Comment utiliser EduXP ?', body: 'Crée une matière → ajoute des chapitres → écris ou colle ton cours → génère un quiz IA en un clic.' },
+    { title: 'Comment utiliser EducXP ?', body: 'Crée une matière → ajoute des chapitres → écris ou colle ton cours → génère un quiz IA en un clic.' },
     { title: 'Astuce — Flashcards', body: 'Plus ton cours est détaillé, meilleure sera la qualité des flashcards et des quiz générés par l\'IA.' },
     { title: 'Astuce — Score', body: 'Fais des quiz régulièrement pour suivre ta progression. Ton score moyen s\'affiche sur le tableau de bord.' },
   ];
@@ -2053,7 +2053,7 @@ li{margin:5px 0}ul,ol{padding-left:24px}
 .dt{color:#9ca3af;font-size:13px}
 @media print{body{margin:10px}}
 </style></head><body>
-<div class="hdr"><div class="subj">${sub.name}</div><div class="chap">${ch.title}</div><div class="dt">⚡ EduXP — ${date}</div></div>
+<div class="hdr"><div class="subj">${sub.name}</div><div class="chap">${ch.title}</div><div class="dt">⚡ EducXP — ${date}</div></div>
 ${parseMarkdown(ch.summary)}
 </body></html>`;
 
@@ -2320,7 +2320,7 @@ async function exportFlashcards() {
     wrapCanvasText(ctx, fc.back, 28, H/2 + 58, W-56, 26);
     // watermark
     ctx.fillStyle = '#1e2240'; ctx.font = '12px system-ui, sans-serif';
-    ctx.fillText('⚡ EduXP', W-80, H-14);
+    ctx.fillText('⚡ EducXP', W-80, H-14);
 
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     files.push(new File([blob], `flashcard-${i+1}-${(fc.front||'').slice(0,20).replace(/\s+/g,'_')}.png`, { type:'image/png' }));
