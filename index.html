@@ -2314,8 +2314,9 @@ function exoCalcPress(v) {
   else if(v==='='){
     try{
       let e=exoCE.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
-        .replace(/π/g,Math.PI).replace(/√\(/g,'Math.sqrt(').replace(/sin\(/g,'Math.sin(')
-        .replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(')
+        .replace(/π/g,Math.PI).replace(/√\(/g,'Math.sqrt(')
+        .replace(/sin\(/g,'Math.sin(Math.PI/180*').replace(/cos\(/g,'Math.cos(Math.PI/180*')
+        .replace(/tan\(/g,'Math.tan(Math.PI/180*')
         .replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(')
         .replace(/(\d+(?:\.\d+)?)²/g,'($1**2)');
       if(!/^[0-9+\-*/.()Math.,\s_a-zA-Z]+$/.test(e))throw 0;
@@ -2474,8 +2475,8 @@ function calcPress(v) {
       if (!calcExpr) return;
       let expr = calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')
         .replace(/π/g, Math.PI).replace(/√\(/g,'Math.sqrt(')
-        .replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(')
-        .replace(/tan\(/g,'Math.tan(').replace(/log\(/g,'Math.log10(')
+        .replace(/sin\(/g,'Math.sin(Math.PI/180*').replace(/cos\(/g,'Math.cos(Math.PI/180*')
+        .replace(/tan\(/g,'Math.tan(Math.PI/180*').replace(/log\(/g,'Math.log10(')
         .replace(/ln\(/g,'Math.log(');
       // handle x²
       expr = expr.replace(/(\d+(?:\.\d+)?)²/g,'($1**2)');
@@ -2513,13 +2514,13 @@ function calcUpdateHist() {
 
 // ── Convertisseur ──
 const CONV_CATS = {
-  '📏 Longueur': { m:1, cm:100, mm:1000, km:0.001, 'mi':0.000621371, 'ft':3.28084, 'in':39.3701 },
+  '📏 Longueur': { m:1, km:0.001, dm:10, cm:100, mm:1000, 'mi':0.000621371, 'ft':3.28084, 'in':39.3701 },
   '⚖️ Masse':   { kg:1, g:1000, mg:1e6, t:0.001, lb:2.20462, oz:35.274 },
   '🌡️ Température': null,
-  '🧪 Volume':  { L:1, mL:1000, 'm³':0.001, 'cm³':1000, 'ft³':0.0353147, 'gal':0.264172 },
+  '🧪 Volume':  { L:1, dL:10, cL:100, mL:1000, 'm³':0.001, 'cm³':1000, 'ft³':0.0353147, 'gal(US)':0.264172 },
   '⚡ Vitesse': { 'm/s':1, 'km/h':3.6, 'mph':2.23694, 'nœud':1.94384 },
-  '📐 Angle':   { deg:1, rad: 180/Math.PI, grad: 400/360 },
-  '⏱️ Temps':   { s:1, min:1/60, h:1/3600, ms:1000, 'μs':1e6 },
+  '📐 Angle':   { deg:1, rad:Math.PI/180, grad:400/360 },
+  '⏱️ Temps':   { s:1, min:1/60, h:1/3600, ms:1000 },
 };
 let convCat = '📏 Longueur';
 function initConvert() {
