@@ -202,36 +202,49 @@ input,textarea,select{font-family:inherit}
 .bic{width:32px;height:32px;padding:0;justify-content:center;border-radius:var(--r8)}
 
 /* ── STATS ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:26px}
-.sc{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r12);padding:16px 18px;transition:border-color var(--tr),box-shadow var(--tr)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.sc{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r12);padding:20px 22px;transition:border-color var(--tr),box-shadow var(--tr);position:relative;overflow:hidden}
 .sc:hover{border-color:var(--brd2);box-shadow:var(--sh)}
+.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--r12) 0 0 var(--r12)}
+.sc:nth-child(1)::before{background:var(--accent)}
+.sc:nth-child(2)::before{background:var(--green)}
+.sc:nth-child(3)::before{background:var(--yellow)}
+.sc:nth-child(4)::before{background:var(--red)}
 .sc-ico{display:none}
-.sc-val{font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px}
-.sc-lbl{font-size:10px;color:var(--txt2);margin-top:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.sc-val{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1.5px;color:var(--txt)}
+.sc-lbl{font-size:10px;color:var(--txt2);margin-top:7px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
 
 /* ── SUBJECT CARDS ── */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-.scard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r12);overflow:hidden;cursor:pointer;transition:border-color var(--tr),transform var(--tr),box-shadow var(--tr)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.scard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r12);overflow:hidden;cursor:pointer;transition:border-color var(--tr),transform var(--tr),box-shadow var(--tr);display:flex;flex-direction:column}
 .scard:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:var(--sh-md)}
-.scard-accent{height:2px;display:block;flex-shrink:0}
+.scard-accent{height:3px;display:block;flex-shrink:0}
 .scard-h{display:none}
 .scard-ico{display:none}
-.scard-b{padding:14px 16px 12px}
-.scard-n{font-size:14px;font-weight:700;margin-bottom:4px;letter-spacing:-.2px}
-.scard-st{display:flex;gap:8px;font-size:11px;color:var(--txt2);margin-bottom:8px;flex-wrap:wrap}
-.scard-st span{display:flex;align-items:center;gap:3px}
-.spbar{height:2px;background:var(--brd);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.scard-b{padding:16px 18px 14px;flex:1;display:flex;flex-direction:column}
+.scard-n{font-size:14px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
+.scard-desc{font-size:11px;color:var(--txt2);margin-bottom:10px;line-height:1.5;flex:1}
+.scard-st{display:flex;gap:10px;font-size:11px;color:var(--txt2);margin-bottom:10px;flex-wrap:wrap}
+.scard-st span{display:flex;align-items:center;gap:4px;background:var(--sur2);border:1px solid var(--brd);border-radius:5px;padding:2px 8px}
+.spbar{height:2px;background:var(--brd);border-radius:2px;overflow:hidden;margin-bottom:10px}
 .spfill{height:100%;border-radius:2px;transition:width .5s ease}
-.scard-acts{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity var(--tr)}
+.scard-acts{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity var(--tr);margin-top:auto}
 .scard:hover .scard-acts{opacity:1}
 .sact{width:24px;height:24px;border:none;border-radius:var(--r6);background:rgba(255,255,255,.06);color:var(--txt2);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}
 .sact:hover{background:rgba(255,255,255,.1);color:var(--txt)}
 .sact.del:hover{background:rgba(239,68,68,.15);color:var(--red)}
-.sadd{background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:var(--r12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all var(--tr);padding:24px 20px;color:var(--txt2);min-height:120px}
+.sadd{background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:var(--r12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all var(--tr);padding:28px 20px;color:var(--txt2);min-height:148px}
 .sadd:hover{border-color:var(--accent);color:var(--txt);background:var(--acdim)}
-.sadd-ico{font-size:18px;opacity:.2}
-.sadd:hover .sadd-ico{opacity:.45}
+.sadd-ico{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:300;color:var(--txt2);transition:all var(--tr)}
+.sadd:hover .sadd-ico{background:var(--acdim);color:var(--accent)}
 .sadd-txt{font-size:12px;font-weight:600;letter-spacing:-.1px}
+.sadd-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+
+/* Home tip banner */
+.home-tip{margin-top:24px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--r12);padding:18px 20px;display:flex;align-items:flex-start;gap:14px}
+.home-tip-icon{width:36px;height:36px;border-radius:var(--r8);background:var(--acdim);border:1px solid rgba(99,102,241,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.home-tip-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.home-tip-body{font-size:12px;color:var(--txt2);line-height:1.6}
 
 /* ── SUBJECT VIEW ── */
 .svh{
@@ -650,6 +663,7 @@ input,textarea,select{font-family:inherit}
           </div>
           <div class="stats" id="home-stats"></div>
           <div class="sgrid" id="home-grid"></div>
+          <div id="home-extra"></div>
         </div>
 
         <!-- SUBJECT -->
@@ -1104,17 +1118,17 @@ function renderHome() {
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
   })();
 
-  document.getElementById('home-stats').innerHTML = `
-    <div class="sc"><div class="sc-ico">📚</div><div class="sc-val">${S.subjects.length}</div><div class="sc-lbl">Matières</div></div>
-    <div class="sc"><div class="sc-ico">📖</div><div class="sc-val">${totalChapters}</div><div class="sc-lbl">Chapitres</div></div>
-    <div class="sc"><div class="sc-ico">📋</div><div class="sc-val">${totalCCF}</div><div class="sc-lbl">CCF enregistrés</div></div>
-    <div class="sc"><div class="sc-ico">🎯</div><div class="sc-val">${avgScore}%</div><div class="sc-lbl">Score moyen quiz</div></div>
-  `;
-
-  const sub = document.getElementById('home-sub');
   const h = new Date().getHours();
   const greet = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
-  sub.textContent = `${greet} ! ${S.subjects.length ? 'Quelle matière aujourd\'hui ?' : 'Crée ta première matière pour commencer.'}`;
+  const userName = currentUser?.email?.split('@')[0] || '';
+  document.getElementById('home-sub').textContent = `${greet}${userName ? ' ' + userName : ''} — ${S.subjects.length ? 'Quelle matière aujourd\'hui ?' : 'Crée ta première matière pour commencer.'}`;
+
+  document.getElementById('home-stats').innerHTML = `
+    <div class="sc"><div class="sc-val">${S.subjects.length}</div><div class="sc-lbl">Matières</div></div>
+    <div class="sc"><div class="sc-val">${totalChapters}</div><div class="sc-lbl">Chapitres</div></div>
+    <div class="sc"><div class="sc-val">${totalCCF}</div><div class="sc-lbl">CCF enregistrés</div></div>
+    <div class="sc"><div class="sc-val">${avgScore > 0 ? avgScore + '%' : '—'}</div><div class="sc-lbl">Score moyen quiz</div></div>
+  `;
 
   const grid = document.getElementById('home-grid');
   let html = '';
@@ -1130,13 +1144,15 @@ function renderHome() {
     const style = `animation-delay:${i * 0.06}s`;
 
     html += `<div class="scard ci" style="${style}" onclick="nav('subject',{subjectId:'${s.id}'})">
-      <div class="scard-accent" style="background:${col.t}">
+      <div class="scard-accent" style="background:${col.t}"></div>
       <div class="scard-b">
         <div class="scard-n">${esc(s.name)}</div>
+        ${s.desc ? `<div class="scard-desc">${esc(s.desc)}</div>` : ''}
         <div class="scard-st">
-          <span>📖 ${chapters} chapitre${chapters !== 1 ? 's' : ''}</span>
-          ${ccf ? `<span>📋 ${ccf} CCF</span>` : ''}
-          ${avg !== null ? `<span>🎯 ${avg}%</span>` : ''}
+          <span>${chapters} chapitre${chapters !== 1 ? 's' : ''}</span>
+          ${ccf ? `<span>${ccf} CCF</span>` : ''}
+          ${bac ? `<span>${bac} BAC</span>` : ''}
+          ${avg !== null ? `<span style="color:${avg>=80?'var(--green)':avg>=50?'var(--yellow)':'var(--red)'}">${avg}%</span>` : ''}
         </div>
         ${avg !== null ? `<div class="spbar"><div class="spfill" style="width:${avg}%;background:${col.t}"></div></div>` : ''}
         <div class="scard-acts">
@@ -1147,8 +1163,65 @@ function renderHome() {
     </div>`;
   });
 
-  html += `<div class="sadd" onclick="openSubjectModal()"><div class="sadd-ico">➕</div><div class="sadd-txt">Nouvelle matière</div></div>`;
+  html += `<div class="sadd" onclick="openSubjectModal()">
+    <div class="sadd-ico">+</div>
+    <div class="sadd-txt">Nouvelle matière</div>
+    <div class="sadd-sub">Ajoute une matière à réviser</div>
+  </div>`;
   grid.innerHTML = html;
+
+  // Extra section
+  const totalQuiz = S.subjects.reduce((a,s)=>(s.chapters||[]).reduce((b,c)=>b+(c.quizScores?.length||0),a),0);
+  const extra = document.getElementById('home-extra');
+  const tips = [
+    { title: 'Comment utiliser EduXP ?', body: 'Crée une matière → ajoute des chapitres → écris ou colle ton cours → génère un quiz IA en un clic.' },
+    { title: 'Astuce — Flashcards', body: 'Plus ton cours est détaillé, meilleure sera la qualité des flashcards et des quiz générés par l\'IA.' },
+    { title: 'Astuce — Score', body: 'Fais des quiz régulièrement pour suivre ta progression. Ton score moyen s\'affiche sur le tableau de bord.' },
+  ];
+  const tip = tips[new Date().getDay() % tips.length];
+  extra.innerHTML = `
+    <div style="margin-top:28px">
+      <div style="font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">Fonctionnalités disponibles</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="home-tip" style="flex-direction:column;gap:10px;cursor:pointer" onclick="nav('exercises')">
+          <div style="width:36px;height:36px;border-radius:var(--r8);background:var(--acdim);border:1px solid rgba(99,102,241,.15);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+          </div>
+          <div>
+            <div class="home-tip-title">Correction IA</div>
+            <div class="home-tip-body">Fais corriger tes exercices par l'IA instantanément, toutes matières.</div>
+          </div>
+        </div>
+        <div class="home-tip" style="flex-direction:column;gap:10px">
+          <div style="width:36px;height:36px;border-radius:var(--r8);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          </div>
+          <div>
+            <div class="home-tip-title">Quiz IA</div>
+            <div class="home-tip-body">Génère un QCM personnalisé depuis ton cours en un clic. ${totalQuiz > 0 ? `<b style="color:var(--green)">${totalQuiz} quiz fait${totalQuiz>1?'s':''}</b> jusqu'ici.` : 'Ouvre un chapitre pour commencer.'}</div>
+          </div>
+        </div>
+        <div class="home-tip" style="flex-direction:column;gap:10px">
+          <div style="width:36px;height:36px;border-radius:var(--r8);background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.15);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" fill="none" stroke="var(--yellow)" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          <div>
+            <div class="home-tip-title">Flashcards</div>
+            <div class="home-tip-body">Mémorise efficacement avec des cartes question/réponse générées depuis ton cours.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="home-tip" style="margin-top:10px">
+      <div style="width:36px;height:36px;border-radius:var(--r8);background:var(--acdim);border:1px solid rgba(99,102,241,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      </div>
+      <div>
+        <div class="home-tip-title">${tip.title}</div>
+        <div class="home-tip-body">${tip.body}</div>
+      </div>
+    </div>
+  `;
 }
 
 // ═══════════════════════════════════════════════════
