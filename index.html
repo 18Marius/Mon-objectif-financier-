@@ -725,6 +725,11 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 .qopt.sel   { border-color:var(--violet); background:rgba(124,58,237,.1) }
 .qopt.correct { border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green) }
 .qopt.wrong   { border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red) }
+.qopt.disabled { pointer-events:none; opacity:.7 }
+/* Quiz timer */
+.qtimer { display:inline-flex; align-items:center; gap:4px; font-size:13px; font-family:'JetBrains Mono',monospace; color:var(--txt3); }
+.qtimer.warn { color:var(--red); animation:warnPulse .7s ease-in-out infinite alternate; }
+@keyframes warnPulse { from{opacity:1} to{opacity:.45} }
 .qprog { margin-bottom:20px }
 .qprog-bar { height:4px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; margin-top:6px }
 .qprog-fill { height:100%; background:var(--gp); border-radius:2px; transition:width .4s }
@@ -1298,8 +1303,6 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 /* ─── ANIMATIONS ──────────────────────────────────── */
 @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
 @keyframes spin { to{transform:rotate(360deg)} }
-@keyframes campusPulse { 0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.3);opacity:1} }
-@keyframes campusFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .spin { animation:spin .8s linear infinite }
 
@@ -1888,6 +1891,16 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 .ced-preview-pane p { margin:6px 0; }
 .course-ta.hidden { display:none; }
 
+/* Save indicator dot */
+.saved-lbl { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--txt3); }
+.sdot { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; transition:background .3s; }
+.sdot.dirty { background:#f59e0b; animation:dotPulse21 1.2s ease-in-out infinite; }
+
+/* Voice button active state */
+.btn.voice-on { border-color:var(--red) !important; color:var(--red) !important; }
+.btn.voice-pulse { animation:voicePulse .9s ease-in-out infinite alternate; }
+@keyframes voicePulse { from{box-shadow:0 0 0 0 rgba(239,68,68,0)} to{box-shadow:0 0 0 5px rgba(239,68,68,.25)} }
+
 /* ═══════════════════════════════════════════════════
    QUIZ CONFIG
 ═══════════════════════════════════════════════════ */
@@ -2186,7 +2199,7 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
           <!-- Main greeting title -->
           <h1 class="nhero-title" id="nhero-greeting">Bon apprentissage !</h1>
           <!-- Subtitle -->
-          <p class="nhero-sub" id="home-sub">Ton campus d'apprentissage intelligent</p>
+          <p class="nhero-sub" id="home-sub">Ta plateforme d'apprentissage intelligente</p>
           <!-- Quick CTA -->
           <button class="nhero-cta" onclick="openSubjectModal()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2444,8 +2457,8 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
   <div class="modal">
     <button class="mclose" onclick="closeModal('m-bac')">✕</button>
     <div class="mtitle">Nouvelle annale BAC</div>
-    <div class="fg"><label>Titre *</label><input class="inp" id="bac-name" placeholder="Ex: Annale 2023 — Sujet A"></div>
-    <div class="fg"><label>Année</label><input type="number" class="inp" id="bac-year" placeholder="2023" min="2000" max="2030"></div>
+    <div class="fg"><label>Titre *</label><input class="inp" id="bac-name" placeholder="Ex: Annale 2026 — Sujet A"></div>
+    <div class="fg"><label>Année</label><input type="number" class="inp" id="bac-year" placeholder="2026" min="2000" max="2035"></div>
     <div class="fg"><label>Contenu / Sujet</label><textarea class="ta" id="bac-content" placeholder="Colle ici le sujet..."></textarea></div>
     <div class="mfoot">
       <button class="btn bg" onclick="closeModal('m-bac')">Annuler</button>
@@ -2702,51 +2715,19 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
   }
   animate();
 
-  // Mouse tilt on subject cards
-  document.addEventListener('mousemove', function(e) {
-    document.querySelectorAll('.scard-subj,.ci').forEach(card => {
-      const rect = card.getBoundingClientRect();
-      if (!rect.width) return;
-      const cx = (e.clientX - rect.left) / rect.width;
-      const cy = (e.clientY - rect.top) / rect.height;
-      if (cx >= 0 && cx <= 1 && cy >= 0 && cy <= 1) {
-        card.style.setProperty('--mx', (cx * 100).toFixed(1) + '%');
-        card.style.setProperty('--my', (cy * 100).toFixed(1) + '%');
-        const tx = (cx - .5) * 8;
-        const ty = (cy - .5) * -8;
-        card.style.transform = `perspective(600px) rotateX(${ty}deg) rotateY(${tx}deg) translateZ(4px)`;
-      } else {
-        card.style.transform = '';
-      }
-    });
-  });
 
-  // Update dock active state on nav
-  const origNav = window.nav;
-  if (typeof origNav === 'undefined') {
-    document.addEventListener('DOMContentLoaded', function() {
-      const _nav = window.nav;
-      window.nav = function(view, params) {
-        document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
-        const map = { home: 'sb-home', campus: 'sb-campus', gallery: 'sb-gallery' };
-        const id = map[view];
-        if (id) document.getElementById(id)?.classList.add('active');
-        return _nav(view, params);
-      };
-    });
-  }
 })();
 </script>
 
-<!-- DOCK ACTIVE STATE PATCH -->
+<!-- DOCK ACTIVE STATE -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const _nav = window.nav;
+  var _nav = window.nav;
   if (typeof _nav === 'function') {
     window.nav = function(view, params) {
-      document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
-      const map = { home:'sb-home', campus:'sb-campus', gallery:'sb-gallery' };
-      if (map[view]) document.getElementById(map[view])?.classList.add('active');
+      document.querySelectorAll('.dock-btn').forEach(function(b){ b.classList.remove('active'); });
+      var map = { home:'sb-home', gallery:'sb-gallery' };
+      if (map[view]) { var el = document.getElementById(map[view]); if (el) el.classList.add('active'); }
       return _nav(view, params);
     };
   }
@@ -5366,9 +5347,8 @@ function continueOffline() {
 }
 
 // ═══════════════════════════════════════════════════
-//  INIT (campus removed)
+//  AUTH INIT
 // ═══════════════════════════════════════════════════
-const CAMPUS_ACCENT = '#F59E0B'; // kept to avoid ref errors if any inline HTML remains
 
 
 // ═══════════════════════════════════════════════════
