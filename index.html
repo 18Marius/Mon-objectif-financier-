@@ -2213,6 +2213,33 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 }
 .nhero-cta:active { transform:translateY(-1px); }
 
+/* Festivity Hero — 3D sphere canvas */
+#hero-canvas {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius:28px;
+  pointer-events:none;
+  z-index:1;
+  opacity:.72;
+}
+/* Ensure all hero content stays above canvas */
+.nhero-badge, .nhero-title, .nhero-sub, .nhero-cta {
+  position:relative;
+  z-index:2;
+}
+
+/* Subject card 3D tilt */
+.scard.ci {
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:transform .12s cubic-bezier(.22,1,.36,1), box-shadow .12s ease;
+}
+.scard.ci:hover {
+  box-shadow:0 16px 48px rgba(124,58,237,.28);
+}
+
 /* Section header */
 .sgrid-header {
   display:flex;
@@ -2288,6 +2315,8 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 
         <!-- ══ HERO BANNER — Quantam Mysh + Hero 1 (21st.dev) ══ -->
         <div class="nhero" id="nhero">
+          <!-- 3D Festivity Hero spheres (21st.dev) -->
+          <canvas id="hero-canvas" aria-hidden="true"></canvas>
           <!-- Background grid lines (Hero 1 pattern) -->
           <div class="nhero-grid"></div>
           <!-- Bottom radial glow (Quantam Mysh pattern) -->
@@ -3143,6 +3172,8 @@ function renderHome() {
 
   html += `<div class="sadd" onclick="openSubjectModal()"><div class="sadd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div class="sadd-txt">Nouvelle matière</div></div>`;
   grid.innerHTML = html;
+  // Reset any lingering tilt transforms on re-render
+  setTimeout(function(){ document.querySelectorAll('.scard.ci').forEach(function(c){c.style.transform='';}); }, 0);
 }
 
 // ═══════════════════════════════════════════════════
@@ -6640,6 +6671,163 @@ if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',init);
 }else{
   init();
+}
+
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     HERO CANVAS — Festivity Hero spheres (21st.dev)
+     Three.js breathing spheres with mouse repulsion
+══════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+if(typeof THREE==='undefined')return;
+
+var canvas=document.getElementById('hero-canvas');
+if(!canvas)return;
+
+var scene,camera,renderer,spheres=[],clock;
+var mouse={x:0,y:0};
+var inited=false;
+var rafId=null;
+
+var COLORS=[0x7C3AED,0x22D3EE,0x6366F1,0xA78BFA,0x0EA5E9,0x8B5CF6,0x38BDF8,0xC4B5FD];
+
+function initHeroCanvas(){
+  if(inited)return;
+  inited=true;
+
+  var parent=canvas.parentElement;
+  var W=parent.offsetWidth||380;
+  var H=parent.offsetHeight||260;
+
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(55,W/H,0.1,100);
+  camera.position.z=5.5;
+
+  renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setSize(W,H,false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setClearColor(0x000000,0);
+
+  clock=new THREE.Clock();
+
+  for(var i=0;i<18;i++){
+    var r=0.07+Math.random()*0.19;
+    var geo=new THREE.SphereGeometry(r,14,14);
+    var col=COLORS[i%COLORS.length];
+    var mat=new THREE.MeshBasicMaterial({
+      color:col,
+      transparent:true,
+      opacity:0.45+Math.random()*0.38
+    });
+    var mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(
+      (Math.random()-0.5)*7.2,
+      (Math.random()-0.5)*3.4,
+      (Math.random()-0.5)*1.8
+    );
+    mesh.userData={
+      ox:mesh.position.x,
+      oy:mesh.position.y,
+      oz:mesh.position.z,
+      bp:Math.random()*Math.PI*2,
+      bs:0.4+Math.random()*0.9,
+      ba:0.08+Math.random()*0.14,
+      fp:Math.random()*Math.PI*2,
+      fs:0.25+Math.random()*0.45,
+      fa:0.08+Math.random()*0.22
+    };
+    scene.add(mesh);
+    spheres.push(mesh);
+  }
+
+  canvas.addEventListener('mousemove',function(e){
+    var rect=canvas.getBoundingClientRect();
+    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  },{passive:true});
+
+  window.addEventListener('resize',function(){
+    if(!renderer)return;
+    var p=canvas.parentElement;
+    var nw=p.offsetWidth;
+    var nh=p.offsetHeight;
+    camera.aspect=nw/nh;
+    camera.updateProjectionMatrix();
+    renderer.setSize(nw,nh,false);
+  });
+
+  animate();
+}
+
+function animate(){
+  rafId=requestAnimationFrame(animate);
+  var t=clock.getElapsedTime();
+  var mp=new THREE.Vector3(mouse.x*3.6,mouse.y*1.7,0);
+
+  spheres.forEach(function(mesh){
+    var u=mesh.userData;
+    var s=1+Math.sin(t*u.bs+u.bp)*u.ba;
+    mesh.scale.setScalar(s);
+    mesh.position.x=u.ox+Math.cos(t*u.fs*0.7+u.fp)*u.fa*0.5;
+    mesh.position.y=u.oy+Math.sin(t*u.fs+u.fp)*u.fa;
+    var dist=mesh.position.distanceTo(mp);
+    if(dist<1.4){
+      var push=mesh.position.clone().sub(mp).normalize().multiplyScalar((1.4-dist)*0.035);
+      mesh.position.add(push);
+    }
+  });
+
+  renderer.render(scene,camera);
+}
+
+/* ── Card 3D tilt on pointermove ── */
+document.addEventListener('pointermove',function(e){
+  document.querySelectorAll('.scard.ci').forEach(function(card){
+    var rect=card.getBoundingClientRect();
+    if(!rect.width)return;
+    var inside=e.clientX>=rect.left&&e.clientX<=rect.right&&
+               e.clientY>=rect.top&&e.clientY<=rect.bottom;
+    if(inside){
+      var cx=rect.left+rect.width/2;
+      var cy=rect.top+rect.height/2;
+      var rx=((e.clientY-cy)/(rect.height/2))*-7;
+      var ry=((e.clientX-cx)/(rect.width/2))*7;
+      card.style.transform='perspective(700px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateZ(6px)';
+    }else{
+      card.style.transform='';
+    }
+  });
+},{passive:true});
+
+/* pointer leaves window → reset all tilts */
+document.addEventListener('pointerleave',function(){
+  document.querySelectorAll('.scard.ci').forEach(function(c){c.style.transform='';});
+});
+
+/* ── Hook into renderHome to init canvas ── */
+var _rh=window.renderHome;
+if(typeof _rh==='function'){
+  window.renderHome=function(){
+    _rh.apply(this,arguments);
+    setTimeout(initHeroCanvas,60);
+  };
+}else{
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(initHeroCanvas,400);
+  });
+}
+
+/* ── Init immediately if home is already visible ── */
+if(document.readyState!=='loading'){
+  setTimeout(function(){
+    var nhero=document.getElementById('nhero');
+    if(nhero&&nhero.offsetParent!==null)initHeroCanvas();
+  },500);
 }
 
 })();
