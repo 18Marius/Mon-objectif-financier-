@@ -2,7 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07060F">
 <title>EducXP — Apprends sans limite</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,6 +77,12 @@
   /* Layout */
   --header-h: 56px;
   --sidebar-w: 0px;
+
+  /* Safe area (iPhone notch / home bar) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+  --safe-l:   env(safe-area-inset-left, 0px);
+  --safe-r:   env(safe-area-inset-right, 0px);
 }
 
 /* ─── RESET ───────────────────────────────────────── */
@@ -1308,19 +1318,136 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 .spin { animation:spin .8s linear infinite }
 
 /* ─── RESPONSIVE ──────────────────────────────────── */
-@media (max-width:720px) {
-  .xp-progress-wrap { display:none }
-  .streak-chip { display:none }
-  .nexus-bc-wrap { display:none }
+/* ══════════════════════════════════════════════════════
+   MOBILE — iPhone / Touch optimizations
+   Safe area · Native dock · Bottom sheets · Performance
+══════════════════════════════════════════════════════ */
+
+/* ─── Touch devices: suppress hover artifacts ──────── */
+@media (hover:none) and (pointer:coarse) {
+  .sc:hover { transform:none !important; border-color:rgba(39,39,42,.95) !important; box-shadow:none !important; }
+  .scard-subj:hover,.ci[onclick*="subjectId"]:hover { border-color:var(--bd) !important; background:var(--s1) !important; box-shadow:none !important; }
+  .dock-btn:hover { transform:none !important; background:transparent !important; }
+  .nhero-cta:hover { transform:none !important; }
+  .sc::before { animation:none !important; }
+  .scard.ci { transform:none !important; }
+  .icard:hover { background:var(--s1) !important; border-color:var(--bd) !important; transform:none !important; }
 }
-@media (max-width:520px) {
-  .nexus-header { padding:0 12px; gap:10px }
-  .stats { grid-template-columns:1fr 1fr }
-  .sgrid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)) }
-  .dock-btn span { display:none }
-  .dock-btn { min-width:52px; padding:10px 14px }
-  .page { padding:16px }
-  .qwrap,.fcwrap { max-width:100% }
+
+/* ─── Tablet & mobile base (≤ 768px) ────────────────── */
+@media (max-width:768px) {
+  body { -webkit-text-size-adjust:100%; }
+
+  /* Page — bottom clearance for dock */
+  .page { padding:16px 14px calc(72px + var(--safe-bot)); }
+
+  /* Header — compact + notch safe */
+  .nexus-header {
+    padding:calc(var(--safe-top) + 10px) 14px 10px;
+    height:auto;
+    min-height:var(--header-h);
+  }
+  .nexus-bc-wrap,.xp-progress-wrap,.streak-chip { display:none; }
+
+  /* Hero — compact mobile layout */
+  .nhero { padding:36px 20px 32px; gap:12px; margin-bottom:20px; border-radius:20px; }
+  .nhero-title { font-size:clamp(24px,7vw,36px); letter-spacing:-.8px; }
+  .nhero-sub { font-size:13px; }
+  .nhero-cta { padding:12px 22px; font-size:14px; width:100%; justify-content:center; max-width:260px; }
+
+  /* Stats — horizontal scroll strip */
+  .stats {
+    display:flex !important;
+    grid-template-columns:unset !important;
+    overflow-x:auto;
+    gap:10px;
+    margin-bottom:20px;
+    padding-bottom:4px;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .stats::-webkit-scrollbar { display:none; }
+  .sc,.stats .scard { flex:0 0 148px !important; min-width:148px; }
+
+  /* Subject grid — 2 columns */
+  .sgrid { grid-template-columns:repeat(2,1fr); gap:10px; }
+
+  /* Dock — native full-width bottom tab bar */
+  .nexus-dock {
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    transform:none !important;
+    border-radius:0 !important;
+    width:100% !important;
+    padding:8px 0 calc(var(--safe-bot) + 6px) !important;
+    justify-content:space-around !important;
+    border:none !important;
+    border-top:1px solid rgba(255,255,255,.08) !important;
+    box-shadow:0 -12px 40px rgba(0,0,0,.6) !important;
+    gap:0 !important;
+  }
+  .nexus-dock::before { display:none !important; }
+  .dock-btn {
+    flex:1 !important;
+    min-width:unset !important;
+    padding:8px 6px 6px !important;
+    border-radius:12px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    gap:3px !important;
+    transform:none !important;
+  }
+  .dock-btn span { display:flex !important; font-size:10px !important; font-weight:500 !important; }
+  .dock-btn svg { width:22px !important; height:22px !important; }
+  .dock-btn.active::after { display:none !important; }
+
+  /* Modals — bottom sheet */
+  .overlay { align-items:flex-end !important; padding:0 !important; }
+  .modal {
+    border-radius:24px 24px 0 0 !important;
+    max-width:100% !important;
+    max-height:92dvh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:20px 20px calc(var(--safe-bot) + 20px) !important;
+    animation:sheetUp .32s cubic-bezier(.22,1,.36,1) !important;
+  }
+  @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+  /* Subject view header */
+  .svh { padding:14px 16px; gap:12px; }
+  .svh-icon { font-size:32px; }
+  .svh-name { font-size:17px; }
+
+  /* Tabs — full width */
+  .stabs { width:100%; }
+  .stab { flex:1; text-align:center; padding:8px 6px; font-size:12px; }
+
+  /* Touch targets */
+  .btn { min-height:42px; }
+
+  /* Quiz / flashcard */
+  .qwrap,.fcwrap { max-width:100%; }
+}
+
+/* ─── iPhone standard (≤ 430px) ─────────────────────── */
+@media (max-width:430px) {
+  .scard-subj { padding:16px; }
+  .scard-subj-icon { font-size:28px; margin-bottom:10px; }
+  .sc-val { font-size:24px; }
+  .nexus-logo { font-size:16px; }
+  .nhero { padding:28px 16px 24px; }
+}
+
+/* ─── iPhone SE / small (≤ 375px) ───────────────────── */
+@media (max-width:375px) {
+  .nhero-title { font-size:22px; }
+  .page { padding:12px 10px calc(72px + var(--safe-bot)); }
+  .sc,.stats .scard { flex:0 0 128px !important; min-width:128px; }
+  .sgrid { grid-template-columns:1fr 1fr; gap:8px; }
 }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important }
