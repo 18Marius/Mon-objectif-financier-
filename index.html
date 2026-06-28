@@ -1478,6 +1478,382 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
   *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important }
   #bg-canvas { display:none }
 }
+
+/* ══════════════════════════════════════════════════════
+   21st.dev OVERRIDE LAYER
+   DarkGrid · GlowingEffect · LumaBar · StatCard Halo
+══════════════════════════════════════════════════════ */
+
+/* ─── STAT CARDS (.sc) — StatCard halo pattern ──── */
+.stats {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+  margin-bottom:28px;
+}
+.sc {
+  position:relative;
+  padding:18px 16px;
+  background:linear-gradient(135deg,rgba(9,9,11,.82),rgba(13,11,28,.72));
+  border:1px solid rgba(39,39,42,.95);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow:hidden;
+  transition:border-color .3s,box-shadow .3s,transform .25s cubic-bezier(.22,1,.36,1);
+  cursor:default;
+}
+.sc::before {
+  content:'';
+  position:absolute;
+  top:-80%; left:-80%;
+  width:260%; height:260%;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(124,58,237,.065) 20%,
+    transparent 40%,
+    rgba(34,211,238,.045) 60%,
+    transparent 80%
+  );
+  animation:haloSpin21 14s linear infinite;
+  pointer-events:none;
+  z-index:0;
+}
+.sc:hover {
+  border-color:rgba(124,58,237,.42);
+  box-shadow:0 4px 28px rgba(0,0,0,.5),0 0 0 1px rgba(124,58,237,.12) inset;
+  transform:translateY(-2px);
+}
+.sc:hover::before { animation-duration:7s; }
+.sc-ico {
+  position:relative;
+  z-index:1;
+  width:36px; height:36px;
+  background:rgba(124,58,237,.14);
+  border:1px solid rgba(124,58,237,.25);
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--purple);
+}
+.sc-ico svg { width:16px; height:16px; }
+.sc-val {
+  position:relative;
+  z-index:1;
+  font-family:'Space Grotesk',system-ui;
+  font-size:30px;
+  font-weight:700;
+  line-height:1;
+  background:var(--grad-r);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.sc-lbl {
+  position:relative;
+  z-index:1;
+  font-size:11px;
+  font-weight:500;
+  color:var(--txt3);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+@keyframes haloSpin21 {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+
+/* ─── SUBJECT CARDS (.scard.ci) — DarkGrid pattern ─ */
+.scard {
+  padding:0 !important;
+  background:linear-gradient(to bottom,rgba(9,9,11,.72),rgba(9,9,11,.38)) !important;
+  border:1px solid rgba(39,39,42,.95) !important;
+  border-radius:22px !important;
+  overflow:visible !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:0 !important;
+  cursor:pointer !important;
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:border-color .3s,box-shadow .3s !important;
+  position:relative;
+}
+/* Violet radial glow follows mouse */
+.scard.ci::before {
+  content:'' !important;
+  position:absolute !important;
+  inset:0 !important;
+  border-radius:22px !important;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(124,58,237,.12) 0%,transparent 60%) !important;
+  opacity:0 !important;
+  transition:opacity .3s !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+}
+.scard.ci:hover::before { opacity:1 !important; }
+/* Top-left corner glass shine on hover */
+.scard.ci::after {
+  content:'' !important;
+  position:absolute !important;
+  inset:0 !important;
+  border-radius:inherit !important;
+  background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%) !important;
+  opacity:0 !important;
+  transition:opacity .3s !important;
+  pointer-events:none !important;
+  z-index:2 !important;
+}
+.scard.ci:hover::after { opacity:1 !important; }
+.scard.ci:hover {
+  border-color:rgba(124,58,237,.48) !important;
+  box-shadow:
+    0 0 0 1px rgba(124,58,237,.14) inset,
+    0 8px 40px rgba(0,0,0,.55) !important;
+}
+
+/* ── DarkGrid corner squares ─ */
+.sc-corner {
+  position:absolute;
+  width:10px; height:10px;
+  background:#ffffff;
+  opacity:0;
+  transition:opacity .25s,transform .25s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
+  z-index:10;
+  transform:scale(.5);
+}
+.sc-corner.tl { top:-5px; left:-5px; }
+.sc-corner.tr { top:-5px; right:-5px; }
+.sc-corner.bl { bottom:-5px; left:-5px; }
+.sc-corner.br { bottom:-5px; right:-5px; }
+.scard:hover .sc-corner { opacity:1; transform:scale(1); }
+
+/* ── GlowingEffect conic border ─ */
+.glow-ring {
+  position:absolute;
+  inset:-1px;
+  border-radius:23px;
+  pointer-events:none;
+  z-index:0;
+  background:conic-gradient(
+    from calc(var(--ring-start,0) * 1deg),
+    rgba(124,58,237,0) 0deg,
+    rgba(124,58,237,.85) 28deg,
+    rgba(34,211,238,.65) 52deg,
+    rgba(124,58,237,.2) 76deg,
+    rgba(124,58,237,0) 100deg
+  );
+  opacity:var(--ring-active,0);
+  transition:opacity .35s;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1px;
+}
+
+/* ── Card colored header ─ */
+.scard-h {
+  height:84px;
+  border-radius:21px 21px 0 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.scard-h::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.1) 0%,rgba(0,0,0,.12) 100%);
+}
+.scard-ico {
+  font-size:38px;
+  line-height:1;
+  position:relative;
+  z-index:1;
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,.35));
+}
+
+/* ── Card body ─ */
+.scard-b {
+  padding:14px 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  position:relative;
+  z-index:3;
+  flex:1;
+}
+.scard-n {
+  font-family:'Space Grotesk',system-ui !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+  color:var(--txt) !important;
+  letter-spacing:-.15px !important;
+}
+.scard-st {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+.scard-st span {
+  font-size:11px;
+  color:var(--txt3);
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:6px;
+  padding:2px 7px;
+}
+.spbar {
+  margin-top:4px;
+  height:3px;
+  background:rgba(255,255,255,.06);
+  border-radius:2px;
+  overflow:hidden;
+}
+.spfill {
+  height:100%;
+  border-radius:2px;
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.scard-acts {
+  display:flex;
+  gap:5px;
+  margin-top:6px;
+}
+.sact {
+  padding:4px 9px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;
+  color:var(--txt3);
+  font-size:11px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.sact:hover { background:rgba(255,255,255,.1); color:var(--txt); }
+.sact.del:hover { background:rgba(239,68,68,.12); color:var(--red); border-color:rgba(239,68,68,.28); }
+
+/* Add subject button */
+.sadd {
+  border-radius:22px !important;
+  background:rgba(124,58,237,.03) !important;
+  border-color:rgba(124,58,237,.2) !important;
+  transition:all .25s !important;
+}
+.sadd:hover {
+  border-color:rgba(124,58,237,.45) !important;
+  background:rgba(124,58,237,.07) !important;
+  transform:translateY(-2px) !important;
+  box-shadow:0 4px 20px rgba(124,58,237,.12) !important;
+}
+
+/* ─── LumaBar dock — sliding glow indicator ──────── */
+.nexus-dock {
+  padding:8px 12px !important;
+  gap:4px !important;
+  background:rgba(5,4,16,.93) !important;
+  border-color:rgba(255,255,255,.06) !important;
+  box-shadow:
+    0 24px 64px rgba(0,0,0,.88),
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 0 48px rgba(124,58,237,.07) !important;
+  overflow:visible !important;
+}
+/* Sliding radial glow under active button */
+.nexus-dock::before {
+  content:'';
+  position:absolute;
+  width:74px; height:74px;
+  background:radial-gradient(circle,rgba(124,58,237,.4) 0%,transparent 70%);
+  border-radius:50%;
+  top:50%;
+  transform:translateY(-50%) translateX(-50%);
+  left:var(--dock-gx,50%);
+  transition:left .45s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
+  z-index:0;
+}
+.dock-btn {
+  position:relative !important;
+  z-index:1 !important;
+  padding:10px 20px !important;
+  border-radius:16px !important;
+  min-width:72px !important;
+  transition:all .25s cubic-bezier(.22,1,.36,1) !important;
+}
+.dock-btn:hover {
+  transform:translateY(-4px) !important;
+  background:rgba(255,255,255,.05) !important;
+  color:var(--txt) !important;
+}
+.dock-btn.active {
+  background:rgba(124,58,237,.18) !important;
+  color:var(--purple) !important;
+  box-shadow:0 0 0 1px rgba(124,58,237,.28),0 0 20px rgba(124,58,237,.18) inset !important;
+}
+.dock-btn.active::after {
+  width:26px !important;
+  height:2px !important;
+  background:linear-gradient(90deg,var(--violet),var(--cyan)) !important;
+  box-shadow:0 0 14px var(--gv) !important;
+  bottom:5px !important;
+}
+
+/* ─── Auth card premium ──────────────────────────── */
+.auth-card {
+  background:linear-gradient(145deg,rgba(12,10,30,.97),rgba(7,6,15,1)) !important;
+  border-color:rgba(124,58,237,.24) !important;
+  box-shadow:
+    0 40px 100px rgba(0,0,0,.92),
+    0 0 0 1px rgba(124,58,237,.1) inset,
+    0 0 80px rgba(124,58,237,.06) !important;
+}
+#auth-screen {
+  background:rgba(3,2,12,.98) !important;
+}
+.auth-tab.act {
+  background:var(--gp) !important;
+  color:#fff !important;
+  box-shadow:0 0 20px rgba(124,58,237,.3) !important;
+}
+
+/* ─── Page title gradient ────────────────────────── */
+.pt {
+  font-size:26px !important;
+  font-weight:700 !important;
+  letter-spacing:-1px !important;
+  background:var(--grad-r);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* ─── Chapter item cards ─────────────────────────── */
+.icard {
+  background:linear-gradient(to right,rgba(9,9,11,.65),rgba(9,9,11,.42)) !important;
+  border-color:rgba(39,39,42,.9) !important;
+  transition:all .22s cubic-bezier(.22,1,.36,1) !important;
+}
+.icard:hover {
+  border-color:rgba(124,58,237,.42) !important;
+  transform:translateX(6px) !important;
+  background:rgba(15,12,35,.72) !important;
+  box-shadow:-4px 0 0 0 rgba(124,58,237,.52),0 4px 20px rgba(0,0,0,.4) !important;
+}
+
+/* ─── Reduced motion ─────────────────────────────── */
+@media (prefers-reduced-motion:reduce) {
+  .sc::before { animation:none !important; }
+  .glow-ring { display:none !important; }
+  .sc-corner { transition:none !important; }
+}
 </style>
 </head>
 <body>
@@ -5489,6 +5865,105 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateBC();
   await initSupabase();
 });
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     21st.dev INTERACTION LAYER
+     DarkGrid corners · GlowingEffect ring · LumaBar dock
+══════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── Inject corner squares + glow ring into a card ── */
+function decorCard(card){
+  if(card.dataset.d21)return;
+  card.dataset.d21='1';
+  // White corner squares (DarkGrid pattern)
+  ['tl','tr','bl','br'].forEach(function(p){
+    var c=document.createElement('div');
+    c.className='sc-corner '+p;
+    card.appendChild(c);
+  });
+  // Conic glow border ring (GlowingEffect pattern)
+  var ring=document.createElement('div');
+  ring.className='glow-ring';
+  card.insertBefore(ring,card.firstChild);
+}
+
+/* ── Process all existing subject cards ─────────── */
+function processCards(){
+  document.querySelectorAll('.scard.ci').forEach(decorCard);
+}
+
+/* ── GlowingEffect: conic gradient border tracks mouse ── */
+document.addEventListener('pointermove',function(e){
+  document.querySelectorAll('.scard.ci').forEach(function(card){
+    var rect=card.getBoundingClientRect();
+    if(!rect.width)return;
+    var ring=card.querySelector('.glow-ring');
+    if(!ring)return;
+    var prox=72;
+    var near=e.clientX>rect.left-prox&&e.clientX<rect.right+prox&&
+             e.clientY>rect.top-prox&&e.clientY<rect.bottom+prox;
+    ring.style.setProperty('--ring-active',near?'1':'0');
+    if(near){
+      var cx=rect.left+rect.width/2;
+      var cy=rect.top+rect.height/2;
+      var angle=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI+90;
+      ring.style.setProperty('--ring-start',angle.toFixed(1));
+    }
+  });
+},{passive:true});
+
+/* ── LumaBar dock: sliding radial glow under active btn ── */
+function syncDock(){
+  var dock=document.querySelector('.nexus-dock');
+  var active=document.querySelector('.dock-btn.active');
+  if(!dock||!active)return;
+  var dr=dock.getBoundingClientRect();
+  var ar=active.getBoundingClientRect();
+  dock.style.setProperty('--dock-gx',(ar.left-dr.left+ar.width/2)+'px');
+}
+
+/* ── MutationObserver: catch dynamically rendered cards ── */
+var obs=new MutationObserver(function(muts){
+  muts.forEach(function(m){
+    m.addedNodes.forEach(function(n){
+      if(n.nodeType!==1)return;
+      if(n.matches&&n.matches('.scard.ci'))decorCard(n);
+      if(n.querySelectorAll)n.querySelectorAll('.scard.ci').forEach(decorCard);
+    });
+  });
+});
+
+/* ── Init ─────────────────────────────────────────── */
+function init(){
+  processCards();
+  syncDock();
+  obs.observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('.dock-btn'))setTimeout(syncDock,80);
+  });
+  // Also sync on nav (the app's nav() function updates active class)
+  var _origNav=window.nav;
+  if(typeof _origNav==='function'){
+    window.nav=function(view,params){
+      var r=_origNav(view,params);
+      setTimeout(syncDock,120);
+      setTimeout(processCards,200);
+      return r;
+    };
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
+
+})();
 </script>
 </body>
 </html>
