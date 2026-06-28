@@ -1853,6 +1853,145 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
   .sc::before { animation:none !important; }
   .glow-ring { display:none !important; }
   .sc-corner { transition:none !important; }
+  .nhero-dot { animation:none !important; }
+}
+
+/* ═══════════════════════════════════════════════════
+   NHERO — Quantam Mysh Hero + Hero 1 (21st.dev)
+   Full-width hero banner for home screen
+═══════════════════════════════════════════════════ */
+.nhero {
+  position:relative;
+  width:100%;
+  padding:52px 24px 48px;
+  margin-bottom:28px;
+  border-radius:28px;
+  background:linear-gradient(180deg,rgba(18,12,42,.55) 0%,rgba(7,6,15,.88) 100%);
+  border:1px solid rgba(255,255,255,.055);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:14px;
+}
+/* Hero 1 — grid line overlay */
+.nhero-grid {
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(124,58,237,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,.055) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 85% 85% at 50% 50%,#000 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 85% 85% at 50% 50%,#000 30%,transparent 100%);
+  pointer-events:none;
+  z-index:0;
+}
+/* Quantam Mysh — bottom radial glow */
+.nhero-glow {
+  position:absolute;
+  bottom:-30px;
+  left:50%;
+  transform:translateX(-50%);
+  width:75%;
+  height:200px;
+  background:radial-gradient(ellipse at center bottom,
+    rgba(124,58,237,.38) 0%,
+    rgba(34,211,238,.14) 38%,
+    transparent 68%
+  );
+  pointer-events:none;
+  filter:blur(20px);
+  z-index:0;
+}
+/* Badge pill */
+.nhero-badge {
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:5px 16px;
+  background:rgba(124,58,237,.1);
+  border:1px solid rgba(124,58,237,.3);
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  color:rgba(167,139,250,.9);
+  letter-spacing:.05em;
+}
+/* Pulsing live dot */
+.nhero-dot {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#10b981;
+  box-shadow:0 0 8px #10b981;
+  flex-shrink:0;
+  animation:dotPulse21 2.4s ease-in-out infinite;
+}
+@keyframes dotPulse21 {
+  0%,100% { opacity:1; box-shadow:0 0 8px #10b981; }
+  50%      { opacity:.55; box-shadow:0 0 18px #10b981,0 0 32px rgba(16,185,129,.35); }
+}
+/* Large gradient hero title */
+.nhero-title {
+  position:relative;
+  z-index:2;
+  font-family:'Space Grotesk',system-ui;
+  font-size:clamp(30px,5vw,54px);
+  font-weight:800;
+  letter-spacing:-1.5px;
+  line-height:1.1;
+  background:linear-gradient(135deg,#fff 0%,rgba(196,181,253,.9) 50%,rgba(34,211,238,.8) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin:0;
+}
+/* Hero subtitle */
+.nhero-sub {
+  position:relative;
+  z-index:2;
+  font-size:15px;
+  color:rgba(161,161,170,.75);
+  line-height:1.6;
+  margin:0;
+  max-width:460px;
+}
+/* CTA button */
+.nhero-cta {
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:11px 24px;
+  background:linear-gradient(135deg,rgba(124,58,237,.88),rgba(109,40,217,.96));
+  border:1px solid rgba(167,139,250,.28);
+  border-radius:12px;
+  color:#fff;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 4px 28px rgba(124,58,237,.38),0 0 0 1px rgba(124,58,237,.18) inset;
+  margin-top:4px;
+}
+.nhero-cta:hover {
+  background:linear-gradient(135deg,rgba(139,92,246,.92),rgba(124,58,237,1));
+  transform:translateY(-3px);
+  box-shadow:0 10px 36px rgba(124,58,237,.52),0 0 0 1px rgba(167,139,250,.32) inset;
+}
+.nhero-cta:active { transform:translateY(-1px); }
+
+/* Section header */
+.sgrid-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
 }
 </style>
 </head>
@@ -1904,17 +2043,33 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 
       <!-- HOME -->
       <div class="view active" id="v-home">
-        <div class="ph">
-          <div>
-            <div class="pt">Mes Matières</div>
-            <div class="ps" id="home-sub">Sélectionne une matière pour commencer</div>
+
+        <!-- ══ HERO BANNER — Quantam Mysh + Hero 1 (21st.dev) ══ -->
+        <div class="nhero" id="nhero">
+          <!-- Background grid lines (Hero 1 pattern) -->
+          <div class="nhero-grid"></div>
+          <!-- Bottom radial glow (Quantam Mysh pattern) -->
+          <div class="nhero-glow"></div>
+          <!-- Badge pill -->
+          <div class="nhero-badge">
+            <span class="nhero-dot"></span>
+            EducXP Platform · 2025
           </div>
-          <button class="btn bp" onclick="openSubjectModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <!-- Main greeting title -->
+          <h1 class="nhero-title" id="nhero-greeting">Bon apprentissage !</h1>
+          <!-- Subtitle -->
+          <p class="nhero-sub" id="home-sub">Ton campus d'apprentissage intelligent</p>
+          <!-- Quick CTA -->
+          <button class="nhero-cta" onclick="openSubjectModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Nouvelle matière
           </button>
         </div>
+
         <div class="stats" id="home-stats"></div>
+        <div class="sgrid-header">
+          <div class="pt">Mes Matières</div>
+        </div>
         <div class="sgrid" id="home-grid"></div>
       </div>
 
@@ -2653,9 +2808,20 @@ function renderHome() {
   `;
 
   const sub = document.getElementById('home-sub');
+  const hero = document.getElementById('nhero-greeting');
   const h = new Date().getHours();
   const greet = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
-  sub.textContent = `${greet} ! ${S.subjects.length ? 'Quelle matière aujourd\'hui ?' : 'Crée ta première matière pour commencer.'}`;
+  const userName = (currentUser?.email || '').split('@')[0];
+  const displayName = userName ? ` ${userName.charAt(0).toUpperCase() + userName.slice(1)}` : '';
+  if (hero) hero.textContent = `${greet}${displayName} !`;
+  const motivations = [
+    'Quelle matière attaque-t-on aujourd\'hui ?',
+    'Continue sur ta lancée — chaque chapitre compte.',
+    'Prêt à progresser ? Choisis ta matière.',
+    'Le savoir est ta super-puissance. À toi de jouer !',
+  ];
+  const motiv = motivations[Math.floor((S.xp || 0) % motivations.length)];
+  sub.textContent = S.subjects.length ? motiv : 'Crée ta première matière pour commencer.';
 
   const grid = document.getElementById('home-grid');
   let html = '';
