@@ -1857,6 +1857,233 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
 }
 
 /* ═══════════════════════════════════════════════════
+   SEARCH OVERLAY
+═══════════════════════════════════════════════════ */
+.search-overlay {
+  position:fixed; inset:0;
+  background:rgba(3,2,12,.9);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  z-index:900;
+  display:none; flex-direction:column;
+  align-items:center; padding:72px 20px 40px;
+}
+.search-overlay.open { display:flex; }
+.search-box {
+  width:100%; max-width:620px;
+  display:flex; gap:10px; align-items:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(124,58,237,.42);
+  border-radius:18px; padding:13px 18px;
+  box-shadow:0 0 0 4px rgba(124,58,237,.1),0 32px 64px rgba(0,0,0,.7);
+}
+.search-ico-svg { color:rgba(124,58,237,.8); flex-shrink:0; }
+.search-inp {
+  flex:1; background:none; border:none; outline:none;
+  font-size:17px; font-family:inherit; color:var(--txt);
+}
+.search-inp::placeholder { color:var(--txt3); }
+.search-close-btn {
+  background:none; border:none; color:var(--txt3);
+  font-size:18px; cursor:pointer; padding:4px;
+  transition:color .15s;
+}
+.search-close-btn:hover { color:var(--txt); }
+.search-results {
+  width:100%; max-width:620px; margin-top:16px;
+  overflow-y:auto; max-height:calc(100vh - 220px);
+  display:flex; flex-direction:column; gap:6px;
+}
+.search-empty {
+  text-align:center; color:var(--txt3); padding:40px 20px;
+  font-size:14px;
+}
+.sr-group-title {
+  font-size:11px; font-weight:700; color:var(--txt3);
+  text-transform:uppercase; letter-spacing:.06em;
+  padding:8px 12px 4px;
+}
+.sr-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:12px; cursor:pointer; transition:all .15s;
+}
+.sr-item:hover { background:rgba(124,58,237,.1); border-color:rgba(124,58,237,.32); }
+.sr-ico { font-size:20px; flex-shrink:0; }
+.sr-main { flex:1; min-width:0; }
+.sr-name { font-weight:600; font-size:14px; color:var(--txt); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sr-meta { font-size:12px; color:var(--txt3); margin-top:1px; }
+.sr-tag {
+  font-size:10px; font-weight:700; padding:2px 8px;
+  border-radius:6px; background:rgba(124,58,237,.14);
+  color:var(--purple); flex-shrink:0;
+}
+.search-trigger {
+  padding:8px 10px; background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08); border-radius:10px;
+  color:var(--txt2); cursor:pointer; display:flex;
+  align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.search-trigger:hover { background:rgba(124,58,237,.15); color:var(--purple); border-color:rgba(124,58,237,.3); }
+
+/* ═══════════════════════════════════════════════════
+   ONBOARDING OVERLAY
+═══════════════════════════════════════════════════ */
+.onboard-overlay {
+  position:fixed; inset:0;
+  background:rgba(3,2,12,.94);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  z-index:950; display:none;
+  align-items:center; justify-content:center; padding:20px;
+}
+.onboard-overlay.open { display:flex; }
+.onboard-card {
+  background:linear-gradient(145deg,rgba(14,11,32,.98),rgba(7,6,15,1));
+  border:1px solid rgba(124,58,237,.28); border-radius:28px;
+  padding:36px 32px; max-width:460px; width:100%;
+  box-shadow:0 40px 100px rgba(0,0,0,.9),0 0 80px rgba(124,58,237,.08);
+  animation:slideUp .3s cubic-bezier(.22,1,.36,1);
+}
+.onboard-dots {
+  display:flex; gap:6px; margin-bottom:28px;
+}
+.onboard-dot {
+  height:3px; flex:1; border-radius:2px;
+  background:rgba(255,255,255,.1); transition:background .3s;
+}
+.onboard-dot.act { background:var(--violet); }
+.onboard-step-ico {
+  width:52px; height:52px; border-radius:16px;
+  background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; margin-bottom:18px;
+}
+.onboard-title {
+  font-family:'Space Grotesk',system-ui;
+  font-size:21px; font-weight:800; letter-spacing:-.4px;
+  color:var(--txt); margin-bottom:10px;
+}
+.onboard-desc { font-size:14px; color:var(--txt2); line-height:1.65; }
+.onboard-nav {
+  display:flex; justify-content:space-between;
+  align-items:center; margin-top:30px; gap:10px;
+}
+.onboard-skip { background:none; border:none; color:var(--txt3); font-size:13px; cursor:pointer; font-family:inherit; }
+.onboard-skip:hover { color:var(--txt2); }
+.onboard-next {
+  padding:11px 28px; background:var(--gp); border:none;
+  border-radius:12px; color:#fff; font-size:14px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:all .2s;
+  box-shadow:0 4px 24px rgba(124,58,237,.38);
+}
+.onboard-next:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(124,58,237,.5); }
+
+/* ═══════════════════════════════════════════════════
+   EDITOR FORMATTING TOOLBAR
+═══════════════════════════════════════════════════ */
+.ced-fmt-bar {
+  display:flex; align-items:center; gap:2px;
+  padding:6px 10px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px 12px 0 0; border-bottom:none;
+  flex-wrap:wrap;
+}
+.fmt-btn {
+  padding:5px 10px; background:none;
+  border:1px solid transparent; border-radius:7px;
+  color:var(--txt2); font-size:13px; font-weight:700;
+  cursor:pointer; font-family:inherit;
+  transition:all .15s; line-height:1;
+}
+.fmt-btn:hover { background:rgba(124,58,237,.15); color:var(--purple); border-color:rgba(124,58,237,.25); }
+.fmt-sep { width:1px; height:18px; background:rgba(255,255,255,.1); margin:0 3px; flex-shrink:0; }
+.fmt-preview-btn {
+  margin-left:auto; padding:5px 13px;
+  background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.25);
+  border-radius:7px; color:var(--purple); font-size:12px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.fmt-preview-btn:hover { background:rgba(124,58,237,.2); }
+.fmt-preview-btn.act { background:rgba(124,58,237,.25); color:#d4b4ff; }
+.ced-preview-pane {
+  display:none; padding:18px 22px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.07); border-top:none;
+  min-height:260px; font-size:15px; line-height:1.75;
+  color:var(--txt); overflow-y:auto;
+}
+.ced-preview-pane h1 { font-size:21px; font-weight:800; margin:14px 0 6px; color:var(--purple); }
+.ced-preview-pane h2 { font-size:17px; font-weight:700; margin:12px 0 5px; color:var(--cyan); }
+.ced-preview-pane h3 { font-size:14px; font-weight:700; margin:10px 0 4px; color:var(--txt); text-transform:uppercase; letter-spacing:.05em; }
+.ced-preview-pane strong { color:#fff; font-weight:700; }
+.ced-preview-pane em { color:var(--xp); font-style:italic; }
+.ced-preview-pane code { background:rgba(124,58,237,.18); padding:2px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:.86em; }
+.ced-preview-pane blockquote { border-left:3px solid var(--violet); padding-left:14px; color:var(--txt2); margin:10px 0; }
+.ced-preview-pane ul,
+.ced-preview-pane ol { padding-left:22px; margin:6px 0; }
+.ced-preview-pane li { margin:3px 0; }
+.ced-preview-pane hr { border:none; border-top:1px solid rgba(255,255,255,.1); margin:16px 0; }
+.ced-preview-pane p { margin:6px 0; }
+.course-ta.hidden { display:none; }
+
+/* ═══════════════════════════════════════════════════
+   QUIZ CONFIG
+═══════════════════════════════════════════════════ */
+.quiz-cfg-panel {
+  padding:18px; background:rgba(124,58,237,.07);
+  border:1px solid rgba(124,58,237,.2); border-radius:16px;
+  display:flex; flex-direction:column; gap:14px;
+  margin-top:12px;
+}
+.qcfg-title { font-size:13px; font-weight:700; color:var(--txt); }
+.qcfg-label { font-size:11px; color:var(--txt3); text-transform:uppercase; letter-spacing:.04em; margin-bottom:5px; }
+.qcfg-row { display:flex; gap:6px; flex-wrap:wrap; }
+.qcfg-opt {
+  padding:6px 14px; background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1); border-radius:9px;
+  font-size:13px; font-weight:600; color:var(--txt2);
+  cursor:pointer; transition:all .15s; font-family:inherit;
+}
+.qcfg-opt.sel {
+  background:rgba(124,58,237,.2); border-color:rgba(124,58,237,.5); color:var(--purple);
+}
+
+/* ═══════════════════════════════════════════════════
+   XP INFO TOOLTIP
+═══════════════════════════════════════════════════ */
+.xp-info-wrap { position:relative; display:flex; align-items:center; }
+.xp-info-btn {
+  width:15px; height:15px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+  color:var(--txt3); font-size:9px; font-weight:700;
+  cursor:pointer; display:flex; align-items:center;
+  justify-content:center; transition:all .15s;
+  flex-shrink:0; margin-left:4px; font-family:inherit;
+}
+.xp-info-btn:hover { background:rgba(124,58,237,.2); color:var(--purple); border-color:rgba(124,58,237,.4); }
+.xp-tooltip {
+  position:absolute; bottom:calc(100% + 8px); right:0;
+  background:rgba(10,8,28,.98); border:1px solid rgba(124,58,237,.32);
+  border-radius:14px; padding:14px 16px;
+  font-size:12px; color:var(--txt2); line-height:1.6;
+  width:230px; z-index:300;
+  box-shadow:0 16px 48px rgba(0,0,0,.8);
+  display:none; pointer-events:none;
+}
+.xp-tooltip.open { display:block; }
+.xp-tip-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:5px; }
+.xp-tip-ico { color:var(--purple); flex-shrink:0; }
+
+/* CCF info */
+.sc[data-tip] { cursor:help; }
+.sc[data-tip] .sc-lbl::after { content:' ⓘ'; font-size:9px; opacity:.55; }
+
+/* ═══════════════════════════════════════════════════
    NHERO — Quantam Mysh Hero + Hero 1 (21st.dev)
    Full-width hero banner for home screen
 ═══════════════════════════════════════════════════ */
@@ -2026,7 +2253,22 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
         <span id="hStreak">0</span>j
       </div>
+      <div class="xp-info-wrap">
+        <button class="xp-info-btn" onclick="toggleXpTip(this)" title="Comment gagner de l'XP ?">?</button>
+        <div class="xp-tooltip" id="xp-tooltip">
+          <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px">Comment gagner de l'XP</div>
+          <div class="xp-tip-row"><span class="xp-tip-ico">📖</span><span>Créer un chapitre : +5 XP</span></div>
+          <div class="xp-tip-row"><span class="xp-tip-ico">📝</span><span>Terminer un quiz : +10–30 XP</span></div>
+          <div class="xp-tip-row"><span class="xp-tip-ico">🃏</span><span>Maîtriser toutes les flashcards : +20 XP</span></div>
+          <div class="xp-tip-row"><span class="xp-tip-ico">📋</span><span>Générer une fiche de révision : +10 XP</span></div>
+          <div class="xp-tip-row"><span class="xp-tip-ico">📷</span><span>Ajouter une photo de cours : +3 XP</span></div>
+        </div>
+      </div>
     </div>
+
+    <button class="search-trigger" onclick="openSearch()" title="Rechercher (matières, chapitres)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
 
     <div class="nexus-user" id="user-chip" onclick="handleUserChip()">
       <div class="user-av-ring" id="user-av">?</div>
@@ -2053,7 +2295,7 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
           <!-- Badge pill -->
           <div class="nhero-badge">
             <span class="nhero-dot"></span>
-            EducXP Platform · 2025
+            Cours · IA · Quiz · Révisions
           </div>
           <!-- Main greeting title -->
           <h1 class="nhero-title" id="nhero-greeting">Bon apprentissage !</h1>
@@ -2438,6 +2680,49 @@ select.inp option { background:#0D0B1F; color:var(--txt) }
   </div>
 </div>
 
+<!-- SEARCH OVERLAY -->
+<div id="search-overlay" class="search-overlay" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box">
+    <svg class="search-ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input id="search-inp" class="search-inp" placeholder="Chercher une matière, un chapitre..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape')closeSearch()">
+    <button class="search-close-btn" onclick="closeSearch()">✕</button>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboard-overlay" class="onboard-overlay">
+  <div class="onboard-card" id="onboard-card"></div>
+</div>
+
+<!-- QUIZ CONFIG MODAL -->
+<div class="overlay" id="m-quiz-cfg">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('m-quiz-cfg')">✕</button>
+    <div class="mtitle">Configurer le Quiz</div>
+    <div class="fg">
+      <div class="qcfg-label">Nombre de questions</div>
+      <div class="qcfg-row" id="qcfg-n-row">
+        <button class="qcfg-opt sel" onclick="selectQCfg('n',5,this)">5</button>
+        <button class="qcfg-opt" onclick="selectQCfg('n',10,this)">10</button>
+        <button class="qcfg-opt" onclick="selectQCfg('n',15,this)">15</button>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="qcfg-label">Difficulté</div>
+      <div class="qcfg-row" id="qcfg-d-row">
+        <button class="qcfg-opt sel" onclick="selectQCfg('d','auto',this)">Auto</button>
+        <button class="qcfg-opt" onclick="selectQCfg('d','easy',this)">Facile</button>
+        <button class="qcfg-opt" onclick="selectQCfg('d','hard',this)">Difficile</button>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn bg" onclick="closeModal('m-quiz-cfg')">Annuler</button>
+      <button class="btn bp" onclick="launchConfiguredQuiz()">Générer le Quiz</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <img id="lightbox-img" src="" alt="">
@@ -2803,7 +3088,7 @@ function renderHome() {
   document.getElementById('home-stats').innerHTML = `
     <div class="sc"><div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div class="sc-val">${S.subjects.length}</div><div class="sc-lbl">Matières</div></div>
     <div class="sc"><div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div><div class="sc-val">${totalChapters}</div><div class="sc-lbl">Chapitres</div></div>
-    <div class="sc"><div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 12h6M9 16h4"/></svg></div><div class="sc-val">${totalCCF}</div><div class="sc-lbl">CCF enregistrés</div></div>
+    <div class="sc" data-tip="CCF = Contrôle en Cours de Formation. Notes de tes évaluations continues (oraux, TP, devoirs surveillés)."><div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 12h6M9 16h4"/></svg></div><div class="sc-val">${totalCCF}</div><div class="sc-lbl">CCF enregistrés ⓘ</div></div>
     <div class="sc"><div class="sc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="sc-val">${avgScore}%</div><div class="sc-lbl">Score moyen quiz</div></div>
   `;
 
@@ -3056,6 +3341,20 @@ function renderChapter() {
         </div>
       </div>
       <input type="file" id="img-upload" accept="image/*" multiple capture="environment" style="display:none" onchange="handleImgUpload(event)">
+      <div class="ced-fmt-bar">
+        <button class="fmt-btn" onclick="fmtWrap('**','**')" title="Gras (Ctrl+B)"><b>G</b></button>
+        <button class="fmt-btn" onclick="fmtWrap('*','*')" title="Italique"><i style="font-style:italic">I</i></button>
+        <div class="fmt-sep"></div>
+        <button class="fmt-btn" onclick="fmtLine('## ')" title="Titre principal">H1</button>
+        <button class="fmt-btn" onclick="fmtLine('### ')" title="Sous-titre">H2</button>
+        <div class="fmt-sep"></div>
+        <button class="fmt-btn" onclick="fmtLine('- ')" title="Liste à puces">• Liste</button>
+        <button class="fmt-btn" onclick="fmtInsert('\\n---\\n')" title="Séparateur horizontal">—</button>
+        <button class="fmt-btn" onclick="fmtWrap('\`','\`')" title="Code / formule"><span style="font-family:monospace">{ }</span></button>
+        <div class="fmt-sep"></div>
+        <button class="fmt-preview-btn" id="preview-toggle-btn" onclick="togglePreview()">👁 Aperçu</button>
+      </div>
+      <div class="ced-preview-pane" id="ced-preview-pane"></div>
       <textarea class="course-ta" id="course-ta" placeholder="Écris ou colle ton cours ici...
 &#10;📷 Prends tes notes en photo — l'IA extrait le texte automatiquement
 &#10;🎤 Dicte à la voix avec le bouton Dicter
@@ -3198,15 +3497,43 @@ function setAIBtnLoading(id, loading) {
 // ═══════════════════════════════════════════════════
 //  AI: QUIZ GENERATION
 // ═══════════════════════════════════════════════════
+let quizCfg = { n: 5, difficulty: 'auto' };
+
+function selectQCfg(type, val, btn) {
+  const rowId = type === 'n' ? 'qcfg-n-row' : 'qcfg-d-row';
+  document.querySelectorAll('#' + rowId + ' .qcfg-opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  if (type === 'n') quizCfg.n = val;
+  else quizCfg.difficulty = val;
+}
+
 async function startAIQuiz() {
   const sub = S.subjects.find(s => s.id === R.subjectId);
   const ch = sub?.chapters?.find(c => c.id === R.chapterId);
   if (!ch) return;
 
   if (ch.quiz?.length) {
-    nav('quiz', { subjectId: R.subjectId, chapterId: R.chapterId });
-    return;
+    // Quiz exists — offer to replay OR reconfigure
+    const choice = confirm('Un quiz existe déjà. OK = le rejouer | Annuler = générer un nouveau quiz');
+    if (choice) {
+      nav('quiz', { subjectId: R.subjectId, chapterId: R.chapterId });
+      return;
+    }
   }
+  // Open config modal
+  quizCfg = { n: 5, difficulty: 'auto' };
+  document.querySelectorAll('#qcfg-n-row .qcfg-opt').forEach((b,i) => b.classList.toggle('sel', i===0));
+  document.querySelectorAll('#qcfg-d-row .qcfg-opt').forEach((b,i) => b.classList.toggle('sel', i===0));
+  openModal('m-quiz-cfg');
+}
+
+async function launchConfiguredQuiz() {
+  closeModal('m-quiz-cfg');
+  const sub = S.subjects.find(s => s.id === R.subjectId);
+  const ch = sub?.chapters?.find(c => c.id === R.chapterId);
+  if (!sub || !ch) return;
+  ch.quiz = null;
+  save();
   await generateAndStartQuiz(sub, ch);
 }
 
@@ -3214,13 +3541,18 @@ async function generateAndStartQuiz(sub, ch) {
   setAIBtnLoading('btn-quiz', true);
   toast('ai', AI_MSGS[Math.floor(Math.random() * AI_MSGS.length)], 5000);
 
+  const n = quizCfg.n || 5;
+  const diffHint = quizCfg.difficulty === 'easy' ? ' Niveau facile : questions directes sur des définitions et faits.'
+                 : quizCfg.difficulty === 'hard' ? ' Niveau difficile : questions d\'analyse, d\'application et de raisonnement.'
+                 : '';
+
   try {
-    const system = `Tu es un professeur expert en ${sub.name}. Génère exactement 5 questions QCM sur le cours fourni.
+    const system = `Tu es un professeur expert en ${sub.name}. Génère exactement ${n} questions QCM sur le cours fourni.${diffHint}
 Réponds UNIQUEMENT avec du JSON valide, sans aucun texte autour.
 Format EXACT: {"quiz":[{"q":"question","opts":["option A","option B","option C","option D"],"correct":0,"exp":"explication courte"}]}
 "correct" = index (0-3) de la bonne réponse. Sois précis et basé uniquement sur le contenu.`;
 
-    const userMsg = `Matière: ${sub.name}\nChapitre: ${ch.title}\n\nCours:\n${(ch.content || '').substring(0, 3500)}\n\nGénère 5 QCM JSON.`;
+    const userMsg = `Matière: ${sub.name}\nChapitre: ${ch.title}\n\nCours:\n${(ch.content || '').substring(0, 3500)}\n\nGénère ${n} QCM JSON.`;
     const raw = await callAI(system, userMsg, 'quiz');
     const parsed = parseAIJSON(raw);
 
@@ -3228,7 +3560,7 @@ Format EXACT: {"quiz":[{"q":"question","opts":["option A","option B","option C",
 
     ch.quiz = parsed.quiz;
     save();
-    toast('ok', '✅ Quiz généré !');
+    toast('ok', `✅ Quiz ${n} questions généré !`);
     nav('quiz', { subjectId: sub.id, chapterId: ch.id });
   } catch (e) {
     toast('err', '❌ Erreur IA : ' + (e.message || 'Réessaie'));
@@ -3500,11 +3832,15 @@ function renderFC() {
       <button class="btn" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)" onclick="markUnknown()">✗ À revoir</button>
     </div>
     ${fcState.idx === total - 1 && fcState.known.size > 0 ? `
-      <div style="margin-top:20px;text-align:center;padding:20px;background:var(--sur);border-radius:var(--r16);border:1px solid var(--brd)">
-        <div style="font-size:24px;margin-bottom:8px">${known === total ? '🏆' : '📊'}</div>
-        <div style="font-weight:700;font-size:16px">${known}/${total} cartes connues</div>
-        <div style="font-size:13px;color:var(--txt2);margin-top:4px">${known === total ? 'Parfait ! Tu maîtrises tout !' : 'Continue à réviser les cartes restantes !'}</div>
-        <button class="btn bp" style="margin-top:14px" onclick="regenAndFlashcards()">Régénérer</button>
+      <div style="margin-top:20px;text-align:center;padding:22px;background:var(--sur);border-radius:var(--r16);border:1px solid var(--brd)">
+        <div style="font-size:26px;margin-bottom:8px">${known === total ? '🏆' : '📊'}</div>
+        <div style="font-weight:800;font-size:17px">${known}/${total} cartes maîtrisées</div>
+        <div style="font-size:13px;color:var(--txt2);margin-top:4px">${known === total ? 'Parfait ! Tu maîtrises tout !' : `Encore ${total - known} carte${total-known>1?'s':''} à revoir.`}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px">
+          ${known < total ? `<button class="btn" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red)" onclick="retryWrongFC()">✗ Revoir les ${total - known} erreur${total-known>1?'s':''}</button>` : ''}
+          <button class="btn bp" onclick="regenAndFlashcards()">Régénérer</button>
+          <button class="btn bg" onclick="navBack()">← Retour</button>
+        </div>
       </div>
     ` : ''}
   `;
@@ -4972,6 +5308,10 @@ async function loadFromSupabase() {
       DB.save('eduxp_player', S.player);
       renderView(); renderHUD();
       toast('ok', '☁️ Données synchronisées !');
+      setTimeout(initOnboarding, 800);
+    } else {
+      renderView(); renderHUD();
+      setTimeout(initOnboarding, 600);
     }
     setSyncState('ok');
   } catch (e) {
@@ -6030,6 +6370,179 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderView();
   updateBC();
   await initSupabase();
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     NEW FEATURES: Search · Onboarding · Editor Toolbar · FC Retry · XP Tip
+══════════════════════════════════════════════════════ -->
+<script>
+// ─── SEARCH ───────────────────────────────────────
+function openSearch() {
+  var overlay = document.getElementById('search-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  var inp = document.getElementById('search-inp');
+  if (inp) { inp.value = ''; inp.focus(); }
+  doSearch('');
+}
+function closeSearch() {
+  document.getElementById('search-overlay')?.classList.remove('open');
+}
+function doSearch(q) {
+  var container = document.getElementById('search-results');
+  if (!container) return;
+  q = (q || '').toLowerCase().trim();
+  if (!q) {
+    container.innerHTML = '<div class="search-empty">Tape le nom d\'une matière ou d\'un chapitre…</div>';
+    return;
+  }
+  var subjectHits = [], chapterHits = [];
+  (S.subjects || []).forEach(function(sub) {
+    if (sub.name.toLowerCase().includes(q)) subjectHits.push(sub);
+    (sub.chapters || []).forEach(function(ch) {
+      if (ch.title.toLowerCase().includes(q) || (ch.content || '').toLowerCase().includes(q))
+        chapterHits.push({ sub: sub, ch: ch });
+    });
+  });
+  if (!subjectHits.length && !chapterHits.length) {
+    container.innerHTML = '<div class="search-empty">Aucun résultat pour «&nbsp;' + esc(q) + '&nbsp;»</div>';
+    return;
+  }
+  var html = '';
+  if (subjectHits.length) {
+    html += '<div class="sr-group-title">Matières</div>';
+    subjectHits.forEach(function(sub) {
+      html += '<div class="sr-item" onclick="closeSearch();nav(\'subject\',{subjectId:\''+sub.id+'\'})">'
+        + '<div class="sr-ico">'+(sub.icon||'📚')+'</div>'
+        + '<div class="sr-main"><div class="sr-name">'+esc(sub.name)+'</div>'
+        + '<div class="sr-meta">'+(sub.chapters?.length||0)+' chapitre(s)</div></div>'
+        + '<div class="sr-tag">Matière</div></div>';
+    });
+  }
+  if (chapterHits.length) {
+    html += '<div class="sr-group-title">Chapitres</div>';
+    chapterHits.slice(0, 12).forEach(function(item) {
+      var preview = (item.ch.content || '').replace(/[#*\-`>]/g,'').substring(0,55);
+      html += '<div class="sr-item" onclick="closeSearch();nav(\'chapter\',{subjectId:\''+item.sub.id+'\',chapterId:\''+item.ch.id+'\'})">'
+        + '<div class="sr-ico">'+(item.sub.icon||'📖')+'</div>'
+        + '<div class="sr-main"><div class="sr-name">'+esc(item.ch.title)+'</div>'
+        + '<div class="sr-meta">'+esc(item.sub.name)+(preview?' · '+esc(preview)+'…':'')+'</div></div>'
+        + '<div class="sr-tag">Chapitre</div></div>';
+    });
+  }
+  container.innerHTML = html;
+}
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+
+// ─── ONBOARDING ───────────────────────────────────
+var ONBOARD_STEPS = [
+  { ico:'📚', title:'Bienvenue sur EducXP !', desc:'Ta plateforme scolaire tout-en-un. Organise tes cours, génère des quiz, crée des flashcards — tout avec l\'IA. En 3 étapes tu seras opérationnel.' },
+  { ico:'✏️', title:'Crée tes matières', desc:'Clique sur "Nouvelle matière" depuis l\'accueil. Donne-lui un nom, une couleur et une icône. Ajoute ensuite des chapitres et colle-y ton cours.' },
+  { ico:'🤖', title:'L\'IA fait le reste', desc:'Une fois ton cours ajouté, génère automatiquement un Quiz, des Flashcards ou une Fiche de révision en un clic. Tu peux aussi dicter à la voix ou importer des photos.' },
+  { ico:'🏆', title:'Gagne de l\'XP !', desc:'Chaque quiz, flashcard et fiche te rapporte de l\'XP. Monte de niveau en révisant. Utilise la recherche (🔍 ou Ctrl+K) pour retrouver n\'importe quel chapitre.' }
+];
+var _onboardStep = 0;
+function initOnboarding() {
+  if (localStorage.getItem('eduxp_onboard')) return;
+  _onboardStep = 0;
+  renderOnboardStep();
+  document.getElementById('onboard-overlay')?.classList.add('open');
+}
+function renderOnboardStep() {
+  var step = ONBOARD_STEPS[_onboardStep];
+  var total = ONBOARD_STEPS.length;
+  var isLast = _onboardStep === total - 1;
+  var card = document.getElementById('onboard-card');
+  if (!card || !step) return;
+  card.innerHTML =
+    '<div class="onboard-dots">'
+    + ONBOARD_STEPS.map(function(_,i){ return '<div class="onboard-dot '+(i<=_onboardStep?'act':'')+'"></div>'; }).join('')
+    + '</div>'
+    + '<div class="onboard-step-ico">'+step.ico+'</div>'
+    + '<div class="onboard-title">'+step.title+'</div>'
+    + '<div class="onboard-desc">'+step.desc+'</div>'
+    + '<div class="onboard-nav">'
+    + '<button class="onboard-skip" onclick="closeOnboarding()">Passer</button>'
+    + '<button class="onboard-next" onclick="'+(isLast?'closeOnboarding()':'nextOnboard()')+'">'+( isLast?'🚀 C\'est parti !':'Suivant →')+'</button>'
+    + '</div>';
+}
+function nextOnboard() { _onboardStep++; if (_onboardStep >= ONBOARD_STEPS.length) closeOnboarding(); else renderOnboardStep(); }
+function closeOnboarding() { localStorage.setItem('eduxp_onboard','1'); document.getElementById('onboard-overlay')?.classList.remove('open'); }
+
+// ─── EDITOR FORMAT TOOLBAR ───────────────────────
+function getTA() { return document.getElementById('course-ta'); }
+function fmtWrap(pre, suf) {
+  var ta = getTA(); if (!ta) return;
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  var sel = ta.value.substring(s, e) || 'texte';
+  ta.setRangeText(pre + sel + suf, s, e, 'select');
+  ta.focus(); ta.dispatchEvent(new Event('input'));
+}
+function fmtLine(prefix) {
+  var ta = getTA(); if (!ta) return;
+  var pos = ta.selectionStart;
+  var lineStart = ta.value.lastIndexOf('\n', pos - 1) + 1;
+  var cur = ta.value.substring(lineStart, lineStart + prefix.length);
+  if (cur === prefix) ta.setRangeText('', lineStart, lineStart + prefix.length, 'end');
+  else ta.setRangeText(prefix, lineStart, lineStart, 'end');
+  ta.focus(); ta.dispatchEvent(new Event('input'));
+}
+function fmtInsert(text) {
+  var ta = getTA(); if (!ta) return;
+  var pos = ta.selectionStart;
+  ta.setRangeText(text, pos, pos, 'end');
+  ta.focus(); ta.dispatchEvent(new Event('input'));
+}
+var _previewOn = false;
+function togglePreview() {
+  var ta = getTA();
+  var pane = document.getElementById('ced-preview-pane');
+  var btn = document.getElementById('preview-toggle-btn');
+  if (!ta || !pane || !btn) return;
+  _previewOn = !_previewOn;
+  if (_previewOn) {
+    pane.innerHTML = parseMarkdown(ta.value) || '<span style="color:var(--txt3);font-size:13px">Rien à prévisualiser — écris d\'abord ton cours.</span>';
+    pane.style.display = 'block'; ta.classList.add('hidden');
+    btn.classList.add('act'); btn.textContent = '✎ Éditer';
+  } else {
+    pane.style.display = 'none'; ta.classList.remove('hidden');
+    btn.classList.remove('act'); btn.textContent = '👁 Aperçu';
+  }
+}
+
+// ─── FLASHCARD RETRY ──────────────────────────────
+function retryWrongFC() {
+  var wrongCards = fcState.cards.filter(function(_, i){ return !fcState.known.has(i); });
+  if (!wrongCards.length) return;
+  fcState.cards = wrongCards;
+  fcState.idx = 0; fcState.known = new Set(); fcState.flipped = false;
+  toast('ok', '🔁 ' + wrongCards.length + ' carte' + (wrongCards.length > 1 ? 's' : '') + ' à retravailler');
+  renderFC();
+}
+
+// ─── XP INFO TOOLTIP ─────────────────────────────
+function toggleXpTip(btn) {
+  var tip = document.getElementById('xp-tooltip');
+  if (!tip) return;
+  var isOpen = tip.classList.contains('open');
+  tip.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    setTimeout(function() {
+      document.addEventListener('click', function closeXpTip(e) {
+        if (!btn.contains(e.target)) { tip.classList.remove('open'); document.removeEventListener('click', closeXpTip); }
+      });
+    }, 10);
+  }
+}
+
+// CCF stat tooltip via data-tip
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.sc[data-tip]').forEach(function(card) { card.title = card.dataset.tip; });
+  initOnboarding();
 });
 </script>
 
